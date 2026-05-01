@@ -12,7 +12,7 @@
 A lightweight, robust JavaScript library for currency operations with precision and reliability. Designed to handle monetary values safely, avoiding floating point issues common in financial calculations. Inspired by the lib of the same name [currency.js](https://www.npmjs.com/package/currency.js).
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/eriveltondasilva/currency.js/main/assets/currency-banner.png" alt="Currency.js Banner" width="600">
+  <img src="https://raw.githubusercontent.com/eriveltondasilva/currency.js/main/src/assets/currency-banner.png" alt="Currency.js Banner" width="600">
 </p>
 
 ## 📖 Table of Contents <!-- omit in toc -->
