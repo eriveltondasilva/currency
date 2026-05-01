@@ -1,1 +1,2 @@
-npm run fmt
+# .husky/pre-commit
+bunx lint-staged
