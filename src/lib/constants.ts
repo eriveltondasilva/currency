@@ -1,4 +1,4 @@
-import type { FormatOptions } from './types';
+import type { MoneyOptions } from '../types';
 
 export const TAG = Symbol('@eriveltondasilva/currency');
 
@@ -10,6 +10,7 @@ export const ROUNDING_MODES = {
   CEIL: 'ceil',
   TRUNC: 'trunc',
 } as const;
+export type RoundingMode = (typeof ROUNDING_MODES)[keyof typeof ROUNDING_MODES];
 
 export const CURRENCY_LOCALES = {
   BRL: 'pt-BR',
@@ -19,13 +20,14 @@ export const CURRENCY_LOCALES = {
   JPY: 'ja-JP',
   CNY: 'zh-CN',
 } as const;
+export type CurrencyCode = keyof typeof CURRENCY_LOCALES;
+export type CurrencyLocale = (typeof CURRENCY_LOCALES)[CurrencyCode];
 
 export const FORMAT_STYLES = {
   CURRENCY: 'currency',
   DECIMAL: 'decimal',
 } as const;
 
-export const DEFAULT_FORMAT_OPTIONS = {
+export const DEFAULT_MONEY_OPTIONS = {
   currencyCode: 'USD',
-  locale: CURRENCY_LOCALES.USD,
-} as const satisfies FormatOptions;
+} as const satisfies MoneyOptions;

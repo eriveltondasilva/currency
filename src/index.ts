@@ -3,13 +3,11 @@ import { factories } from './factories';
 // ─── Exports ─────────────────────────────────────────────────────────────────
 
 // Types
+export type { CurrencyCode, CurrencyLocale, RoundingMode } from './lib/constants';
 export type {
-  CurrencyCode,
-  CurrencyLocale,
-  FormatOptions,
   MoneyInput,
+  MoneyOptions,
   PricedItem,
-  RoundingMode,
 } from './types';
 
 export {
@@ -19,7 +17,7 @@ export {
   InvalidPercentageError,
   InvalidRangeError,
   MoneyError,
-} from './errors';
+} from './lib/errors';
 export { BRL, CNY, EUR, GBP, JPY, USD } from './presets';
 
 // Core class

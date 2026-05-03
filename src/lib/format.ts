@@ -1,25 +1,13 @@
-import type { DisplayOptions } from '@/types';
+import type { FormatOptions } from '@/types';
 import type { MoneyContract } from '@/types/money';
 
-import { FORMAT_STYLES } from '@/constants';
+import { DEFAULT_MONEY_OPTIONS, FORMAT_STYLES } from '@/lib/constants';
+import { resolveLocale } from '@/lib/utils';
 
-/**
- * Formats a monetary value as a localized string using `Intl.NumberFormat`.
- *
- * @param money   - A Money instance, a number, or a string representing the amount.
- * @param options - Formatting options (currency code, locale, symbol visibility, etc.).
- *
- * @throws {InvalidInputError} if `input` is null or undefined.
- *
- * @example
- * formatMoney(10.5, { currencyCode: 'BRL' })
- * // → 'R$ 10,50'
- *
- * formatMoney(1000, { currencyCode: 'USD', showSymbol: false })
- * // → '1,000.00'
- */
-export function formatMoney(money: MoneyContract, options: Partial<DisplayOptions>): string {
-  const { currencyCode, locale, showSymbol = true } = options;
+export function formatMoney(money: MoneyContract, options: FormatOptions): string {
+  const currencyCode = options.currencyCode ?? DEFAULT_MONEY_OPTIONS.currencyCode;
+  const locale = resolveLocale({ currencyCode, locale: options.locale });
+  const showSymbol = options.showSymbol ?? true;
 
   const { minimumFractionDigits, maximumFractionDigits } = new Intl.NumberFormat(locale, {
     style: FORMAT_STYLES.CURRENCY,

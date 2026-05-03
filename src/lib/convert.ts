@@ -1,15 +1,18 @@
-import type { CurrencyLocale, MoneyInput } from '@/types';
+import type { CurrencyLocale } from '@/lib/constants';
 
-import { CENT_FACTOR } from '@/constants';
-import { InvalidInputError } from '@/errors';
-import { isMoney, isNil, isString } from '@/utils';
+import { CENT_FACTOR, CURRENCY_LOCALES, DEFAULT_MONEY_OPTIONS } from '@/lib/constants';
+import { InvalidInputError } from '@/lib/errors';
+import { isMoney, isNil, isString } from '@/lib/utils';
 
-// ─── Internal helpers ─────────────────────────────────────────────────────────
+// ─── Internal helpers ────────────────────────────────────────────────────────
+
 type Separators = { decimal: string; group: string };
 
-const separatorCache = new Map<string, Separators>();
+const separatorCache = new Map<CurrencyLocale, Separators>();
 
-function getSeparators(locale: string): Separators {
+const DEFAULT_LOCALE: CurrencyLocale = CURRENCY_LOCALES[DEFAULT_MONEY_OPTIONS.currencyCode];
+
+function getSeparators(locale: CurrencyLocale): Separators {
   if (separatorCache.has(locale)) return separatorCache.get(locale) as Separators;
 
   const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
@@ -22,7 +25,7 @@ function getSeparators(locale: string): Separators {
   return result;
 }
 
-function normalizeDecimal(input: string, locale: string): string {
+function normalizeDecimal(input: string, locale: CurrencyLocale): string {
   const { decimal, group } = getSeparators(locale);
 
   return input.replace(new RegExp(RegExp.escape(group), 'g'), '').replace(decimal, '.');
@@ -35,30 +38,24 @@ function numberToMinorUnit(input: number): number {
   return input === 0 ? 0 : Math.round(input * CENT_FACTOR);
 }
 
-function stringToMinorUnit(input: string, locale: string): number {
+function stringToMinorUnit(input: string, locale: CurrencyLocale): number {
   const cleaned = input.trim().replace(/[^\d.,+-]/g, '');
 
   if (cleaned === '' || cleaned === '-' || cleaned === '+') return 0;
 
-  const parsed = Number.parseFloat(normalizeDecimal(cleaned, locale));
+  const normalized = normalizeDecimal(cleaned, locale);
+  const parsed = Number.parseFloat(normalized);
 
   if (Number.isNaN(parsed)) {
-    throw new InvalidInputError(`Cannot parse "${input}" as a monetary value.`);
+    throw new InvalidInputError(`Cannot parse "${input}" as a monetary value.`, input);
   }
 
   return numberToMinorUnit(parsed);
 }
 
-// ─── Public ───────────────────────────────────────────────────────────────────
+// ─── Main ────────────────────────────────────────────────────────────────────
 
-/**
- * Converts any accepted monetary input to integer minor units (e.g. cents).
- *
- * String parsing uses `locale` to detect separators automatically.
- *
- * @throws {InvalidInputError} if the value is null, undefined, NaN, or Infinity.
- */
-export function toMinorUnit(input: MoneyInput, locale: CurrencyLocale): number {
+export function toMinorUnit(input: unknown, locale: CurrencyLocale = DEFAULT_LOCALE): number {
   if (isNil(input)) {
     throw new InvalidInputError('Value cannot be null or undefined.', input);
   }
