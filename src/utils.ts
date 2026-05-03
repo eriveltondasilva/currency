@@ -1,35 +1,41 @@
+/** Internal utility functions. */
+
+import type { MoneyContract } from './types/money';
+
+import { TAG } from './constants';
+
 export function isNil(value: unknown): value is null | undefined {
-  return value === null || value === undefined;
+  return value == null;
 }
 
 export function isString(value: unknown): value is string {
   return typeof value === 'string';
 }
 
-export function isArray<T = unknown>(value: unknown): value is T[] {
+export function isNumber(value: unknown): value is number {
+  return typeof value === 'number';
+}
+
+export function isArray(value: unknown): value is unknown[] {
   return Array.isArray(value);
 }
 
-export function isObject(value: unknown): value is object {
-  return typeof value === 'object' && !isNil(value) && !isArray(value);
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 export function isEmpty(value: unknown): boolean {
-  if (isNil(value)) {
-    return true;
-  }
-
-  if (isString(value)) {
-    return value.trim().length === 0;
-  }
-
-  if (isArray(value)) {
-    return value.length === 0;
-  }
-
-  if (isObject(value)) {
-    return Object.keys(value).length === 0;
-  }
-
+  if (isNil(value)) return true;
+  if (isString(value)) return value.trim().length === 0;
+  if (isArray(value)) return value.length === 0;
+  if (isRecord(value)) return Object.keys(value).length === 0;
+  if (value instanceof Set || value instanceof Map) return value.size === 0;
   return false;
+}
+export function isFiniteNumber(value: unknown): value is number {
+  return isNumber(value) && Number.isFinite(value);
+}
+
+export function isMoney(value: unknown): value is MoneyContract {
+  return isRecord(value) && '_tag' in value && value._tag === TAG;
 }
