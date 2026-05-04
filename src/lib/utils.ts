@@ -1,9 +1,8 @@
-/** Internal utility functions. */
-
-import type { MoneyOptions } from '@/types';
 import type { MoneyContract } from '@/types/money';
 
-import { CURRENCY_LOCALES, type CurrencyLocale, TAG } from '@/lib/constants';
+import { type CountryCode, CURRENCIES, type CurrencyConfig, SUPPORTED_CODES } from './currencies';
+import { InvalidInputError } from './errors';
+import { TAG } from '@/lib/constants';
 
 export function isNil(value: unknown): value is null | undefined {
   return value == null;
@@ -25,6 +24,10 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+export function isMoney(value: unknown): value is MoneyContract {
+  return isRecord(value) && '_tag' in value && value._tag === TAG;
+}
+
 export function isEmpty(value: unknown): boolean {
   if (isNil(value)) return true;
   if (isString(value)) return value.trim().length === 0;
@@ -33,14 +36,21 @@ export function isEmpty(value: unknown): boolean {
   return false;
 }
 
-export function isFiniteNumber(value: unknown): value is number {
-  return isNumber(value) && Number.isFinite(value);
-}
+/**
+ * Resolves a CountryCode string to its CurrencyConfig.
+ * Validates at runtime — safe for JavaScript consumers.
+ *
+ * @throws {InvalidInputError} if the code is not supported.
+ */
+export function resolveCurrency(region: string): CurrencyConfig {
+  const config = CURRENCIES[region as CountryCode];
 
-export function isMoney(value: unknown): value is MoneyContract {
-  return isRecord(value) && '_tag' in value && value._tag === TAG;
-}
+  if (!config) {
+    throw new InvalidInputError(
+      `'${region}' is not a supported currency region. Supported codes: ${SUPPORTED_CODES}.`,
+      region,
+    );
+  }
 
-export function resolveLocale(options: MoneyOptions): CurrencyLocale {
-  return options.locale ?? CURRENCY_LOCALES[options.currencyCode];
+  return config;
 }

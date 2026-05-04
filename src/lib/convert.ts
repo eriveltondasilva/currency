@@ -1,68 +1,61 @@
-import type { CurrencyLocale } from '@/lib/constants';
+import type { CurrencyConfig } from './currencies';
 
-import { CENT_FACTOR, CURRENCY_LOCALES, DEFAULT_MONEY_OPTIONS } from '@/lib/constants';
+import { DEFAULT_CURRENCY } from '@/lib/currencies';
 import { InvalidInputError } from '@/lib/errors';
 import { isMoney, isNil, isString } from '@/lib/utils';
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
-type Separators = { decimal: string; group: string };
-
-const separatorCache = new Map<CurrencyLocale, Separators>();
-
-const DEFAULT_LOCALE: CurrencyLocale = CURRENCY_LOCALES[DEFAULT_MONEY_OPTIONS.currencyCode];
-
-function getSeparators(locale: CurrencyLocale): Separators {
-  if (separatorCache.has(locale)) return separatorCache.get(locale) as Separators;
-
-  const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
-  const result = {
-    decimal: parts.find((p) => p.type === 'decimal')?.value ?? '.',
-    group: parts.find((p) => p.type === 'group')?.value ?? ',',
-  };
-
-  separatorCache.set(locale, result);
-  return result;
-}
-
-function normalizeDecimal(input: string, locale: CurrencyLocale): string {
-  const { decimal, group } = getSeparators(locale);
+function normalizeDecimal(input: string, currency: CurrencyConfig): string {
+  const { decimal, group } = currency;
 
   return input.replace(new RegExp(RegExp.escape(group), 'g'), '').replace(decimal, '.');
 }
 
-function numberToMinorUnit(input: number): number {
-  if (!Number.isFinite(input)) {
-    throw new InvalidInputError(`Expected a finite number, got ${input}.`);
+function numberToMinorUnit(input: number, minorUnit: number): number {
+  if (Number.isNaN(input)) {
+    throw new InvalidInputError('Expected a finite number, got NaN.', input);
   }
-  return input === 0 ? 0 : Math.round(input * CENT_FACTOR);
+
+  if (!Number.isFinite(input)) {
+    throw new InvalidInputError(
+      `Expected a finite number, got ${input > 0 ? '+Infinity' : '-Infinity'}.`,
+      input,
+    );
+  }
+
+  return input === 0 ? 0 : Math.round(input * minorUnit);
 }
 
-function stringToMinorUnit(input: string, locale: CurrencyLocale): number {
+function stringToMinorUnit(input: string, currency: CurrencyConfig): number {
   const cleaned = input.trim().replace(/[^\d.,+-]/g, '');
 
   if (cleaned === '' || cleaned === '-' || cleaned === '+') return 0;
 
-  const normalized = normalizeDecimal(cleaned, locale);
+  const normalized = normalizeDecimal(cleaned, currency);
   const parsed = Number.parseFloat(normalized);
 
   if (Number.isNaN(parsed)) {
-    throw new InvalidInputError(`Cannot parse "${input}" as a monetary value.`, input);
+    throw new InvalidInputError(
+      `Cannot parse "${input}" as a monetary value. ` +
+        `Expected a number using "${currency.decimal}" as decimal separator.`,
+      input,
+    );
   }
 
-  return numberToMinorUnit(parsed);
+  return numberToMinorUnit(parsed, currency.minorUnit);
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 
-export function toMinorUnit(input: unknown, locale: CurrencyLocale = DEFAULT_LOCALE): number {
+export function toMinorUnit(input: unknown, currency: CurrencyConfig = DEFAULT_CURRENCY): number {
   if (isNil(input)) {
-    throw new InvalidInputError('Value cannot be null or undefined.', input);
+    throw new InvalidInputError(`Value cannot be null or undefined. Received: ${input}.`, input);
   }
 
-  if (isMoney(input)) return input.cents();
+  if (isMoney(input)) return input.amount();
 
-  if (isString(input)) return stringToMinorUnit(input, locale);
+  if (isString(input)) return stringToMinorUnit(input, currency);
 
-  return numberToMinorUnit(Number(input));
+  return numberToMinorUnit(Number(input), currency.minorUnit);
 }

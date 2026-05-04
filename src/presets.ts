@@ -1,25 +1,36 @@
-import type { FormatOptions, MoneyInput } from './types';
+import type { MoneyInput } from './types';
+import type { MoneyContract } from './types/money';
 
-import { factories as Money } from './factories';
+import { from } from './factories';
 
-// ─── Currency presets ─────────────────────────────────────────────────────────
+export function BR(value: MoneyInput): MoneyContract {
+  return from(value, 'BR');
+}
 
-type PresetOptions = Omit<FormatOptions, 'currencyCode'>;
+export function US(value: MoneyInput): MoneyContract {
+  return from(value, 'US');
+}
 
-export const BRL = (value: MoneyInput, options: PresetOptions = {}) =>
-  Money.from(value, { ...options, currencyCode: 'BRL' });
+export function DE(value: MoneyInput): MoneyContract {
+  return from(value, 'DE');
+}
 
-export const USD = (value: MoneyInput, options: PresetOptions = {}) =>
-  Money.from(value, { ...options, currencyCode: 'USD' });
+export function FR(value: MoneyInput): MoneyContract {
+  return from(value, 'FR');
+}
 
-export const EUR = (value: MoneyInput, options: PresetOptions = {}) =>
-  Money.from(value, { ...options, currencyCode: 'EUR' });
+export function PT(value: MoneyInput): MoneyContract {
+  return from(value, 'PT');
+}
 
-export const GBP = (value: MoneyInput, options: PresetOptions = {}) =>
-  Money.from(value, { ...options, currencyCode: 'GBP' });
+export function GB(value: MoneyInput): MoneyContract {
+  return from(value, 'GB');
+}
 
-export const JPY = (value: MoneyInput, options: PresetOptions = {}) =>
-  Money.from(value, { ...options, currencyCode: 'JPY' });
+export function JP(value: MoneyInput): MoneyContract {
+  return from(value, 'JP');
+}
 
-export const CNY = (value: MoneyInput, options: PresetOptions = {}) =>
-  Money.from(value, { ...options, currencyCode: 'CNY' });
+export function CN(value: MoneyInput): MoneyContract {
+  return from(value, 'CN');
+}

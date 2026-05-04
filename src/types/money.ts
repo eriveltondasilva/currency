@@ -1,10 +1,10 @@
 import type { RoundingMode } from '@/lib/constants';
-import type { MoneyInput, MoneyOptions } from '@/types';
+import type { FormatOptions, MoneyInput } from '@/types';
 
 export interface MoneyContract {
   // ─── Accessors ────────────────────────────────────────────────────────
 
-  cents(): number;
+  amount(): number;
 
   value(): number;
 
@@ -24,9 +24,9 @@ export interface MoneyContract {
 
   // ─── Arithmetic ───────────────────────────────────────────────────────
 
-  plus(value: MoneyInput): MoneyContract;
+  plus(input: MoneyInput): MoneyContract;
 
-  minus(value: MoneyInput): MoneyContract;
+  minus(input: MoneyInput): MoneyContract;
 
   times(factor: number): MoneyContract;
 
@@ -38,23 +38,23 @@ export interface MoneyContract {
 
   negate(): MoneyContract;
 
-  max(value: MoneyInput): MoneyContract;
+  max(input: MoneyInput): MoneyContract;
 
-  min(value: MoneyInput): MoneyContract;
+  min(input: MoneyInput): MoneyContract;
 
   round(precision: number, mode?: RoundingMode): MoneyContract;
 
   // ─── Comparison ───────────────────────────────────────────────────────
 
-  equals(value: MoneyInput): boolean;
+  equals(input: MoneyInput): boolean;
 
-  greaterThan(value: MoneyInput): boolean;
+  greaterThan(input: MoneyInput): boolean;
 
-  lessThan(value: MoneyInput): boolean;
+  lessThan(input: MoneyInput): boolean;
 
-  greaterThanOrEqual(value: MoneyInput): boolean;
+  greaterThanOrEqual(input: MoneyInput): boolean;
 
-  lessThanOrEqual(value: MoneyInput): boolean;
+  lessThanOrEqual(input: MoneyInput): boolean;
 
   isBetween(min: MoneyInput, max: MoneyInput): boolean;
 
@@ -70,7 +70,7 @@ export interface MoneyContract {
 
   // ─── conversion ─────────────────────────────────────────────
 
-  format(options?: MoneyOptions): string;
+  format(options?: FormatOptions): string;
 
   clone(): MoneyContract;
 

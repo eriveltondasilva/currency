@@ -1,16 +1,17 @@
-import { factories } from './factories';
+import * as factories from './factories';
 
 // ─── Exports ─────────────────────────────────────────────────────────────────
 
 // Types
-export type { CurrencyCode, CurrencyLocale, RoundingMode } from './lib/constants';
+export type { RoundingMode } from './lib/constants';
 export type {
+  FormatOptions,
   MoneyInput,
-  MoneyOptions,
   PricedItem,
 } from './types';
 
 export {
+  CurrencyMismatchError,
   DivisionByZeroError,
   InvalidAllocationError,
   InvalidInputError,
@@ -18,7 +19,6 @@ export {
   InvalidRangeError,
   MoneyError,
 } from './lib/errors';
-export { BRL, CNY, EUR, GBP, JPY, USD } from './presets';
 
 // Core class
 export const Money = Object.freeze(factories);
