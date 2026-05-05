@@ -72,20 +72,20 @@ export class Money implements MoneyContract {
 
   // ─── Private helpers ───────────────────────────────────────────────────────
 
-  // TODO: implementar #assertSameCurrency
   #assertSameCurrency(input: MoneyInput): void {
     if (isMoney(input) && input.currencyCode() !== this.#currency.code) {
       throw new CurrencyMismatchError(this.#currency.code, input.currencyCode());
     }
   }
 
+  #resolve(input: MoneyInput): number {
+    this.#assertSameCurrency(input);
+    return toMinorUnit(input, this.#currency);
+  }
+
   #make(amount: number): MoneyContract {
     return new Money(SKIP_CONVERT, this.#currency, Math.round(amount));
   }
-
-  // #clone(): MoneyContract {
-  //   return new Money(SKIP_CONVERT, this.#currency, this.#amount);
-  // }
 
   // ─── Accessors ────────────────────────────────────────────────────────────
 
@@ -132,15 +132,11 @@ export class Money implements MoneyContract {
   // ─── Arithmetic ───────────────────────────────────────────────────────────
 
   plus(input: MoneyInput): MoneyContract {
-    this.#assertSameCurrency(input);
-    const addend = toMinorUnit(input, this.#currency);
-    return addend === 0 ? this.#make(this.#amount) : this.#make(this.#amount + addend);
+    return this.#make(this.#amount + this.#resolve(input));
   }
 
   minus(input: MoneyInput): MoneyContract {
-    this.#assertSameCurrency(input);
-    const subtrahend = toMinorUnit(input, this.#currency);
-    return subtrahend === 0 ? this.#make(this.#amount) : this.#make(this.#amount - subtrahend);
+    return this.#make(this.#amount - this.#resolve(input));
   }
 
   times(factor: number): MoneyContract {
@@ -149,6 +145,7 @@ export class Money implements MoneyContract {
     }
 
     if (factor === 0) return Money.zero(this.#currency);
+
     if (factor === 1) return this.#make(this.#amount);
 
     return this.#make(this.#amount * factor);
@@ -177,14 +174,12 @@ export class Money implements MoneyContract {
   }
 
   max(input: MoneyInput): MoneyContract {
-    this.#assertSameCurrency(input);
-    const other = toMinorUnit(input, this.#currency);
+    const other = this.#resolve(input);
     return this.#amount >= other ? this.#make(this.#amount) : this.#make(other);
   }
 
   min(input: MoneyInput): MoneyContract {
-    this.#assertSameCurrency(input);
-    const other = toMinorUnit(input, this.#currency);
+    const other = this.#resolve(input);
     return this.#amount <= other ? this.#make(this.#amount) : this.#make(other);
   }
 
@@ -208,32 +203,28 @@ export class Money implements MoneyContract {
   // ─── Comparison ───────────────────────────────────────────────────────────
 
   equals(input: MoneyInput): boolean {
-    this.#assertSameCurrency(input);
-    return this.#amount === toMinorUnit(input, this.#currency);
+    return this.#amount === this.#resolve(input);
   }
+
   greaterThan(input: MoneyInput): boolean {
-    this.#assertSameCurrency(input);
-    return this.#amount > toMinorUnit(input, this.#currency);
+    return this.#amount > this.#resolve(input);
   }
+
   lessThan(input: MoneyInput): boolean {
-    this.#assertSameCurrency(input);
-    return this.#amount < toMinorUnit(input, this.#currency);
+    return this.#amount < this.#resolve(input);
   }
+
   greaterThanOrEqual(input: MoneyInput): boolean {
-    this.#assertSameCurrency(input);
-    return this.#amount >= toMinorUnit(input, this.#currency);
+    return this.#amount >= this.#resolve(input);
   }
+
   lessThanOrEqual(input: MoneyInput): boolean {
-    this.#assertSameCurrency(input);
-    return this.#amount <= toMinorUnit(input, this.#currency);
+    return this.#amount <= this.#resolve(input);
   }
 
   isBetween(min: MoneyInput, max: MoneyInput): boolean {
-    this.#assertSameCurrency(min);
-    this.#assertSameCurrency(max);
-
-    const minAmount = toMinorUnit(min, this.#currency);
-    const maxAmount = toMinorUnit(max, this.#currency);
+    const minAmount = this.#resolve(min);
+    const maxAmount = this.#resolve(max);
 
     if (minAmount > maxAmount) throw new InvalidRangeError();
 
@@ -243,7 +234,9 @@ export class Money implements MoneyContract {
   // ─── Business ─────────────────────────────────────────────────────────────
 
   percentage(percent: number): MoneyContract {
-    if (percent <= 0) throw new InvalidPercentageError('Percentage must be greater than zero.');
+    if (percent < 0) throw new InvalidPercentageError('Percentage must be non-negative.');
+
+    if (percent === 0) return Money.zero(this.#currency);
 
     if (percent === 100) return this.#make(this.#amount);
 
@@ -263,7 +256,9 @@ export class Money implements MoneyContract {
   }
 
   applySurcharge(surcharge: number): MoneyContract {
-    if (surcharge <= 0) throw new InvalidPercentageError('Surcharge must be greater than zero.');
+    if (surcharge < 0) throw new InvalidPercentageError('Surcharge must be non-negative.');
+
+    if (surcharge === 0) return this.#make(this.#amount);
 
     return this.plus(this.percentage(surcharge));
   }
