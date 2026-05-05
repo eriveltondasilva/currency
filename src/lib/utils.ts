@@ -28,20 +28,6 @@ export function isMoney(value: unknown): value is MoneyContract {
   return isRecord(value) && '_tag' in value && value._tag === TAG;
 }
 
-export function isEmpty(value: unknown): boolean {
-  if (isNil(value)) return true;
-  if (isString(value)) return value.trim().length === 0;
-  if (isArray(value)) return value.length === 0;
-  if (isRecord(value)) return Object.keys(value).length === 0;
-  return false;
-}
-
-/**
- * Resolves a CountryCode string to its CurrencyConfig.
- * Validates at runtime — safe for JavaScript consumers.
- *
- * @throws {InvalidInputError} if the code is not supported.
- */
 export function resolveCurrency(region: string): CurrencyConfig {
   const config = CURRENCIES[region as CountryCode];
 

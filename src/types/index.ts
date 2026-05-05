@@ -4,8 +4,6 @@ import type { MoneyContract } from './money';
 
 export type MoneyInput = number | string | MoneyContract;
 
-export type Maybe<T> = T | null | undefined;
-
 // ─── Format options ───────────────────────────────────────────────────────────
 
 export interface FormatOptions {
@@ -48,6 +46,6 @@ export interface FormatOptions {
 // ─── Other ───────────────────────────────────────────────────────────────────
 
 export interface PricedItem {
-  price: Maybe<MoneyInput>;
+  price: MoneyInput;
   quantity?: number;
 }

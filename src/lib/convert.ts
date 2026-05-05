@@ -6,10 +6,14 @@ import { isMoney, isNil, isString } from '@/lib/utils';
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function normalizeDecimal(input: string, currency: CurrencyConfig): string {
   const { decimal, group } = currency;
 
-  return input.replace(new RegExp(RegExp.escape(group), 'g'), '').replace(decimal, '.');
+  return input.replace(new RegExp(escapeRegex(group), 'g'), '').replace(decimal, '.');
 }
 
 function numberToMinorUnit(input: number, minorUnit: number): number {

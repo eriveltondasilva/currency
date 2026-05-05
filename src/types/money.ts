@@ -1,6 +1,8 @@
 import type { RoundingMode } from '@/lib/constants';
 import type { FormatOptions, MoneyInput } from '@/types';
 
+export type MoneyJSON = { amount: number; currency: string };
+
 export interface MoneyContract {
   // ─── Accessors ────────────────────────────────────────────────────────
 
@@ -10,9 +12,13 @@ export interface MoneyContract {
 
   integer(): number;
 
-  fraction(): number;
+  cents(): number;
 
   units(): [number, number];
+
+  currencyCode(): string;
+
+  locale(): string;
 
   // ─── State ────────────────────────────────────────────────────────────
 
@@ -75,6 +81,8 @@ export interface MoneyContract {
   clone(): MoneyContract;
 
   toString(): string;
+
+  toJSON(): MoneyJSON;
 
   valueOf(): number;
 }
