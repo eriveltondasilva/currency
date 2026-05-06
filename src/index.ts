@@ -1,13 +1,13 @@
-import * as factories from './factories';
+import * as api from './api';
 
 // ─── Exports ─────────────────────────────────────────────────────────────────
 
 // Types
-export type { RoundingMode } from './lib/constants';
 export type {
   FormatOptions,
   MoneyInput,
   PricedItem,
+  RoundingMode,
 } from './types';
 
 export {
@@ -18,9 +18,23 @@ export {
   InvalidPercentageError,
   InvalidRangeError,
   MoneyError,
+  UnsupportedCurrencyError,
 } from './lib/errors';
 
 // Core class
-export const Money = Object.freeze(factories);
-export const { from: money } = factories;
+export const Money = Object.freeze(api);
+export {
+  average,
+  clamp,
+  from as money,
+  from,
+  fromMinorUnits,
+  max,
+  min,
+  percent,
+  sum,
+  total,
+  zero,
+} from './api';
+export { isMoney, isMoneyInput } from './lib/utils';
 export default Money;
