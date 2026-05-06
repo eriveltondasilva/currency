@@ -1,14 +1,12 @@
 import type { FormatOptions } from '@/types';
-import type { MoneyContract } from '@/types/money';
-import type { CurrencyConfig } from './currencies';
-
-import { FORMAT_STYLES } from '@/lib/constants';
+import type { MoneyContract } from '@/types/contract';
+import type { Currency } from './currencies';
 
 type IntlCurrencyDisplay = Exclude<FormatOptions['currencyDisplay'], 'none'>;
 
 export function formatMoney(
   money: MoneyContract,
-  currency: CurrencyConfig,
+  currency: Currency,
   options: FormatOptions = {},
 ): string {
   const locale = options.locale ?? currency.locale;
@@ -22,12 +20,12 @@ export function formatMoney(
     : ((options.currencyDisplay ?? 'symbol') as IntlCurrencyDisplay);
 
   return new Intl.NumberFormat(locale, {
-    style: isDecimalOnly ? FORMAT_STYLES.DECIMAL : FORMAT_STYLES.CURRENCY,
+    style: isDecimalOnly ? 'decimal' : 'currency',
     currency: isDecimalOnly ? undefined : code,
 
     currencyDisplay,
 
-    notation: options.notation || 'standard',
+    notation: options.notation ?? 'standard',
     signDisplay: options.signDisplay ?? 'auto',
     useGrouping: options.useGrouping ?? true,
 
