@@ -1,7 +1,10 @@
-import type { RoundingMode } from '@/lib/constants';
-import type { FormatOptions, MoneyInput } from '@/types';
+import type { CurrencyCode } from '@/lib/currencies';
+import type { FormatOptions, MoneyInput, RoundingMode } from '@/types';
 
-export type MoneyJSON = { amount: number; currency: string };
+export interface MoneyJSON {
+  amount: number;
+  currencyCode: CurrencyCode;
+}
 
 export interface MoneyContract {
   // ─── Accessors ────────────────────────────────────────────────────────
@@ -14,7 +17,7 @@ export interface MoneyContract {
 
   cents(): number;
 
-  units(): [number, number];
+  units(): [integer: number, cents: number];
 
   currencyCode(): string;
 
@@ -48,7 +51,7 @@ export interface MoneyContract {
 
   min(input: MoneyInput): MoneyContract;
 
-  round(precision: number, mode?: RoundingMode): MoneyContract;
+  round(step: number, mode?: RoundingMode): MoneyContract;
 
   // ─── Comparison ───────────────────────────────────────────────────────
 
@@ -74,7 +77,7 @@ export interface MoneyContract {
 
   allocate(parts: number): MoneyContract[];
 
-  // ─── conversion ─────────────────────────────────────────────
+  // ─── Display ─────────────────────────────────────────────
 
   format(options?: FormatOptions): string;
 

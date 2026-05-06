@@ -1,10 +1,11 @@
-import type { MoneyContract } from './money';
+import type { MoneyContract } from './contract';
 
-// ─── Primitives ───────────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 export type MoneyInput = number | string | MoneyContract;
+export type RoundingMode = 'ceil' | 'floor' | 'round' | 'trunc';
 
-// ─── Format options ───────────────────────────────────────────────────────────
+// ─── Format options ──────────────────────────────────────────────────────────
 
 export interface FormatOptions {
   /**
