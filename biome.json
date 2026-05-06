@@ -18,7 +18,15 @@
     "rules": {
       "recommended": true,
       "correctness": { "recommended": true },
-      "style": { "recommended": true },
+      "style": {
+        "recommended": true,
+        "useImportType": {
+          "level": "on",
+          "options": {
+            "style": "separatedType"
+          }
+        }
+      },
       "complexity": { "recommended": true },
       "suspicious": {
         "recommended": true,
@@ -47,7 +55,8 @@
               ":BLANK_LINE:",
               { "type": true },
               ":BLANK_LINE:",
-              ":PATH:"
+              ":PATH:",
+              ":BLANK_LINE:"
             ]
           }
         }
