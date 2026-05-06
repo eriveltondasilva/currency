@@ -26,7 +26,7 @@ const banner = `/**
 
 export default defineConfig([
   {
-    entry: ['./src/index.ts'],
+    entry: ['./src/index.ts', './src/presets.ts'],
     tsconfig: './tsconfig.build.json',
     banner: { js: banner },
     dts: { banner },
