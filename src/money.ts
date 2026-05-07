@@ -14,22 +14,33 @@ import {
 import { formatMoney } from './lib/format';
 import { isMoney } from './lib/utils';
 
-type RoundFn = (v: number) => number;
+type RoundFunction = (value: number) => number;
 
 const ROUND_FUNCTIONS = {
   ceil: Math.ceil,
   floor: Math.floor,
-  round: Math.round,
   trunc: Math.trunc,
-  expand: (v: number) => (v >= 0 ? Math.ceil(v) : Math.floor(v)),
-  halfExpand: (v: number) => Math.sign(v) * Math.round(Math.abs(v)),
-  halfEven: (v: number) => {
-    const floor = Math.floor(v);
-    const frac = v - floor;
-    if (frac !== 0.5) return Math.round(v);
+  expand: (value: number) => {
+    return value >= 0 ? Math.ceil(value) : Math.floor(value);
+  },
+  //
+  halfExpand: (value: number) => {
+    return Math.sign(value) * Math.round(Math.abs(value));
+  },
+  halfEven: (value: number) => {
+    const floor = Math.floor(value);
+    const frac = value - floor;
+    if (frac !== 0.5) return Math.round(value);
     return floor % 2 === 0 ? floor : floor + 1;
   },
-} as const satisfies Record<RoundingMode, RoundFn>;
+  halfCeil: Math.round,
+  halfFloor: (value) => {
+    return Math.ceil(value - 0.5);
+  },
+  halfTrunc: (value) => {
+    return value >= 0 ? Math.ceil(value - 0.5) : Math.floor(value + 0.5);
+  },
+} as const satisfies Record<RoundingMode, RoundFunction>;
 
 const SKIP_CONVERT = Symbol('money.internal');
 const DEFAULT_ROUNDING_MODE: RoundingMode = 'halfExpand';
