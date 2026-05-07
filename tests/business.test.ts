@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { MoneyContract } from '@/types/contract';
+import type { MoneyContract } from '@/types';
 
 import { from, zero } from '@/api/creation';
 import { InvalidAllocationError, InvalidPercentageError } from '@/lib/errors';

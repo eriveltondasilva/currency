@@ -1,6 +1,5 @@
 import type { CountryCode } from '@/lib/currencies';
-import type { MoneyInput, PricedItem } from '@/types';
-import type { MoneyContract } from '@/types/contract';
+import type { MoneyContract, MoneyInput, PricedItem } from '@/types';
 
 import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
 import { zero } from './creation';

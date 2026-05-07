@@ -1,6 +1,5 @@
 import type { CountryCode } from '@/lib/currencies';
-import type { MoneyInput } from '@/types';
-import type { MoneyContract } from '@/types/contract';
+import type { MoneyContract, MoneyInput } from '@/types';
 
 import { DEFAULT_COUNTRY_CODE, resolveCurrency } from '@/lib/currencies';
 import { Money } from '@/money';
