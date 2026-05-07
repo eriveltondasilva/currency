@@ -1,7 +1,7 @@
 import type { Currency } from './currencies';
 
-import { InvalidInputError } from '@/lib/errors';
-import { isMoney, isNil, isNumber, isString } from '@/lib/utils';
+import { InvalidInputError } from './errors';
+import { isMoney, isNil, isNumber, isString } from './utils';
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 

@@ -1,5 +1,4 @@
-import type { FormatOptions } from '@/types';
-import type { MoneyContract } from '@/types/contract';
+import type { FormatOptions, MoneyContract } from '@/types';
 import type { Currency } from './currencies';
 
 type IntlCurrencyDisplay = Exclude<FormatOptions['currencyDisplay'], 'none'>;

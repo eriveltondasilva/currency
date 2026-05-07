@@ -1,5 +1,4 @@
-import type { MoneyInput } from './types';
-import type { MoneyContract } from './types/contract';
+import type { MoneyContract, MoneyInput } from './types';
 
 import { from } from '@/api/creation';
 

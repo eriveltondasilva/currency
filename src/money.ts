@@ -1,6 +1,5 @@
 import type { Currency } from './lib/currencies';
-import type { FormatOptions, MoneyInput, RoundingMode } from './types';
-import type { MoneyContract, MoneyJSON } from './types/contract';
+import type { FormatOptions, MoneyContract, MoneyInput, MoneyJSON, RoundingMode } from './types';
 
 import { TAG } from './lib/constants';
 import { toMinorUnit } from './lib/convert';
@@ -17,14 +16,23 @@ import { isMoney } from './lib/utils';
 
 type RoundFn = (v: number) => number;
 
-const ROUND_FNS = {
+const ROUND_FUNCTIONS = {
   ceil: Math.ceil,
   floor: Math.floor,
   round: Math.round,
   trunc: Math.trunc,
+  expand: (v: number) => (v >= 0 ? Math.ceil(v) : Math.floor(v)),
+  halfExpand: (v: number) => Math.sign(v) * Math.round(Math.abs(v)),
+  halfEven: (v: number) => {
+    const floor = Math.floor(v);
+    const frac = v - floor;
+    if (frac !== 0.5) return Math.round(v);
+    return floor % 2 === 0 ? floor : floor + 1;
+  },
 } as const satisfies Record<RoundingMode, RoundFn>;
 
 const SKIP_CONVERT = Symbol('money.internal');
+const DEFAULT_ROUNDING_MODE: RoundingMode = 'halfExpand';
 
 export class Money implements MoneyContract {
   /** @internal */
@@ -34,7 +42,7 @@ export class Money implements MoneyContract {
   readonly #currency: Currency;
   readonly #minorUnit: number;
 
-  // ─── Constructor ───────────────────────────────────────────────────────────
+  // #region Constructor
 
   constructor(input: MoneyInput, currency: Currency);
   constructor(sentinel: typeof SKIP_CONVERT, currency: Currency, rawMinorUnits: number);
@@ -55,7 +63,9 @@ export class Money implements MoneyContract {
     this.#amount = toMinorUnit(input, this.#currency);
   }
 
-  // ─── Static factories ──────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Static factories
 
   static fromMinorUnits(amount: number, currency: Currency): MoneyContract {
     if (!Number.isFinite(amount)) {
@@ -77,7 +87,9 @@ export class Money implements MoneyContract {
     return new Money(SKIP_CONVERT, currency, 0);
   }
 
-  // ─── Private helpers ───────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Private helpers
 
   #assertSameCurrency(input: MoneyInput): void {
     if (isMoney(input) && input.currencyCode() !== this.#currency.code) {
@@ -94,7 +106,13 @@ export class Money implements MoneyContract {
     return new Money(SKIP_CONVERT, this.#currency, Math.round(amount));
   }
 
-  // ─── Accessors ────────────────────────────────────────────────────────────
+  #zero() {
+    return Money.zero(this.#currency);
+  }
+
+  // #endregion
+
+  // #region Accessors
 
   amount(): number {
     return this.#amount;
@@ -124,19 +142,25 @@ export class Money implements MoneyContract {
     return this.#currency.locale;
   }
 
-  // ─── State ────────────────────────────────────────────────────────────────
+  // #endregion
+
+  // #region State
 
   isZero(): boolean {
     return this.#amount === 0;
   }
+
   isPositive(): boolean {
     return this.#amount > 0;
   }
+
   isNegative(): boolean {
     return this.#amount < 0;
   }
 
-  // ─── Arithmetic ───────────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Arithmetic
 
   plus(input: MoneyInput): MoneyContract {
     return this.#make(this.#amount + this.#resolve(input));
@@ -153,7 +177,7 @@ export class Money implements MoneyContract {
       });
     }
 
-    if (factor === 0) return Money.zero(this.#currency);
+    if (factor === 0) return this.#zero();
 
     return this.#make(this.#amount * factor);
   }
@@ -172,7 +196,9 @@ export class Money implements MoneyContract {
     return this.#make(this.#amount / divisor);
   }
 
-  // ─── Transformation ───────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Transformation
 
   absolute(): MoneyContract {
     return this.#make(Math.abs(this.#amount));
@@ -192,20 +218,21 @@ export class Money implements MoneyContract {
     return this.#amount <= other ? this.#make(this.#amount) : this.#make(other);
   }
 
-  round(step: number, mode: RoundingMode = 'round'): MoneyContract {
-    if (!Number.isInteger(step) || step < 1)
-      throw new InvalidInputError(`Step must be a positive integer, got ${step}.`, { input: step });
+  round(increment: number, mode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
+    if (!Number.isInteger(increment) || increment < 1) {
+      throw new InvalidInputError(`Step must be a positive integer, got ${increment}.`, {
+        input: increment,
+      });
+    }
 
-    if (step === 1 || this.isZero()) return this.#make(this.#amount);
+    if (increment === 1 || this.isZero()) return this.#make(this.#amount);
 
-    const abs = Math.abs(this.#amount);
-    const result = ROUND_FNS[mode](abs / step) * step;
-    const finalAmount = this.#amount < 0 ? -result : result;
-
-    return this.#make(finalAmount);
+    return this.#make(ROUND_FUNCTIONS[mode](this.#amount / increment) * increment);
   }
 
-  // ─── Comparison ───────────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Comparison
 
   equals(input: MoneyInput): boolean {
     return this.#amount === this.#resolve(input);
@@ -236,13 +263,16 @@ export class Money implements MoneyContract {
     return this.#amount >= minAmount && this.#amount <= maxAmount;
   }
 
-  // ─── Business ─────────────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Business
 
   percentage(percent: number): MoneyContract {
-    if (percent < 0)
+    if (percent < 0) {
       throw new InvalidPercentageError('Percentage must be non-negative.', { input: percent });
+    }
 
-    if (percent === 0) return Money.zero(this.#currency);
+    if (percent === 0) return this.#zero();
 
     if (percent === 100) return this.#make(this.#amount);
 
@@ -258,7 +288,7 @@ export class Money implements MoneyContract {
 
     if (discount === 0) return this.#make(this.#amount);
 
-    if (discount === 100) return Money.zero(this.#currency);
+    if (discount === 100) return this.#zero();
 
     return this.minus(this.percentage(discount));
   }
@@ -273,13 +303,13 @@ export class Money implements MoneyContract {
   }
 
   allocate(parts: number): MoneyContract[] {
-    if (!Number.isInteger(parts) || parts <= 0) throw new InvalidAllocationError();
+    if (!Number.isInteger(parts) || parts < 1) throw new InvalidAllocationError();
 
-    if (this.isZero()) {
-      return Array.from({ length: parts }, () => Money.zero(this.#currency));
-    }
+    if (parts === 1) return [this.#make(this.#amount)];
 
-    const isNegative = this.#amount < 0;
+    if (this.isZero()) return Array.from({ length: parts }, () => this.#zero());
+
+    const isNegative = this.isNegative();
     const absoluteAmount = Math.abs(this.#amount);
     const base = Math.floor(absoluteAmount / parts);
     const remainder = absoluteAmount % parts;
@@ -290,7 +320,9 @@ export class Money implements MoneyContract {
     });
   }
 
-  // ─── Display ──────────────────────────────────────────────────────────────
+  // #endregion
+
+  // #region Display
 
   format(options?: FormatOptions): string {
     return formatMoney(this, this.#currency, options);
@@ -311,4 +343,6 @@ export class Money implements MoneyContract {
   valueOf(): number {
     return this.value();
   }
+
+  // #endregion
 }

@@ -1,6 +1,6 @@
-import type { MoneyContract } from '@/types/contract';
+import type { MoneyContract } from '@/types';
 
-import { TAG } from '@/lib/constants';
+import { TAG } from './constants';
 
 export function isNil(value: unknown): value is null | undefined {
   return value == null;

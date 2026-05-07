@@ -1,5 +1,7 @@
 import { UnsupportedCurrencyError } from './errors';
 
+// #region Types
+
 export type CountryCode =
   | 'AU'
   | 'BR'
@@ -29,6 +31,8 @@ export type CurrencyCode =
   | 'MXN'
   | 'SGD'
   | 'USD';
+
+// #endregion
 
 // #region Interfaces
 
@@ -94,7 +98,7 @@ const CURRENCY_DEFS = {
 // #region Utils
 
 export const SUPPORTED_CODES = Object.keys(COUNTRY_DEFS).join(', ');
-export const DEFAULT_COUNTRY: CountryCode = 'US';
+export const DEFAULT_COUNTRY_CODE: CountryCode = 'US';
 
 export function resolveCurrency(country: CountryCode): Currency {
   const countryDef = COUNTRY_DEFS[country];
