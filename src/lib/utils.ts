@@ -22,6 +22,6 @@ export function isMoney(value: unknown): value is MoneyContract {
   return isRecord(value) && '_tag' in value && value._tag === TAG;
 }
 
-export function isMoneyInput(value: unknown): value is number | string | MoneyContract {
-  return isNumber(value) || isString(value) || isMoney(value);
+export function isMoneyInput(value: unknown): value is number | MoneyContract {
+  return isNumber(value) || isMoney(value);
 }

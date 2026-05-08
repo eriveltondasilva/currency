@@ -1,6 +1,6 @@
 import type { CurrencyCode } from './lib/currencies';
 
-export type MoneyInput = number | string | MoneyContract;
+export type MoneyInput = number | MoneyContract;
 
 /**
  * Controls how rounding is applied when the value falls between two steps.
@@ -117,9 +117,9 @@ export interface MoneyContract {
 
   minus(input: MoneyInput): MoneyContract;
 
-  times(factor: number): MoneyContract;
+  times(factor: number, roundingMode?: RoundingMode): MoneyContract;
 
-  dividedBy(divisor: number): MoneyContract;
+  dividedBy(divisor: number, roundingMode?: RoundingMode): MoneyContract;
 
   // #endregion
 
@@ -163,9 +163,11 @@ export interface MoneyContract {
 
   allocate(parts: number): MoneyContract[];
 
+  allocateByRatio(ratios: number[]): MoneyContract[];
+
   // #endregion
 
-  // #region Display
+  // #region Display/Formatting
 
   format(options?: FormatOptions): string;
 
