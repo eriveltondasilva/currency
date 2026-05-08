@@ -1,15 +1,8 @@
 import type { Currency } from './currencies';
 
 import { InvalidInputError } from './errors';
-import { isMoney, isNil, isNumber, isString } from './utils';
 
-// ─── Internal helpers ────────────────────────────────────────────────────────
-
-function normalizeDecimal(input: string, group: string, decimal: string): string {
-  return input.replaceAll(group, '').replace(decimal, '.');
-}
-
-function numberToMinorUnit(input: number, fractionDigits: number): number {
+export function numberToMinorUnit(input: number, fractionDigits: number): number {
   if (Number.isNaN(input)) {
     throw new InvalidInputError('Expected a finite number, got NaN.', { input });
   }
@@ -35,41 +28,22 @@ function numberToMinorUnit(input: number, fractionDigits: number): number {
   return result;
 }
 
-function stringToMinorUnit(input: string, currency: Currency): number {
+export function stringToMinorUnit(input: string, currency: Currency): number {
+  const { group, decimal, fractionDigits } = currency;
+
   const regex = /[^\d.,+-]/g;
   const cleaned = input.trim().replace(regex, '');
 
-  const normalized = normalizeDecimal(cleaned, currency.group, currency.decimal);
+  const normalized = cleaned.replaceAll(group, '').replace(decimal, '.');
   const parsed = Number.parseFloat(normalized);
 
   if (Number.isNaN(parsed)) {
     throw new InvalidInputError(
-      [
-        `Cannot parse "${input}" as a monetary value. `,
-        `Expected a number using "${currency.decimal}" as decimal separator.`,
-      ].join(''),
+      `Cannot parse "${input}" as a monetary value. ` +
+        `Expected a number using "${decimal}" as decimal separator.`,
       { input },
     );
   }
 
-  return numberToMinorUnit(parsed, currency.fractionDigits);
-}
-
-// ─── Main ────────────────────────────────────────────────────────────────────
-
-export function toMinorUnit(input: unknown, currency: Currency): number {
-  if (isNil(input)) {
-    throw new InvalidInputError(`Value cannot be null or undefined. Received: ${input}.`, {
-      input,
-    });
-  }
-
-  if (isMoney(input)) return input.amount();
-  if (isString(input)) return stringToMinorUnit(input, currency);
-  if (isNumber(input)) return numberToMinorUnit(input, currency.fractionDigits);
-
-  throw new InvalidInputError(
-    `Unsupported input type for monetary value. Received: typeof ${typeof input}`,
-    { input },
-  );
+  return numberToMinorUnit(parsed, fractionDigits);
 }

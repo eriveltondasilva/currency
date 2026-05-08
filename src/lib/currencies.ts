@@ -98,7 +98,6 @@ const CURRENCY_DEFS = {
 // #region Utils
 
 export const SUPPORTED_CODES = Object.keys(COUNTRY_DEFS).join(', ');
-export const DEFAULT_COUNTRY_CODE: CountryCode = 'US';
 
 export function resolveCurrency(country: CountryCode): Currency {
   const countryDef = COUNTRY_DEFS[country];
