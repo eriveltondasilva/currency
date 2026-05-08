@@ -5,7 +5,8 @@ export type MoneyErrorCode =
   | 'INVALID_ALLOCATION'
   | 'INVALID_RANGE'
   | 'CURRENCY_MISMATCH'
-  | 'UNSUPPORTED_CURRENCY';
+  | 'UNSUPPORTED_CURRENCY'
+  | 'UNSAFE_INTEGER';
 
 // ─── Base ─────────────────────────────────────────────────────────────────────
 
@@ -89,5 +90,17 @@ export class UnsupportedCurrencyError extends MoneyError {
     );
 
     this.name = 'UnsupportedCurrencyError';
+  }
+}
+
+export class UnsafeIntegerError extends MoneyError {
+  constructor(options?: MoneyErrorOptions) {
+    super(
+      'The resulting amount exceeds the safe integer limit for precision.',
+      'UNSAFE_INTEGER',
+      options,
+    );
+
+    this.name = 'UnsafeIntegerError';
   }
 }
