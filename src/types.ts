@@ -12,16 +12,11 @@ export type MoneyInput = number | MoneyContract;
  * - `'expand'` → away from 0 ( 1.1 →  2, -1.1 → -2)
  *
  * Nearest neighbor (tie-breaking at .5):
- * - `'halfExpand'` → half away from 0 — default, symmetric, human-friendly
- *                    ( 1.5 →  2, -1.5 → -2)
- * - `'halfEven'`   → half to nearest even — banker's rounding, reduces statistical bias
- *                    ( 1.5 →  2,  2.5 →  2, -1.5 → -2)
- * - `'halfCeil'`   → half toward +∞ — matches Math.round, asymmetric in negatives
- *                    ( 1.5 →  2, -1.5 → -1)
- * - `'halfFloor'`  → half toward -∞ — matches Math.round, asymmetric in positives
- *                    ( 1.5 →  1, -1.5 → -2)
- * - `'halfTrunc'`  → half toward 0 — matches Math.round, asymmetric in both directions
- *                    ( 1.5 →  1, -1.5 → -1)
+ * - `'halfExpand'` → half away from 0 — default, symmetric, human-friendly              ( 1.5 →  2, -1.5 → -2)
+ * - `'halfEven'`   → half to nearest even — banker's rounding, reduces statistical bias ( 1.5 →  2,  2.5 →  2, -1.5 → -2)
+ * - `'halfCeil'`   → half toward +∞ — matches Math.round, asymmetric in negatives       ( 1.5 →  2, -1.5 → -1)
+ * - `'halfFloor'`  → half toward -∞ — matches Math.round, asymmetric in positives       ( 1.5 →  1, -1.5 → -2)
+ * - `'halfTrunc'`  → half toward 0 — matches Math.round, asymmetric in both directions  ( 1.5 →  1, -1.5 → -1)
  */
 export type RoundingMode =
   | 'ceil'
@@ -39,7 +34,7 @@ export interface FormatOptions {
   /**
    * Controls how the currency symbol/code is displayed.
    *
-   * - `'symbol'`       → R$, $, €
+   * - `'symbol'`       → R$, $, € (default)
    * - `'narrowSymbol'` → $ (shorter, avoids ambiguity)
    * - `'code'`         → BRL, USD, EUR
    * - `'name'`         → real brasileiro, US dollar
@@ -51,7 +46,7 @@ export interface FormatOptions {
    * Controls the number notation format.
    *
    * - `'standard'` → 1.500.000,00  (default)
-   * - `'compact'`  → 1,5 mi / 1.5M (useful for dashboards)
+   * - `'compact'`  → 1,5 mi / 1.5M — compact and human-friendly, useful for dashboards
    */
   notation?: 'standard' | 'compact';
 
@@ -155,11 +150,11 @@ export interface MoneyContract {
 
   // #region Business
 
-  percentage(percent: number): MoneyContract;
+  percentage(percent: number, roundingMode?: RoundingMode): MoneyContract;
 
-  applyDiscount(discount: number): MoneyContract;
+  applyDiscount(discount: number, roundingMode?: RoundingMode): MoneyContract;
 
-  applySurcharge(surcharge: number): MoneyContract;
+  applySurcharge(surcharge: number, roundingMode?: RoundingMode): MoneyContract;
 
   allocate(parts: number): MoneyContract[];
 
