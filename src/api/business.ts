@@ -4,15 +4,12 @@ import type { MoneyContract, MoneyInput, PricedItem } from '@/types';
 import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
-import { DEFAULT_COUNTRY_CODE, resolveCurrency } from '@/lib/currencies';
+import { resolveCurrency } from '@/lib/currencies';
 import { DivisionByZeroError, InvalidInputError } from '@/lib/errors';
 import { isNumber, isRecord } from '@/lib/utils';
 import { Money } from '@/money';
 
-export function total(
-  items: PricedItem[],
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
-): MoneyContract {
+export function total(items: PricedItem[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(items)) return zero(country);
 
   const currency = resolveCurrency(country);
@@ -42,11 +39,7 @@ export function total(
   return Money.fromMinorUnits(amount, currency);
 }
 
-export function percent(
-  part: MoneyInput,
-  whole: MoneyInput,
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
-): number {
+export function percent(part: MoneyInput, whole: MoneyInput, country: CountryCode): number {
   const currency = resolveCurrency(country);
   const wholeAmount = resolveMinorUnits(whole, currency, 'percent(): whole');
 

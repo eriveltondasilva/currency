@@ -4,14 +4,11 @@ import type { MoneyContract, MoneyInput } from '@/types';
 import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
-import { DEFAULT_COUNTRY_CODE, resolveCurrency } from '@/lib/currencies';
+import { resolveCurrency } from '@/lib/currencies';
 import { InvalidRangeError } from '@/lib/errors';
 import { Money } from '@/money';
 
-export function sum(
-  values: MoneyInput[],
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
-): MoneyContract {
+export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
   const currency = resolveCurrency(country);
@@ -23,10 +20,7 @@ export function sum(
   return Money.fromMinorUnits(amount, currency);
 }
 
-export function average(
-  values: MoneyInput[],
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
-): MoneyContract {
+export function average(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
   const currency = resolveCurrency(country);
@@ -38,10 +32,7 @@ export function average(
   return Money.fromMinorUnits(Math.round(amount / values.length), currency);
 }
 
-export function max(
-  values: MoneyInput[],
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
-): MoneyContract {
+export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
   const currency = resolveCurrency(country);
@@ -55,10 +46,7 @@ export function max(
   return Money.fromMinorUnits(result, currency);
 }
 
-export function min(
-  values: MoneyInput[],
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
-): MoneyContract {
+export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
   const currency = resolveCurrency(country);
@@ -76,7 +64,7 @@ export function clamp(
   value: MoneyInput,
   min: MoneyInput,
   max: MoneyInput,
-  country: CountryCode = DEFAULT_COUNTRY_CODE,
+  country: CountryCode,
 ): MoneyContract {
   const currency = resolveCurrency(country);
   const minAmount = resolveMinorUnits(min, currency, 'clamp(): min');

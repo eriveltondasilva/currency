@@ -23,7 +23,7 @@ export function from(value: unknown, country: CountryCode): MoneyContract {
 
 export function parse(value: unknown, country: CountryCode): MoneyContract {
   if (value == null) {
-    throw new InvalidInputError(`Value cannot be null or undefined.`, { input: value });
+    throw new InvalidInputError('Value cannot be null or undefined.', { input: value });
   }
 
   if (typeof value !== 'string') {
