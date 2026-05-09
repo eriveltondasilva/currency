@@ -1,10 +1,10 @@
-import type { FormatOptions, MoneyContract } from '@/types';
+import type { FormatOptions } from '@/types';
 import type { Currency } from './currencies';
 
 type IntlCurrencyDisplay = Exclude<FormatOptions['currencyDisplay'], 'none'>;
 
 export function formatMoney(
-  money: MoneyContract,
+  value: number,
   currency: Currency,
   options: FormatOptions = {},
 ): string {
@@ -30,5 +30,5 @@ export function formatMoney(
 
     minimumFractionDigits: isCompact ? 0 : currency.fractionDigits,
     maximumFractionDigits: isCompact ? 1 : currency.fractionDigits,
-  }).format(money.value());
+  }).format(value);
 }
