@@ -23,18 +23,24 @@ export {
 
 // Core class
 export const Money = Object.freeze(api);
+
+export {
+  percent,
+  total,
+} from './api/business';
 export {
   average,
   clamp,
+  max,
+  min,
+  sum,
+} from './api/collection';
+export {
   from as money,
   from,
   fromMinorUnits,
-  max,
-  min,
-  percent,
-  sum,
-  total,
+  parse,
   zero,
-} from './api';
+} from './api/creation';
 export { isMoney, isMoneyInput } from './lib/utils';
 export default Money;
