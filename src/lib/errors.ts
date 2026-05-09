@@ -8,8 +8,6 @@ export type MoneyErrorCode =
   | 'UNSUPPORTED_CURRENCY'
   | 'UNSAFE_INTEGER';
 
-// ─── Base ─────────────────────────────────────────────────────────────────────
-
 export interface MoneyErrorOptions extends ErrorOptions {
   input?: unknown;
 }
@@ -27,7 +25,7 @@ export class MoneyError extends Error {
   }
 }
 
-// ─── Subclasses ──────────────────────────────────────────────────────────────
+// ─── Specific Errors ─────────────────────────────────────────────────────────
 
 export class InvalidInputError extends MoneyError {
   constructor(message: string, options?: MoneyErrorOptions) {
