@@ -1,5 +1,12 @@
-import type { Currency } from './lib/currencies';
-import type { FormatOptions, MoneyContract, MoneyInput, MoneyJSON, RoundingMode } from './types';
+import type { Currency, CurrencyCode } from './lib/currencies';
+import type {
+  FormatOptions,
+  MoneyContract,
+  MoneyInput,
+  MoneyJSON,
+  MoneyUnits,
+  RoundingMode,
+} from './types';
 
 import { TAG } from './lib/constants';
 import { numberToMinorUnit } from './lib/convert';
@@ -34,13 +41,13 @@ export class Money implements MoneyContract {
 
   static fromMinorUnits(amount: number, currency: Currency): MoneyContract {
     if (!Number.isFinite(amount)) {
-      throw new InvalidInputError(`Expected a finite number of minor units, got ${amount}.`, {
+      throw new InvalidInputError('Expected a finite number of minor units.', {
         input: amount,
       });
     }
 
     if (!Number.isInteger(amount)) {
-      throw new InvalidInputError(`Minor units must be an integer, got ${amount}.`, {
+      throw new InvalidInputError('Minor units must be an integer.', {
         input: amount,
       });
     }
@@ -103,11 +110,11 @@ export class Money implements MoneyContract {
     return Math.abs(this.#amount % this.#minorUnit);
   }
 
-  units(): [integer: number, cents: number] {
+  units(): MoneyUnits {
     return [this.integer(), this.cents()];
   }
 
-  currencyCode(): string {
+  currencyCode(): CurrencyCode {
     return this.#currency.code;
   }
 
@@ -145,7 +152,7 @@ export class Money implements MoneyContract {
 
   times(factor: number, roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
     if (!Number.isFinite(factor)) {
-      throw new InvalidInputError(`Factor must be a finite number, got ${factor}.`, {
+      throw new InvalidInputError('Factor must be a finite number.', {
         input: factor,
       });
     }
@@ -159,7 +166,7 @@ export class Money implements MoneyContract {
     if (divisor === 0) throw new DivisionByZeroError();
 
     if (!Number.isFinite(divisor)) {
-      throw new InvalidInputError(`Divisor must be a finite number, got ${divisor}.`, {
+      throw new InvalidInputError('Divisor must be a finite number.', {
         input: divisor,
       });
     }
@@ -193,7 +200,7 @@ export class Money implements MoneyContract {
 
   round(increment: number, mode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
     if (!Number.isInteger(increment) || increment < 1) {
-      throw new InvalidInputError(`Step must be a positive integer, got ${increment}.`, {
+      throw new InvalidInputError('Step must be a positive integer.', {
         input: increment,
       });
     }
@@ -256,11 +263,13 @@ export class Money implements MoneyContract {
     discount: number,
     roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
   ): MoneyContract {
-    if (discount < 0)
+    if (discount < 0) {
       throw new InvalidPercentageError('Discount cannot be negative.', { input: discount });
+    }
 
-    if (discount > 100)
+    if (discount > 100) {
       throw new InvalidPercentageError('Discount cannot exceed 100%.', { input: discount });
+    }
 
     if (discount === 0) return this.clone();
 
@@ -300,11 +309,11 @@ export class Money implements MoneyContract {
   }
 
   allocateByRatio(ratios: number[]): MoneyContract[] {
-    if (ratios.length === 0 || ratios.some((r) => r < 0)) {
+    if (ratios.length === 0 || ratios.some((ratio) => ratio < 0)) {
       throw new InvalidAllocationError();
     }
 
-    const total = ratios.reduce((sum, r) => sum + r, 0);
+    const total = ratios.reduce((acc, ratio) => acc + ratio, 0);
 
     if (total === 0) throw new InvalidAllocationError();
 
@@ -313,9 +322,10 @@ export class Money implements MoneyContract {
     const isNegative = this.isNegative();
     const absoluteAmount = Math.abs(this.#amount);
 
-    const shares = ratios.map((r) => Math.floor((absoluteAmount * r) / total));
-    const distributed = shares.reduce((sum, s) => sum + s, 0);
-    const remainder = absoluteAmount - distributed;
+    const shares = ratios.map((ratio) => Math.floor((absoluteAmount * ratio) / total));
+    const distributed = shares.reduce((acc, share) => acc + share, 0);
+
+    const remainder = Math.round(absoluteAmount - distributed);
 
     return shares.map((share, i) => {
       const value = share + (i < remainder ? 1 : 0);
