@@ -206,7 +206,8 @@ export class Money implements MoneyContract {
   }
 
   round(increment: number, mode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
-    if (!Number.isInteger(increment) || increment < 1) {
+    const hasInvalidIncrement = !Number.isInteger(increment) || increment < 1;
+    if (hasInvalidIncrement) {
       throw new InvalidInputError('Step must be a positive integer.', {
         input: increment,
       });
@@ -222,7 +223,9 @@ export class Money implements MoneyContract {
   // #region Comparison
 
   equals(input: MoneyInput): boolean {
-    if (isMoney(input) && input.currencyCode() !== this.#currency.code) return false;
+    const hasDifferentCurrency = isMoney(input) && input.currencyCode() !== this.#currency.code;
+    if (hasDifferentCurrency) return false;
+
     return this.#minorUnits === this.#resolve(input);
   }
 
@@ -315,7 +318,8 @@ export class Money implements MoneyContract {
   }
 
   allocate(parts: number): MoneyContract[] {
-    if (!Number.isInteger(parts) || parts < 1) {
+    const hasInvalidParts = !Number.isInteger(parts) || parts < 1;
+    if (hasInvalidParts) {
       throw new InvalidAllocationError('Number of parts must be a positive integer.');
     }
 
@@ -335,9 +339,18 @@ export class Money implements MoneyContract {
   }
 
   allocateByRatio(ratios: number[]): MoneyContract[] {
-    if (ratios.length === 0 || ratios.some((ratio) => !Number.isFinite(ratio) || ratio < 0)) {
+    const hasInvalidRatios =
+      ratios.length === 0 || ratios.some((ratio) => !Number.isFinite(ratio) || ratio < 0);
+    if (hasInvalidRatios) {
       throw new InvalidAllocationError(
         'Ratios must be a non-empty array of non-negative finite numbers.',
+      );
+    }
+
+    const hasNonIntegerRatios = ratios.some((ratio) => !Number.isInteger(ratio));
+    if (hasNonIntegerRatios) {
+      throw new InvalidAllocationError(
+        'Ratios must be integers. Use whole numbers like [1, 2, 3] or [30, 70].',
       );
     }
 
