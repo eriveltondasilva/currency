@@ -81,24 +81,24 @@ export interface PricedItem {
 }
 
 export interface MoneyJSON {
-  amount: number;
+  minorUnits: number;
   currencyCode: CurrencyCode;
 }
 
-export type MoneyUnits = [integer: number, cents: number];
+export type MoneyParts = [units: number, subunits: number];
 
 export interface MoneyContract {
   // #region Accessors
 
+  minorUnits(): number;
+
   amount(): number;
 
-  value(): number;
+  units(): number;
 
-  integer(): number;
+  subunits(): number;
 
-  cents(): number;
-
-  units(): MoneyUnits;
+  toParts(): MoneyParts;
 
   currencyCode(): CurrencyCode;
 
@@ -124,13 +124,13 @@ export interface MoneyContract {
 
   times(factor: number, roundingMode?: RoundingMode): MoneyContract;
 
-  dividedBy(divisor: number, roundingMode?: RoundingMode): MoneyContract;
+  divide(divisor: number, roundingMode?: RoundingMode): MoneyContract;
 
   // #endregion
 
   // #region Transformation
 
-  absolute(): MoneyContract;
+  abs(): MoneyContract;
 
   negate(): MoneyContract;
 
@@ -156,11 +156,13 @@ export interface MoneyContract {
 
   isBetween(min: MoneyInput, max: MoneyInput): boolean;
 
+  hasSameCurrency(input: MoneyContract): boolean;
+
   // #endregion
 
   // #region Business
 
-  percentage(percent: number, roundingMode?: RoundingMode): MoneyContract;
+  percentOf(percent: number, roundingMode?: RoundingMode): MoneyContract;
 
   applyDiscount(discount: number, roundingMode?: RoundingMode): MoneyContract;
 
