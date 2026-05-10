@@ -32,8 +32,8 @@ export class Money implements MoneyContract {
   readonly #minorUnit: number;
 
   constructor(amount: number, currency: Currency) {
-    this.#currency = currency;
     this.#minorUnit = 10 ** currency.fractionDigits;
+    this.#currency = currency;
     this.#amount = amount;
   }
 
@@ -82,8 +82,16 @@ export class Money implements MoneyContract {
     return numberToMinorUnit(input, this.#currency.fractionDigits);
   }
 
-  #make(amount: number): MoneyContract {
-    return new Money(amount, this.#currency);
+  #make(input: number): MoneyContract {
+    if (!Number.isFinite(input)) {
+      throw new InvalidInputError('Operation produced a non-finite result.', { input: input });
+    }
+
+    if (!Number.isSafeInteger(input)) {
+      throw new UnsafeIntegerError({ input });
+    }
+
+    return new Money(input, this.#currency);
   }
 
   #zero() {
@@ -248,6 +256,10 @@ export class Money implements MoneyContract {
   // #region Business
 
   percentage(percent: number, roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
+    if (!Number.isFinite(percent)) {
+      throw new InvalidPercentageError('Percentage must be a finite number.', { input: percent });
+    }
+
     if (percent < 0) {
       throw new InvalidPercentageError('Percentage must be non-negative.', { input: percent });
     }
@@ -263,6 +275,10 @@ export class Money implements MoneyContract {
     discount: number,
     roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
   ): MoneyContract {
+    if (!Number.isFinite(discount)) {
+      throw new InvalidPercentageError('Discount must be a finite number.', { input: discount });
+    }
+
     if (discount < 0) {
       throw new InvalidPercentageError('Discount cannot be negative.', { input: discount });
     }
@@ -282,6 +298,10 @@ export class Money implements MoneyContract {
     surcharge: number,
     roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
   ): MoneyContract {
+    if (!Number.isFinite(surcharge)) {
+      throw new InvalidPercentageError('Surcharge must be a finite number.', { input: surcharge });
+    }
+
     if (surcharge < 0)
       throw new InvalidPercentageError('Surcharge must be non-negative.', { input: surcharge });
 
@@ -291,7 +311,9 @@ export class Money implements MoneyContract {
   }
 
   allocate(parts: number): MoneyContract[] {
-    if (!Number.isInteger(parts) || parts < 1) throw new InvalidAllocationError();
+    if (!Number.isInteger(parts) || parts < 1) {
+      throw new InvalidAllocationError('Number of parts must be a positive integer.');
+    }
 
     if (parts === 1) return [this.clone()];
 
@@ -309,13 +331,15 @@ export class Money implements MoneyContract {
   }
 
   allocateByRatio(ratios: number[]): MoneyContract[] {
-    if (ratios.length === 0 || ratios.some((ratio) => ratio < 0)) {
-      throw new InvalidAllocationError();
+    if (ratios.length === 0 || ratios.some((ratio) => !Number.isFinite(ratio) || ratio < 0)) {
+      throw new InvalidAllocationError(
+        'Ratios must be a non-empty array of non-negative finite numbers.',
+      );
     }
 
     const total = ratios.reduce((acc, ratio) => acc + ratio, 0);
 
-    if (total === 0) throw new InvalidAllocationError();
+    if (total === 0) throw new InvalidAllocationError('The sum of ratios cannot be zero.');
 
     if (this.isZero()) return ratios.map(() => this.#zero());
 
@@ -325,7 +349,7 @@ export class Money implements MoneyContract {
     const shares = ratios.map((ratio) => Math.floor((absoluteAmount * ratio) / total));
     const distributed = shares.reduce((acc, share) => acc + share, 0);
 
-    const remainder = Math.round(absoluteAmount - distributed);
+    const remainder = absoluteAmount - distributed;
 
     return shares.map((share, i) => {
       const value = share + (i < remainder ? 1 : 0);
