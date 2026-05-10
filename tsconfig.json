@@ -7,6 +7,7 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitReturns": true,
 
     // Module resolution
     "paths": {
