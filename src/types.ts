@@ -77,6 +77,8 @@ export interface MoneyJSON {
   currencyCode: CurrencyCode;
 }
 
+export type MoneyUnits = [integer: number, cents: number];
+
 export interface MoneyContract {
   // #region Accessors
 
@@ -88,9 +90,9 @@ export interface MoneyContract {
 
   cents(): number;
 
-  units(): [integer: number, cents: number];
+  units(): MoneyUnits;
 
-  currencyCode(): string;
+  currencyCode(): CurrencyCode;
 
   locale(): string;
 
