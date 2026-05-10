@@ -5,7 +5,7 @@ import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
-import { InvalidRangeError, UnsafeIntegerError } from '@/lib/errors';
+import { InvalidInputError, InvalidRangeError } from '@/lib/errors';
 import { DEFAULT_ROUND_FN } from '@/lib/rounding';
 import { Money } from '@/money';
 
@@ -19,10 +19,6 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
   const amount = values.reduce<number>((acc, value, i) => {
     return acc + resolveMinorUnits(value, currency, `sum(): index ${i}`);
   }, 0);
-
-  if (!Number.isSafeInteger(amount)) {
-    throw new UnsafeIntegerError({ input: amount });
-  }
 
   return Money.fromMinorUnits(amount, currency);
 }
@@ -38,17 +34,15 @@ export function average(values: MoneyInput[], country: CountryCode): MoneyContra
     return acc + resolveMinorUnits(value, currency, `average(): index ${i}`);
   }, 0);
 
-  if (!Number.isSafeInteger(amount)) {
-    throw new UnsafeIntegerError({ input: amount });
-  }
-
   return Money.fromMinorUnits(DEFAULT_ROUND_FN(amount / values.length), currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(values)) return zero(country);
+  if (isEmptyOrNonArray(values)) {
+    throw new InvalidInputError('max(): array must have at least one element.', { input: values });
+  }
 
   const currency = resolveCurrency(country);
 
@@ -66,7 +60,9 @@ export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(values)) return zero(country);
+  if (isEmptyOrNonArray(values)) {
+    throw new InvalidInputError('min(): array must have at least one element.', { input: values });
+  }
 
   const currency = resolveCurrency(country);
 
@@ -90,6 +86,7 @@ export function clamp(
   country: CountryCode,
 ): MoneyContract {
   const currency = resolveCurrency(country);
+
   const minAmount = resolveMinorUnits(min, currency, 'clamp(): min');
   const maxAmount = resolveMinorUnits(max, currency, 'clamp(): max');
 

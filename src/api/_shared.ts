@@ -3,7 +3,7 @@ import type { MoneyInput } from '@/types';
 
 import { numberToMinorUnit } from '@/lib/convert';
 import { CurrencyMismatchError, InvalidInputError, MoneyError } from '@/lib/errors';
-import { isMoney } from '@/lib/utils';
+import { isMoney } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ export function resolveMinorUnits(value: MoneyInput, currency: Currency, context
     if (value.currencyCode() !== currency.code)
       throw new CurrencyMismatchError(currency.code, value.currencyCode());
 
-    return value.amount();
+    return value.minorUnits();
   }
 
   if (typeof value !== 'number') {
