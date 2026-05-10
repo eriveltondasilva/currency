@@ -9,35 +9,38 @@ import { DivisionByZeroError, InvalidInputError } from '@/lib/errors';
 import { isNumber, isRecord } from '@/lib/utils';
 import { Money } from '@/money';
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function total(items: PricedItem[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(items)) return zero(country);
 
   const currency = resolveCurrency(country);
 
-  const amount = items.reduce((acc, item, i) => {
+  const rawAmount = items.reduce((acc, item, i) => {
     if (!isRecord(item)) {
-      throw new InvalidInputError(
-        `total(): index ${i} — expected { price, quantity? }, got ${String(item)}.`,
-        { input: item },
-      );
+      throw new InvalidInputError(`total(): index ${i} — expected { price, quantity? }.`, {
+        input: item,
+      });
     }
 
     const { price, quantity = 1 } = item;
 
     if (!isNumber(quantity) || !Number.isFinite(quantity) || quantity < 0) {
       throw new InvalidInputError(
-        `total(): index ${i} — quantity must be a non-negative finite number, got ${String(quantity)}.`,
+        `total(): index ${i} — quantity must be a non-negative finite number.`,
         { input: quantity },
       );
     }
 
     const unitAmount = resolveMinorUnits(price, currency, `total(): index ${i} — price`);
 
-    return acc + Math.round(unitAmount * quantity);
+    return acc + unitAmount * quantity;
   }, 0);
 
-  return Money.fromMinorUnits(amount, currency);
+  return Money.fromMinorUnits(Math.round(rawAmount), currency);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function percent(part: MoneyInput, whole: MoneyInput, country: CountryCode): number {
   const currency = resolveCurrency(country);

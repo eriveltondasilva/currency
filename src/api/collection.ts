@@ -6,7 +6,10 @@ import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
 import { InvalidRangeError } from '@/lib/errors';
+import { ROUND_FUNCTIONS } from '@/lib/rounding';
 import { Money } from '@/money';
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
@@ -20,6 +23,8 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
   return Money.fromMinorUnits(amount, currency);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function average(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
@@ -29,36 +34,46 @@ export function average(values: MoneyInput[], country: CountryCode): MoneyContra
     return acc + resolveMinorUnits(value, currency, `average(): index ${i}`);
   }, 0);
 
-  return Money.fromMinorUnits(Math.round(amount / values.length), currency);
+  return Money.fromMinorUnits(ROUND_FUNCTIONS.halfExpand(amount / values.length), currency);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
   const currency = resolveCurrency(country);
-  let result = -Infinity;
 
-  for (const [i, value] of values.entries()) {
-    const amount = resolveMinorUnits(value, currency, `max(): index ${i}`);
-    if (amount > result) result = amount;
-  }
+  const amount = values.slice(1).reduce<number>(
+    (acc, value, i) => {
+      const current = resolveMinorUnits(value, currency, `max(): index ${i + 1}`);
+      return current > acc ? current : acc;
+    },
+    resolveMinorUnits(values[0] as MoneyInput, currency, 'max(): index 0'),
+  );
 
-  return Money.fromMinorUnits(result, currency);
+  return Money.fromMinorUnits(amount, currency);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
   if (isEmptyOrNonArray(values)) return zero(country);
 
   const currency = resolveCurrency(country);
-  let result = Infinity;
 
-  for (const [i, value] of values.entries()) {
-    const amount = resolveMinorUnits(value, currency, `min(): index ${i}`);
-    if (amount < result) result = amount;
-  }
+  const amount = values.slice(1).reduce<number>(
+    (acc, value, i) => {
+      const current = resolveMinorUnits(value, currency, `min(): index ${i + 1}`);
+      return current < acc ? current : acc;
+    },
+    resolveMinorUnits(values[0] as MoneyInput, currency, 'min(): index 0'),
+  );
 
-  return Money.fromMinorUnits(result, currency);
+  return Money.fromMinorUnits(amount, currency);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function clamp(
   value: MoneyInput,

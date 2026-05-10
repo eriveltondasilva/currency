@@ -6,13 +6,15 @@ import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError } from '@/lib/errors';
 import { Money } from '@/money';
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function from(value: unknown, country: CountryCode): MoneyContract {
   if (value == null) {
     throw new InvalidInputError('Value cannot be null or undefined.', { input: value });
   }
 
   if (typeof value !== 'number') {
-    throw new InvalidInputError(`Expected a number, got ${typeof value}.`, { input: value });
+    throw new InvalidInputError(`Expected a number.`, { input: value });
   }
 
   const currency = resolveCurrency(country);
@@ -21,13 +23,15 @@ export function from(value: unknown, country: CountryCode): MoneyContract {
   return Money.fromMinorUnits(amount, currency);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function parse(value: unknown, country: CountryCode): MoneyContract {
   if (value == null) {
     throw new InvalidInputError('Value cannot be null or undefined.', { input: value });
   }
 
   if (typeof value !== 'string') {
-    throw new InvalidInputError(`Expected a string, got ${typeof value}.`, { input: value });
+    throw new InvalidInputError(`Expected a string.`, { input: value });
   }
 
   const currency = resolveCurrency(country);
@@ -36,10 +40,14 @@ export function parse(value: unknown, country: CountryCode): MoneyContract {
   return Money.fromMinorUnits(amount, currency);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function fromMinorUnits(value: number, country: CountryCode): MoneyContract {
   const currency = resolveCurrency(country);
   return Money.fromMinorUnits(value, currency);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function zero(country: CountryCode): MoneyContract {
   const currency = resolveCurrency(country);
