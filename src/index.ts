@@ -43,5 +43,6 @@ export {
   parse,
   zero,
 } from './api/creation';
-export { isMoney, isMoneyInput } from './lib/utils';
+export { isMoneyInput } from './lib/utils';
+export { isMoney } from './money';
 export default Money;
