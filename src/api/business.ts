@@ -1,19 +1,18 @@
 import type { CountryCode } from '@/lib/currencies';
 import type { MoneyContract, MoneyInput, PricedItem } from '@/types';
 
-import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
+import { hasNoItems, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
 import { DivisionByZeroError, InvalidInputError } from '@/lib/errors';
-import { DEFAULT_ROUND_FN } from '@/lib/rounding';
 import { isRecord } from '@/lib/utils';
 import { Money } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function total(items: PricedItem[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(items)) return zero(country);
+  if (hasNoItems(items)) return zero(country);
 
   const currency = resolveCurrency(country);
 
@@ -26,7 +25,8 @@ export function total(items: PricedItem[], country: CountryCode): MoneyContract 
 
     const { price, quantity = 1 } = item;
 
-    if (!Number.isInteger(quantity) || quantity < 0) {
+    const invalidQuantity = !Number.isInteger(quantity) || quantity < 0;
+    if (invalidQuantity) {
       throw new InvalidInputError(
         `total(): index ${i} — quantity must be an integer. ` +
           `Fractional quantities produce ambiguous sub-minor-unit values.`,
@@ -39,18 +39,18 @@ export function total(items: PricedItem[], country: CountryCode): MoneyContract 
     return acc + unitAmount * quantity;
   }, 0);
 
-  return Money.fromMinorUnits(DEFAULT_ROUND_FN(rawAmount), currency);
+  return Money.fromMinorUnits(rawAmount, currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function percent(part: MoneyInput, whole: MoneyInput, country: CountryCode): number {
+export function percent(portion: MoneyInput, base: MoneyInput, country: CountryCode): number {
   const currency = resolveCurrency(country);
-  const wholeAmount = resolveMinorUnits(whole, currency, 'percent(): whole');
+  const baseAmount = resolveMinorUnits(base, currency, 'percent(): whole');
 
-  if (wholeAmount === 0) throw new DivisionByZeroError();
+  if (baseAmount === 0) throw new DivisionByZeroError();
 
-  const partAmount = resolveMinorUnits(part, currency, 'percent(): part');
+  const portionAmount = resolveMinorUnits(portion, currency, 'percent(): part');
 
-  return (partAmount / wholeAmount) * 100;
+  return (portionAmount / baseAmount) * 100;
 }

@@ -6,12 +6,14 @@ import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError } from '@/lib/errors';
 import { Money } from '@/money';
 
-// ─────────────────────────────────────────────────────────────────────────────
+function assertNotNull(value: unknown): void {
+  if (value != null) return;
+  throw new InvalidInputError('Value cannot be null or undefined.', { input: value });
+}
 
-export function from(value: unknown, country: CountryCode): MoneyContract {
-  if (value == null) {
-    throw new InvalidInputError('Value cannot be null or undefined.', { input: value });
-  }
+// ─────────────────────────────────────────────────────────────────────────────
+export function from(value: number, country: CountryCode): MoneyContract {
+  assertNotNull(value);
 
   if (typeof value !== 'number') {
     throw new InvalidInputError(`Expected a number.`, { input: value });
@@ -25,10 +27,8 @@ export function from(value: unknown, country: CountryCode): MoneyContract {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function parse(value: unknown, country: CountryCode): MoneyContract {
-  if (value == null) {
-    throw new InvalidInputError('Value cannot be null or undefined.', { input: value });
-  }
+export function parse(value: string, country: CountryCode): MoneyContract {
+  assertNotNull(value);
 
   if (typeof value !== 'string') {
     throw new InvalidInputError(`Expected a string.`, { input: value });
@@ -43,6 +43,8 @@ export function parse(value: unknown, country: CountryCode): MoneyContract {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function fromMinorUnits(value: number, country: CountryCode): MoneyContract {
+  assertNotNull(value);
+
   if (!Number.isFinite(value)) {
     throw new InvalidInputError('fromMinorUnits(): value must be a finite number.', {
       input: value,

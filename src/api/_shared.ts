@@ -7,7 +7,7 @@ import { isMoney } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function isEmptyOrNonArray(value: unknown): value is [] {
+export function hasNoItems(value: unknown): value is [] {
   return !Array.isArray(value) || value.length === 0;
 }
 

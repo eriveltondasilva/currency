@@ -1,7 +1,7 @@
 import type { CountryCode } from '@/lib/currencies';
 import type { MoneyContract, MoneyInput } from '@/types';
 
-import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
+import { hasNoItems, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
@@ -12,7 +12,7 @@ import { Money } from '@/money';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(values)) return zero(country);
+  if (hasNoItems(values)) return zero(country);
 
   const currency = resolveCurrency(country);
 
@@ -26,7 +26,7 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function average(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(values)) return zero(country);
+  if (hasNoItems(values)) return zero(country);
 
   const currency = resolveCurrency(country);
 
@@ -40,7 +40,7 @@ export function average(values: MoneyInput[], country: CountryCode): MoneyContra
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(values)) {
+  if (hasNoItems(values)) {
     throw new InvalidInputError('max(): array must have at least one element.', { input: values });
   }
 
@@ -60,7 +60,7 @@ export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (isEmptyOrNonArray(values)) {
+  if (hasNoItems(values)) {
     throw new InvalidInputError('min(): array must have at least one element.', { input: values });
   }
 
