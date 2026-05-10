@@ -4,26 +4,28 @@ type RoundFunction = (value: number) => number;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function roundExpand(value: number) {
+function roundExpand(value: number): number {
   return value >= 0 ? Math.ceil(value) : Math.floor(value);
 }
 
-function roundHalfExpand(value: number) {
+function roundHalfExpand(value: number): number {
   return Math.sign(value) * Math.round(Math.abs(value));
 }
 
-function roundHalfEven(value: number) {
-  const floor = Math.floor(value);
-  const fractionalPart = value - floor;
+function roundHalfEven(value: number): number {
+  const floored = Math.floor(value);
+  const fractionalPart = value - floored;
+
   if (fractionalPart !== 0.5) return Math.round(value);
-  return floor % 2 === 0 ? floor : floor + 1;
+
+  return floored % 2 === 0 ? floored : floored + 1;
 }
 
-function roundHalfFloor(value: number) {
+function roundHalfFloor(value: number): number {
   return Math.ceil(value - 0.5);
 }
 
-function roundHalfTrunc(value: number) {
+function roundHalfTrunc(value: number): number {
   return value >= 0 ? Math.ceil(value - 0.5) : Math.floor(value + 0.5);
 }
 

@@ -12,7 +12,7 @@ export interface MoneyErrorOptions extends ErrorOptions {
   input?: unknown;
 }
 
-export class MoneyError extends Error {
+export abstract class MoneyError extends Error {
   readonly code: MoneyErrorCode;
   readonly input?: unknown;
 
