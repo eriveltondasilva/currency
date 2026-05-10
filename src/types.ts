@@ -31,6 +31,9 @@ export type RoundingMode =
   | 'halfTrunc';
 
 export interface FormatOptions {
+  /** Override the locale for display only — does not affect internal values. */
+  locale?: string;
+
   /**
    * Controls how the currency symbol/code is displayed.
    *
@@ -61,14 +64,19 @@ export interface FormatOptions {
   signDisplay?: 'auto' | 'always' | 'exceptZero' | 'negative';
 
   /** Whether to use grouping separators (e.g. 1.000 vs 1000). Defaults to `true`. */
-  useGrouping?: boolean;
+  useGrouping?: boolean | 'always' | 'auto' | 'min2';
 
-  /** Override the locale for display only — does not affect internal values. */
-  locale?: string;
+  currencySign?: 'standard' | 'accounting';
+  compactDisplay?: 'short' | 'long';
+  trailingZeroDisplay?: 'auto' | 'stripIfInteger';
+  roundingMode?: RoundingMode;
+  minimumFractionDigits?: number;
+  maximumFractionDigits?: number;
 }
 
 export interface PricedItem {
   price: MoneyInput;
+  /** Must be a non-negative integer. Fractional quantities are rejected at runtime. */
   quantity?: number;
 }
 
@@ -174,6 +182,13 @@ export interface MoneyContract {
 
   toJSON(): MoneyJSON;
 
+  /**
+   * Returns the monetary value as a float for coercion compatibility.
+   *
+   * @remarks
+   * ⚠️ Do NOT use arithmetic operators (`+`, `-`, `*`) with Money objects —
+   * they bypass safety guarantees. Use `.plus()`, `.minus()`, `.times()` instead.
+   */
   valueOf(): number;
 
   // #endregion
