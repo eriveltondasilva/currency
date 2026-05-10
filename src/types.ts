@@ -182,14 +182,5 @@ export interface MoneyContract {
 
   toJSON(): MoneyJSON;
 
-  /**
-   * Returns the monetary value as a float for coercion compatibility.
-   *
-   * @remarks
-   * ⚠️ Do NOT use arithmetic operators (`+`, `-`, `*`) with Money objects —
-   * they bypass safety guarantees. Use `.plus()`, `.minus()`, `.times()` instead.
-   */
-  valueOf(): number;
-
   // #endregion
 }

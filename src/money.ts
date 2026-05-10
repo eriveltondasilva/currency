@@ -39,24 +39,24 @@ export class Money implements MoneyContract {
 
   // #region Static factories
 
-  static fromMinorUnits(amount: number, currency: Currency): MoneyContract {
-    if (!Number.isFinite(amount)) {
+  static fromMinorUnits(input: number, currency: Currency): MoneyContract {
+    if (!Number.isFinite(input)) {
       throw new InvalidInputError('Expected a finite number of minor units.', {
-        input: amount,
+        input,
       });
     }
 
-    if (!Number.isInteger(amount)) {
+    if (!Number.isInteger(input)) {
       throw new InvalidInputError('Minor units must be an integer.', {
-        input: amount,
+        input,
       });
     }
 
-    if (!Number.isSafeInteger(amount)) {
-      throw new UnsafeIntegerError({ input: amount });
+    if (!Number.isSafeInteger(input)) {
+      throw new UnsafeIntegerError({ input });
     }
 
-    return new Money(amount, currency);
+    return new Money(input, currency);
   }
 
   static zero(currency: Currency): MoneyContract {
@@ -375,10 +375,6 @@ export class Money implements MoneyContract {
 
   toJSON(): MoneyJSON {
     return { amount: this.#amount, currencyCode: this.#currency.code };
-  }
-
-  valueOf(): number {
-    return this.value();
   }
 
   // #endregion
