@@ -1,5 +1,9 @@
 import type { RoundingMode } from '@/types';
 
+type RoundFunction = (value: number) => number;
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function roundExpand(value: number) {
   return value >= 0 ? Math.ceil(value) : Math.floor(value);
 }
@@ -23,6 +27,8 @@ function roundHalfTrunc(value: number) {
   return value >= 0 ? Math.ceil(value - 0.5) : Math.floor(value + 0.5);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const ROUND_FUNCTIONS = {
   ceil: Math.ceil,
   floor: Math.floor,
@@ -34,6 +40,7 @@ export const ROUND_FUNCTIONS = {
   halfCeil: Math.round,
   halfFloor: roundHalfFloor,
   halfTrunc: roundHalfTrunc,
-} as const satisfies Record<RoundingMode, (value: number) => number>;
+} as const satisfies Record<RoundingMode, RoundFunction>;
 
 export const DEFAULT_ROUNDING_MODE: RoundingMode = 'halfExpand';
+export const DEFAULT_ROUND_FN = ROUND_FUNCTIONS[DEFAULT_ROUNDING_MODE];

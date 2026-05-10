@@ -1,20 +1,35 @@
 import type { Currency } from './currencies';
 
 import { InvalidInputError } from './errors';
-import { ROUND_FUNCTIONS } from './rounding';
+import { DEFAULT_ROUND_FN } from './rounding';
 
-const roundingFn = ROUND_FUNCTIONS.halfExpand;
+// ─────────────────────────────────────────────────────────────────────────────
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const regexCache = new Map<string, RegExp>();
+
+function getAllowedPattern(group: string, decimal: string): RegExp {
+  const key = `${group}|${decimal}`;
+
+  if (!regexCache.has(key)) {
+    regexCache.set(key, new RegExp(`[^\\d${escapeRegex(group)}${escapeRegex(decimal)}]`, 'g'));
+  }
+
+  // biome-ignore lint/style/noNonNullAssertion: map never returns null
+  return regexCache.get(key)!;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function numberToMinorUnit(input: number, fractionDigits: number): number {
-  if (Number.isNaN(input) || !Number.isFinite(input)) {
+  if (!Number.isFinite(input)) {
     throw new InvalidInputError('Value must be a finite number.', { input });
   }
 
   if (input === 0) return 0;
 
-  const result = roundingFn(Number(`${input}e${fractionDigits}`));
+  const result = DEFAULT_ROUND_FN(Number(`${input}e${fractionDigits}`));
 
   if (!Number.isFinite(result)) {
     throw new InvalidInputError('Value is too large to be represented as a monetary amount.', {
@@ -37,21 +52,17 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
 export function stringToMinorUnit(input: string, currency: Currency): number {
   const { group, decimal, fractionDigits } = currency;
 
-  const signMatch = /^([+-]?)(.*)$/.exec(input.trim());
-  const sign = signMatch?.[1] ?? '';
-  const rest = signMatch?.[2] ?? '';
+  const [, sign = '', rest = ''] = /^([+-]?)(.*)$/.exec(input.trim()) ?? [];
 
-  const groupEscaped = group.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const decimalEscaped = decimal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const allowedPattern = new RegExp(`[^\\d${groupEscaped}${decimalEscaped}]`, 'g');
-  const cleaned = rest.replace(allowedPattern, '');
+  const allowedPattern = getAllowedPattern(group, decimal);
+  const sanitizedValue = rest.replace(allowedPattern, '');
+  const withoutGroup = sanitizedValue.replaceAll(group, '');
 
-  const withoutGroup = cleaned.replaceAll(group, '');
+  const hasMultipleDecimals = withoutGroup.indexOf(decimal) !== withoutGroup.lastIndexOf(decimal);
 
-  const decimalCount = withoutGroup.split(decimal).length - 1;
-  if (decimalCount > 1) {
+  if (hasMultipleDecimals) {
     throw new InvalidInputError(
-      `Cannot parse value as a monetary amount: multiple decimal separators found.`,
+      'Cannot parse value as a monetary amount: multiple decimal separators found.',
       { input },
     );
   }

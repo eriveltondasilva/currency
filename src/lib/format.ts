@@ -9,26 +9,33 @@ export function formatMoney(
   options: FormatOptions = {},
 ): string {
   const locale = options.locale ?? currency.locale;
-  const code = currency.code;
 
   const isDecimalOnly = options.currencyDisplay === 'none';
   const isCompact = options.notation === 'compact';
 
-  const currencyDisplay = isDecimalOnly
-    ? undefined
-    : ((options.currencyDisplay ?? 'symbol') as IntlCurrencyDisplay);
-
   return new Intl.NumberFormat(locale, {
     style: isDecimalOnly ? 'decimal' : 'currency',
-    currency: isDecimalOnly ? undefined : code,
+    currency: isDecimalOnly ? undefined : currency.code,
 
-    currencyDisplay,
+    currencySign: options.currencySign ?? 'standard',
+
+    currencyDisplay: isDecimalOnly
+      ? undefined
+      : ((options.currencyDisplay as IntlCurrencyDisplay) ?? 'symbol'),
 
     notation: options.notation ?? 'standard',
+    compactDisplay: options.compactDisplay ?? 'short',
+
     signDisplay: options.signDisplay ?? 'auto',
     useGrouping: options.useGrouping ?? true,
 
-    minimumFractionDigits: isCompact ? 0 : currency.fractionDigits,
-    maximumFractionDigits: isCompact ? 1 : currency.fractionDigits,
+    minimumFractionDigits:
+      options.minimumFractionDigits ?? (isCompact ? 0 : currency.fractionDigits),
+    maximumFractionDigits:
+      options.maximumFractionDigits ??
+      (isCompact ? Math.min(1, currency.fractionDigits) : currency.fractionDigits),
+
+    trailingZeroDisplay: options.trailingZeroDisplay ?? 'auto',
+    roundingMode: options.roundingMode ?? 'halfExpand',
   }).format(value);
 }

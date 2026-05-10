@@ -52,8 +52,8 @@ export class DivisionByZeroError extends MoneyError {
 }
 
 export class InvalidAllocationError extends MoneyError {
-  constructor(options?: MoneyErrorOptions) {
-    super('Number of parts must be a positive integer.', 'INVALID_ALLOCATION', options);
+  constructor(message: string, options?: MoneyErrorOptions) {
+    super(message, 'INVALID_ALLOCATION', options);
 
     this.name = 'InvalidAllocationError';
   }
