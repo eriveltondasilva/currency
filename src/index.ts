@@ -18,6 +18,7 @@ export {
   InvalidPercentageError,
   InvalidRangeError,
   MoneyError,
+  UnsafeIntegerError,
   UnsupportedCurrencyError,
 } from './lib/errors';
 
