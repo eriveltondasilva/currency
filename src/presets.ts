@@ -1,18 +1,26 @@
+import type { CountryCode } from './lib/currencies';
 import type { MoneyContract } from './types';
 
-import { from } from '@/api/creation';
+import { from, parse } from './api';
 
-export const au = (value: number): MoneyContract => from(value, 'AU');
-export const br = (value: number): MoneyContract => from(value, 'BR');
-export const ca = (value: number): MoneyContract => from(value, 'CA');
-export const ch = (value: number): MoneyContract => from(value, 'CH');
-export const cn = (value: number): MoneyContract => from(value, 'CN');
-export const de = (value: number): MoneyContract => from(value, 'DE');
-export const fr = (value: number): MoneyContract => from(value, 'FR');
-export const gb = (value: number): MoneyContract => from(value, 'GB');
-export const ind = (value: number): MoneyContract => from(value, 'IN');
-export const jp = (value: number): MoneyContract => from(value, 'JP');
-export const mx = (value: number): MoneyContract => from(value, 'MX');
-export const sg = (value: number): MoneyContract => from(value, 'SG');
-export const pt = (value: number): MoneyContract => from(value, 'PT');
-export const us = (value: number): MoneyContract => from(value, 'US');
+type CreatePreset = (value: number | string) => MoneyContract;
+
+function createPreset(country: CountryCode): CreatePreset {
+  return (value: number | string) =>
+    typeof value === 'string' ? parse(value, country) : from(value, country);
+}
+
+export const au = createPreset('AU');
+export const br = createPreset('BR');
+export const ca = createPreset('CA');
+export const ch = createPreset('CH');
+export const cn = createPreset('CN');
+export const de = createPreset('DE');
+export const fr = createPreset('FR');
+export const gb = createPreset('GB');
+export const ind = createPreset('IN');
+export const jp = createPreset('JP');
+export const mx = createPreset('MX');
+export const sg = createPreset('SG');
+export const pt = createPreset('PT');
+export const us = createPreset('US');
