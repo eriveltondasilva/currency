@@ -5,8 +5,8 @@ import { isEmptyOrNonArray, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
-import { InvalidRangeError } from '@/lib/errors';
-import { ROUND_FUNCTIONS } from '@/lib/rounding';
+import { InvalidRangeError, UnsafeIntegerError } from '@/lib/errors';
+import { DEFAULT_ROUND_FN } from '@/lib/rounding';
 import { Money } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -19,6 +19,10 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
   const amount = values.reduce<number>((acc, value, i) => {
     return acc + resolveMinorUnits(value, currency, `sum(): index ${i}`);
   }, 0);
+
+  if (!Number.isSafeInteger(amount)) {
+    throw new UnsafeIntegerError({ input: amount });
+  }
 
   return Money.fromMinorUnits(amount, currency);
 }
@@ -34,7 +38,11 @@ export function average(values: MoneyInput[], country: CountryCode): MoneyContra
     return acc + resolveMinorUnits(value, currency, `average(): index ${i}`);
   }, 0);
 
-  return Money.fromMinorUnits(ROUND_FUNCTIONS.halfExpand(amount / values.length), currency);
+  if (!Number.isSafeInteger(amount)) {
+    throw new UnsafeIntegerError({ input: amount });
+  }
+
+  return Money.fromMinorUnits(DEFAULT_ROUND_FN(amount / values.length), currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

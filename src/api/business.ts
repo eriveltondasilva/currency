@@ -6,7 +6,8 @@ import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
 import { DivisionByZeroError, InvalidInputError } from '@/lib/errors';
-import { isNumber, isRecord } from '@/lib/utils';
+import { DEFAULT_ROUND_FN } from '@/lib/rounding';
+import { isRecord } from '@/lib/utils';
 import { Money } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,9 +26,10 @@ export function total(items: PricedItem[], country: CountryCode): MoneyContract 
 
     const { price, quantity = 1 } = item;
 
-    if (!isNumber(quantity) || !Number.isFinite(quantity) || quantity < 0) {
+    if (!Number.isInteger(quantity) || quantity < 0) {
       throw new InvalidInputError(
-        `total(): index ${i} — quantity must be a non-negative finite number.`,
+        `total(): index ${i} — quantity must be an integer. ` +
+          `Fractional quantities produce ambiguous sub-minor-unit values.`,
         { input: quantity },
       );
     }
@@ -37,7 +39,7 @@ export function total(items: PricedItem[], country: CountryCode): MoneyContract 
     return acc + unitAmount * quantity;
   }, 0);
 
-  return Money.fromMinorUnits(Math.round(rawAmount), currency);
+  return Money.fromMinorUnits(DEFAULT_ROUND_FN(rawAmount), currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -43,6 +43,22 @@ export function parse(value: unknown, country: CountryCode): MoneyContract {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function fromMinorUnits(value: number, country: CountryCode): MoneyContract {
+  if (!Number.isFinite(value)) {
+    throw new InvalidInputError('fromMinorUnits(): value must be a finite number.', {
+      input: value,
+    });
+  }
+
+  if (!Number.isInteger(value)) {
+    throw new InvalidInputError('fromMinorUnits(): value must be an integer.', { input: value });
+  }
+
+  if (!Number.isSafeInteger(value)) {
+    throw new InvalidInputError('fromMinorUnits(): value exceeds safe integer range.', {
+      input: value,
+    });
+  }
+
   const currency = resolveCurrency(country);
   return Money.fromMinorUnits(value, currency);
 }

@@ -2,7 +2,7 @@ import type { Currency } from '@/lib/currencies';
 import type { MoneyInput } from '@/types';
 
 import { numberToMinorUnit } from '@/lib/convert';
-import { CurrencyMismatchError, InvalidInputError } from '@/lib/errors';
+import { CurrencyMismatchError, InvalidInputError, MoneyError } from '@/lib/errors';
 import { isMoney } from '@/lib/utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -20,11 +20,10 @@ export function resolveMinorUnits(value: MoneyInput, currency: Currency, context
     });
   }
 
-  if (isMoney(value) && value.currencyCode() !== currency.code) {
-    throw new CurrencyMismatchError(currency.code, value.currencyCode());
-  }
-
   if (isMoney(value)) {
+    if (value.currencyCode() !== currency.code)
+      throw new CurrencyMismatchError(currency.code, value.currencyCode());
+
     return value.amount();
   }
 
@@ -37,6 +36,7 @@ export function resolveMinorUnits(value: MoneyInput, currency: Currency, context
   try {
     return numberToMinorUnit(value, currency.fractionDigits);
   } catch (cause) {
+    if (cause instanceof MoneyError) throw cause;
     throw new InvalidInputError(`${context} — invalid value.`, { input: value, cause });
   }
 }
