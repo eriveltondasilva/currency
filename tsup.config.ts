@@ -31,6 +31,7 @@ export default defineConfig([
     banner: { js: banner },
     dts: { banner },
     format: 'esm',
+    target: 'esnext',
     treeshake: true,
     clean: true,
     sourcemap: !isProduction,
