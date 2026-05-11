@@ -3,7 +3,7 @@ import type { MoneyInput } from '@/types';
 
 import { numberToMinorUnit } from '@/lib/convert';
 import { CurrencyMismatchError, InvalidInputError, MoneyError } from '@/lib/errors';
-import { isMoney } from '@/money';
+import { isMoney } from '@/lib/utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 

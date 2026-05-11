@@ -22,9 +22,13 @@ export {
   UnsupportedCurrencyError,
 } from './lib/errors';
 
-// Core class
-export const Money = Object.freeze(api);
+// Namespace
+export const Money = Object.freeze({ ...api });
 
+// Default export
+export default Money;
+
+// API
 export {
   percent,
   total,
@@ -43,6 +47,5 @@ export {
   parse,
   zero,
 } from './api/creation';
-export { isMoneyInput } from './lib/utils';
-export { isMoney } from './money';
-export default Money;
+// Utils
+export { isMoney, isMoneyInput } from './lib/utils';
