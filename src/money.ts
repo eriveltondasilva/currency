@@ -22,6 +22,8 @@ import { formatMoney } from './lib/format';
 import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from './lib/rounding';
 import { isMoney, tag } from './lib/utils';
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Concrete implementation of {@link MoneyContract}.
  *

@@ -1,6 +1,6 @@
 import { UnsupportedCurrencyError } from './errors';
 
-// #region Types
+// ─────────────────────────────────────────────────────────────────────────────
 
 export type CountryCode =
   | 'AU'
@@ -32,9 +32,7 @@ export type CurrencyCode =
   | 'SGD'
   | 'USD';
 
-// #endregion
-
-// #region Interfaces
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface CurrencyDef {
   name: string;
@@ -57,9 +55,7 @@ export interface Currency {
   group: string;
 }
 
-// #endregion
-
-// #region Definitions
+// ─────────────────────────────────────────────────────────────────────────────
 
 const COUNTRY_DEFS = {
   AU: { name: 'Australia', locale: 'en-AU', currency: 'AUD', decimal: '.', group: ',' },
@@ -93,9 +89,7 @@ const CURRENCY_DEFS = {
   USD: { name: 'US Dollar', fractionDigits: 2 },
 } as const satisfies Record<CurrencyCode, CurrencyDef>;
 
-// #endregion
-
-// #region Utils
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const SUPPORTED_CODES = Object.keys(COUNTRY_DEFS).join(', ');
 
@@ -109,5 +103,3 @@ export function resolveCurrency(country: CountryCode): Currency {
 
   return { locale, code: currency, decimal, group, fractionDigits };
 }
-
-// #endregion
