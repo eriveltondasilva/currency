@@ -4,15 +4,15 @@ type RoundFunction = (value: number) => number;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function roundExpand(value: number): number {
+function expand(value: number): number {
   return value >= 0 ? Math.ceil(value) : Math.floor(value);
 }
 
-function roundHalfExpand(value: number): number {
+function halfExpand(value: number): number {
   return Math.sign(value) * Math.round(Math.abs(value));
 }
 
-function roundHalfEven(value: number): number {
+function halfEven(value: number): number {
   const floored = Math.floor(value);
   const fractionalPart = value - floored;
 
@@ -21,11 +21,11 @@ function roundHalfEven(value: number): number {
   return floored % 2 === 0 ? floored : floored + 1;
 }
 
-function roundHalfFloor(value: number): number {
+function halfFloor(value: number): number {
   return Math.ceil(value - 0.5);
 }
 
-function roundHalfTrunc(value: number): number {
+function halfTrunc(value: number): number {
   return value >= 0 ? Math.ceil(value - 0.5) : Math.floor(value + 0.5);
 }
 
@@ -35,13 +35,13 @@ export const ROUND_FUNCTIONS = {
   ceil: Math.ceil,
   floor: Math.floor,
   trunc: Math.trunc,
-  expand: roundExpand,
+  expand,
   //
-  halfExpand: roundHalfExpand,
-  halfEven: roundHalfEven,
+  halfExpand,
+  halfEven,
   halfCeil: Math.round,
-  halfFloor: roundHalfFloor,
-  halfTrunc: roundHalfTrunc,
+  halfFloor,
+  halfTrunc,
 } as const satisfies Record<RoundingMode, RoundFunction>;
 
 export const DEFAULT_ROUNDING_MODE: RoundingMode = 'halfExpand';
