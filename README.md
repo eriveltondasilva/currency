@@ -1,183 +1,215 @@
-# 💰 Currency.js — Currency Manipulation Library <!-- omit in toc -->
+# Currency
 
-![npm](https://img.shields.io/npm/v/@eriveltonsilva/currency.js)
-![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
-![Typescript](https://img.shields.io/badge/TypeScript-5.8-blue)
-![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
-![Size](https://img.shields.io/bundlephobia/minzip/@eriveltonsilva/currency.js) <br>
-![CI](https://github.com/eriveltondasilva/currency.js/actions/workflows/ci.yml/badge.svg)
-![Tests](https://img.shields.io/badge/tests-passing-success)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![npm version](https://img.shields.io/npm/v/@eriveltondasilva/currency)](https://www.npmjs.com/package/@eriveltondasilva/currency)
+[![npm package minimized gzipped size (scoped)](https://img.shields.io/bundlejs/size/%40eriveltondasilva/currency?format=both)](https://www.npmjs.com/package/@eriveltondasilva/currency)
+[![Pull Request](https://github.com/eriveltondasilva/currency/actions/workflows/pull-request.yml/badge.svg)](https://github.com/eriveltondasilva/currency/actions/workflows/pull-request.yml)
+[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?logo=biome)](https://biomejs.dev)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0-blue)](https://www.npmjs.com/package/@eriveltondasilva/currency)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-A lightweight, robust JavaScript library for currency operations with precision and reliability. Designed to handle monetary values safely, avoiding floating point issues common in financial calculations. Inspired by the lib of the same name [currency.js](https://www.npmjs.com/package/currency.js).
+A lightweight TypeScript library for precise monetary operations. All values are stored internally as **minor-unit integers** to eliminate floating-point errors. Every operation returns a new instance — the API is fully immutable.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/eriveltondasilva/currency.js/main/assets/currency-banner.png" alt="Currency.js Banner" width="600">
+  <img src="https://raw.githubusercontent.com/eriveltondasilva/currency.js/main/src/assets/currency-banner.png" alt="Currency.js Banner" width="600">
 </p>
 
-## 📖 Table of Contents <!-- omit in toc -->
 
-- [1. 🚀 Why Currency.js?](#1--why-currencyjs)
-- [2. 📦 Installation](#2--installation)
-- [3. 🔍 Quick Start](#3--quick-start)
-- [4. ✨ Key Features](#4--key-features)
-- [5. 🔧 Core APIs](#5--core-apis)
-  - [5.1. Creating Money Instances](#51-creating-money-instances)
-  - [5.2. Essential Operations](#52-essential-operations)
-- [6. 📚 Documentation](#6--documentation)
-- [7. 🧪 Testing](#7--testing)
-- [8. 🤝 Contributing](#8--contributing)
-- [9. 📄 License](#9--license)
-- [10. 🔗 Resources](#10--resources)
-- [11. 👥 Contributors](#11--contributors)
+## Features
 
-## 1. 🚀 Why Currency.js?
+- 💰 **Precise calculations** — integer-based math eliminates floating-point errors
+- 🔒 **Immutable API** — every operation returns a new instance
+- 🌍 **Internationalization** — formatting support for 14 countries and 100+ locales
+- 🧮 **Business operations** — discounts, surcharges, allocations, and more
+- 📦 **Zero dependencies** — lightweight and focused (< 5KB min+gzip)
+- 🎯 **Type-safe** — full TypeScript support with comprehensive type definitions
+## Quick Start
 
-**Financial operations demand precision.** JavaScript's native floating-point math can lead to errors when handling currency values:
-
-```javascript
-// Native JS floating-point issues
-0.1 + 0.2               // 0.30000000000000004 ❌
-19.99 * 0.07            // 1.3993000000000002 ❌
-(10.25 * 3).toFixed(2)  // "30.75" ❌ (close, but doesn't handle rounding properly)
-
-// With Currency.js
-Money(0.1).plus(0.2).value   // 0.3 ✅
-Money(19.99).percentage(7)   // 1.40 ✅ (properly rounded)
-Money(10.25).times(3).value  // 30.75 ✅
-```
-
-## 2. 📦 Installation
+### Installation
 
 ```bash
 npm install @eriveltonsilva/currency.js
 ```
 
-## 3. 🔍 Quick Start
+```bash
+bun add @eriveltonsilva/currency.js
+```
 
-```javascript
+### Import
+
+```typescript
+// Named imports (recommended — better tree-shaking)
+import { from, parse, sum, total, isMoney, ... } from '@eriveltonsilva/currency.js'
+
+// Default namespace
 import Money from '@eriveltonsilva/currency.js'
 
-// Create money instances
-const price = Money(19.99)
-const discount = Money(5)
+// Country presets
+import { br, us, ... } from '@eriveltonsilva/currency.js/presets'
 
-// Basic operations
-const finalPrice = price.minus(discount)
-console.log(finalPrice.format())  // $14.99
-
-// Chain operations
-const total = Money(100)
-  .applyDiscount(15)                // Apply 15% discount
-  .plus(4.99)                       // Add shipping
-  .format({ currencyCode: 'EUR' })  // Format as euros
-
-console.log(total)  // 89.99 €
-
-// Business calculations
-const subtotal = Money(125.99)
-const installments = subtotal.allocate(3)  // [42.00, 42.00, 41.99]
+// Types
+import type { MoneyContract, MoneyInput, FormatOptions, RoundingMode, PricedItem } from '@eriveltonsilva/currency.js'
 ```
 
-## 4. ✨ Key Features
+### Basic Usage
 
-- ✅ **Zero Dependencies**: Lightweight implementation (< 5KB min+gzip)
-- ✅ **Type-Safe Operations**: Full TypeScript support with comprehensive type definitions
-- ✅ **Immutable Values**: All operations return new Money instances
-- ✅ **Precise Calculations**: Uses integer-based math to eliminate floating-point errors
-- ✅ **Business Operations**: Support for discounts, taxes, installments, and more
-- ✅ **Flexible Formatting**: Internationalization support for 100+ currencies and locales
-- ✅ **Simple API**: Intuitive method names and chainable operations
+```typescript
+// Create instances
+const price = from(19.99, 'BR')
+price.format()     // => 'R$ 19,99'
+price.amount()     // => 19.99
+price.minorUnits() // => 1999
 
-## 5. 🔧 Core APIs
-
-### 5.1. Creating Money Instances
-
-```javascript
-// Basic creation
-const a = Money(10.50)    // From number
-const b = Money("10.50")  // From string
-const c = Money(a)        // From another Money instance
-
-// With format options
-const price = Money(99.99, {
-  currencyCode: 'EUR',
-  locale: 'de-DE',
-})
-
-// Pre-configured currencies
-import { Currency } from '@eriveltonsilva/currency.js'
-
-const usd = Currency.USD(99.99)  // $99.99
-const eur = Currency.EUR(99.99)  // 99.99 €
-const brl = Currency.BRL(99.99)  // R$ 99,99
-```
-
-### 5.2. Essential Operations
-
-```javascript
-// Arithmetic
-const sum = price.plus(20)       // Addition
-const diff = price.minus(5.99)   // Subtraction
-const doubled = price.times(2)   // Multiplication
-const half = price.dividedBy(2)  // Division
-
-// Comparison
-price.equals(99.99)       // true
-price.greaterThan(50)     // true
-price.lessThan(100)       // false
-price.isBetween(50, 150)  // true
+// Arithmetic (all return new instances)
+price.plus(5).format()     // => 'R$ 24,99'
+price.minus(4.99).format() // => 'R$ 15,00'
+price.times(2).format()    // => 'R$ 39,98'
+price.divide(2).format()   // => 'R$ 10,00'
 
 // Business operations
-const tenPercent = price.percentage(10)     // 10% of price
-const discounted = price.applyDiscount(20)  // 20% discount
-const total = price.applySurcharge(15)      // 15% surcharge
+price.applyDiscount(10).format() // => 'R$ 17,99'  (10% off)
+price.applySurcharge(5).format() // => 'R$ 20,99'  (5% added)
+price.percentOf(15).format()     // => 'R$ 3,00'   (15% of price)
+
+// Comparison
+price.equals(19.99)     // => true
+price.greaterThan(10)   // => true
+price.isBetween(10, 50) // => true
+
+// Allocation (largest-remainder method)
+from(10, 'BR').allocate(3).map((m) => m.amount())
+// => [3.34, 3.33, 3.33]
+
+from(100, 'US').allocateByRatio([1, 3]).map((m) => m.amount())
+// => [25, 75]
 ```
 
-## 6. 📚 Documentation
+### Collection Functions
 
-For comprehensive guides and examples, explore our documentation:
+```typescript
+import { sum, average, max, min, clamp } from '@eriveltonsilva/currency.js'
 
-- [API Reference](./docs/01.api-reference.md) - Complete method and property listing
-- [Formatting Guide](./docs/02.formatting.md) - Currency formatting options
-- [Best Practices](./docs/03.best-practices.md) - Recommended usage patterns
-- [Advanced Examples](./docs/04.advanced-examples.md) - Real-world implementations
-- [Important Warnings](./docs/05.important-warnings.md) - Limitations to be aware of
-
-## 7. 🧪 Testing
-
-```bash
-# Run the test suite
-npm test
-
-# Run the test suite with coverage
-npm run test:coverage
+sum([10, 20.50, 5], 'BR').format()   // => 'R$ 35,50'
+average([10, 20, 30], 'US').format() // => '$20.00'
+max([5, 30, 10], 'US').format()      // => '$30.00'
+min([5, 30, 10], 'US').format()      // => '$5.00'
+clamp(150, 0, 100, 'US').format()    // => '$100.00'
 ```
 
-## 8. 🤝 Contributing
+### Business Functions
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```typescript
+import { total, percent } from '@eriveltonsilva/currency.js'
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+const items = [
+  { price: 9.99, quantity: 3 },
+  { price: 4.99 },
+]
+total(items, 'US').format() // => '$34.96'
 
-## 9. 📄 License
+percent(25, 200, 'US') // => 12.5  (25 is 12.5% of 200)
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Country Presets
 
-## 10. 🔗 Resources
+```typescript
+import { br, us, de, jp } from '@eriveltonsilva/currency.js/presets'
 
-- [GitHub Repository](https://github.com/eriveltondasilva/currency.js)
-- [Report Issues](https://github.com/eriveltondasilva/currency.js/issues)
-- [NPM Package](https://www.npmjs.com/package/@eriveltonsilva/currency.js)
+// Accepts number (major units) or locale-formatted string
+br(19.99).format()          // => 'R$ 19,99'
+us(19.99).format()          // => '$19.99'
 
-## 11. 👥 Contributors
+br('R$ 1.999,99').amount()  // => 1999.99
+us('$1,999.99').amount()    // => 1999.99
 
-Thanks to all the people who have contributed to this project:
+de(1500).format()           // => '1.500,00 €'
+jp(500).format()            // => '¥500'
+```
 
-- [Erivelton Silva](https://github.com/eriveltondasilva) - Creator
+### Formatting
 
-To become a contributor, please see the [🤝 Contributing](#8--contributing) section.
+```typescript
+const price = from(1999.9, 'BR')
+
+price.format()                                    // => 'R$ 1.999,90'
+price.format({ currencyDisplay: 'code' })         // => 'BRL 1.999,90'
+price.format({ currencyDisplay: 'none' })         // => '1.999,90'
+price.format({ notation: 'compact' })             // => 'R$ 2 mil'
+price.format({ signDisplay: 'always' })           // => '+R$ 1.999,90'
+price.format({ currencySign: 'accounting' })      // => 'R$ 1.999,90'
+```
+
+### Serialization
+
+```typescript
+const price = from(19.99, 'BR')
+
+// JSON round-trip
+const json = price.toJSON()
+// => { minorUnits: 1999, currencyCode: 'BRL' }
+
+const restored = fromMinorUnits(json.minorUnits, 'BR')
+restored.equals(price)  // => true
+
+// String output
+price.toString()  // => '19.99'
+price.format()    // => 'R$ 19,99'
+```
+
+### Error Handling
+
+```typescript
+import { from, MoneyError, CurrencyMismatchError } from '@eriveltonsilva/currency.js'
+
+try {
+  from(10, 'BR').plus(from(10, 'US'))
+} catch (err) {
+  if (err instanceof MoneyError) {
+    console.error(err.code)     // => 'CURRENCY_MISMATCH'
+    console.error(err.message)  // => 'Cannot operate on mismatched currencies: BRL and USD.'
+  }
+}
+```
+
+All errors extend `MoneyError` and expose a `code` property for programmatic handling:
+
+| Error                      | Code                     |
+| -------------------------- | ------------------------ |
+| `InvalidInputError`        | `'INVALID_INPUT'`        |
+| `InvalidPercentageError`   | `'INVALID_PERCENTAGE'`   |
+| `DivisionByZeroError`      | `'DIVISION_BY_ZERO'`     |
+| `InvalidAllocationError`   | `'INVALID_ALLOCATION'`   |
+| `InvalidRangeError`        | `'INVALID_RANGE'`        |
+| `CurrencyMismatchError`    | `'CURRENCY_MISMATCH'`    |
+| `UnsupportedCurrencyError` | `'UNSUPPORTED_CURRENCY'` |
+| `UnsafeIntegerError`       | `'UNSAFE_INTEGER'`       |
+
+## Supported Countries
+
+| Code | Country        | Currency |
+| ---- | -------------- | -------- |
+| `AU` | Australia      | AUD      |
+| `BR` | Brazil         | BRL      |
+| `CA` | Canada         | CAD      |
+| `CH` | Switzerland    | CHF      |
+| `CN` | China          | CNY      |
+| `DE` | Germany        | EUR      |
+| `FR` | France         | EUR      |
+| `GB` | United Kingdom | GBP      |
+| `IN` | India          | INR      |
+| `JP` | Japan          | JPY      |
+| `MX` | Mexico         | MXN      |
+| `PT` | Portugal       | EUR      |
+| `SG` | Singapore      | SGD      |
+| `US` | United States  | USD      |
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each release.
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details.
+
+## License
+
+MIT © [Erivelton Silva](https://github.com/eriveltondasilva)

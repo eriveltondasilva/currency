@@ -1,32 +1,18 @@
 {
-  "extends": [
-    "@tsconfig/strictest/tsconfig.json",
-    "@tsconfig/node20/tsconfig.json",
-    "@tsconfig/node-ts/tsconfig.json"
-  ],
-  "ts-node": {
-    "esm": true,
-    "transpileOnly": true,
-    "files": true
-  },
+  "extends": "@tsconfig/bun/tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "removeComments": true,
-    //
-    "baseUrl": ".",
+    // Environment setup & latest features
+    "types": ["bun"],
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+
+    // Module resolution
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "docs",
-    "__tests__",
-    "**/*.example.ts",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
 }

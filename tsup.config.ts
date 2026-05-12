@@ -1,38 +1,40 @@
-import { defineConfig } from 'tsup'
-import packageJson from './package.json'
+import { defineConfig } from 'tsup';
 
-const banner =
-`/**
- * ${packageJson.name} v${packageJson.version}
- * ${packageJson.description}
+import pkg from './package.json';
+
+const { name, description, version, author, license, homepage } = pkg;
+const year = new Date().getFullYear();
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const banner = `/**
+ * ${name?.toUpperCase()} v${version}
  *
- * @license ${packageJson.license}
- * @copyright ${new Date().getFullYear()}
- * @author ${packageJson.author}
- * @see ${packageJson.homepage}
+ * ${description || 'no description'}
+ *
+ * @author ${author.name} <${author.email}>
+ * @license ${license?.toUpperCase()}
+ * @copyright ${year} ${author.name}
+ * @version ${version}
+ *
+ * @see ${homepage} - Documentation
+ *
+ * Inspired by:
+ * @see https://github.com/scurker/currency.js
  */
-`
+`;
 
 export default defineConfig([
   {
-    entry: ['./src/index.ts'],
-    treeshake: true,
+    entry: ['./src/index.ts', './src/presets.ts'],
+    tsconfig: './tsconfig.build.json',
+    banner: { js: banner },
+    dts: { banner },
     format: 'esm',
-    clean: true,
-    dts: {
-      only: true,
-      banner: banner,
-    },
-  },
-  {
-    entry: ['./src/index.ts'],
+    target: 'esnext',
     treeshake: true,
-    format: ['esm', 'cjs'],
-    outExtension: ({ format }) => ({
-      js: format === 'esm' ? '.mjs' : '.cjs',
-    }),
-    banner: {
-      js: banner,
-    },
+    clean: true,
+    sourcemap: !isProduction,
+    minify: isProduction,
   },
-])
+]);
