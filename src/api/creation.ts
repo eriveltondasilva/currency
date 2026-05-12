@@ -22,13 +22,13 @@ function assertNotNull(value: unknown): void {
  *
  * Also exported as `money` for more expressive usage.
  *
- * @param value — Amount in major units (e.g. `19.99`).
- * @param country — Supported country code (e.g. `'BR'`, `'US'`).
+ * @param value - Amount in major units (e.g. `19.99`).
+ * @param country - Supported country code (e.g. `'BR'`, `'US'`).
  *
  * @returns A new `MoneyContract` instance.
  *
- * @throws `InvalidInputError` — when `value` is not a finite number, is null/undefined, or exceeds the safe integer range after conversion to minor units.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `value` is not a finite number, is null/undefined, or exceeds the safe integer range after conversion to minor units.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * from(19.99, 'BR').format() // => 'R$ 19,99'
@@ -56,13 +56,13 @@ export function from(value: number, country: CountryCode): MoneyContract {
  * separators. Currency symbols and unknown characters are stripped before
  * parsing.
  *
- * @param value — A locale-formatted string (e.g. `'R$ 1.999,99'`, `'1,999.99'`).
- * @param country — Supported country code that defines the decimal/grouping separators.
+ * @param value - A locale-formatted string (e.g. `'R$ 1.999,99'`, `'1,999.99'`).
+ * @param country - Supported country code that defines the decimal/grouping separators.
  *
  * @returns A new `MoneyContract` instance.
  *
- * @throws `InvalidInputError` — when `value` is not a string, cannot be parsed as a monetary amount, or contains multiple decimal separators.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `value` is not a string, cannot be parsed as a monetary amount, or contains multiple decimal separators.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * parse('R$ 1.999,99', 'BR').amount() // => 1999.99
@@ -89,13 +89,13 @@ export function parse(value: string, country: CountryCode): MoneyContract {
  * Use this when the value is already in minor units — for example, when
  * reconstructing from a database or a {@link MoneyContract.toJSON} payload.
  *
- * @param value — Integer minor-unit value (e.g. `1999` for R$ 19,99).
- * @param country — Supported country code.
+ * @param value - Integer minor-unit value (e.g. `1999` for R$ 19,99).
+ * @param country - Supported country code.
  *
  * @returns A new `MoneyContract` instance.
  *
- * @throws `InvalidInputError` — when `value` is not a finite integer or exceeds `Number.MAX_SAFE_INTEGER`.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `value` is not a finite integer or exceeds `Number.MAX_SAFE_INTEGER`.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * fromMinorUnits(1999, 'BR').amount() // => 19.99
@@ -130,11 +130,11 @@ export function fromMinorUnits(value: number, country: CountryCode): MoneyContra
  * Creates a `MoneyContract` with an amount of zero for the given country.
  * Useful as an identity value for reductions or as a neutral starting point.
  *
- * @param country — Supported country code.
+ * @param country - Supported country code.
  *
  * @returns A new `MoneyContract` with `minorUnits === 0`.
  *
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * zero('BR').isZero()       // => true

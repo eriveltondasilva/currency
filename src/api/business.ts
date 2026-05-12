@@ -18,15 +18,15 @@ import { Money } from '@/money';
  * and an optional `quantity` (non-negative integer, defaults to `1`).
  * Returns `zero(country)` when `items` is empty.
  *
- * @param items — Array of `{ price, quantity? }` objects. See {@link PricedItem}.
- * @param country — Supported country code that defines the output currency.
+ * @param items - Array of `{ price, quantity? }` objects. See {@link PricedItem}.
+ * @param country - Supported country code that defines the output currency.
  *
  * @returns A new `MoneyContract` with the total amount.
  *
- * @throws `InvalidInputError` — when any item is not a plain object, or `quantity` is not a non-negative integer.
- * @throws `CurrencyMismatchError` — when any `price` is a `MoneyContract` with a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
- * @throws `UnsafeIntegerError` — when the accumulated total exceeds `Number.MAX_SAFE_INTEGER`.
+ * @throws `InvalidInputError` - when any item is not a plain object, or `quantity` is not a non-negative integer.
+ * @throws `CurrencyMismatchError` - when any `price` is a `MoneyContract` with a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
+ * @throws `UnsafeIntegerError` - when the accumulated total exceeds `Number.MAX_SAFE_INTEGER`.
  *
  * @example
  * const items = [
@@ -76,27 +76,27 @@ export function total(items: PricedItem[], country: CountryCode): MoneyContract 
  * Both arguments are resolved to minor units before division, ensuring
  * precision. The result is a plain `number`, not a `MoneyContract`.
  *
- * @param portion — The partial amount (numerator).
- * @param base — The reference amount (denominator). Must be non-zero.
- * @param country — Supported country code used to resolve both amounts.
+ * @param value - The partial amount (numerator).
+ * @param total - The reference amount (denominator). Must be non-zero.
+ * @param country - Supported country code used to resolve both amounts.
  *
  * @returns The percentage as a `number` (e.g. `25` for 25%).
  *
- * @throws `DivisionByZeroError` — when `base` resolves to zero.
- * @throws `CurrencyMismatchError` — when either argument is a `MoneyContract` with a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `DivisionByZeroError` - when `base` resolves to zero.
+ * @throws `CurrencyMismatchError` - when either argument is a `MoneyContract` with a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * percent(25, 200, 'US') // => 12.5
  * percent(1, 3, 'BR')    // => 33.333...
  */
-export function percent(portion: MoneyInput, base: MoneyInput, country: CountryCode): number {
+export function percent(value: MoneyInput, total: MoneyInput, country: CountryCode): number {
   const currency = resolveCurrency(country);
-  const baseAmount = resolveMinorUnits(base, currency, 'percent(): whole');
+  const totalAmount = resolveMinorUnits(total, currency, 'percent(): total');
 
-  if (baseAmount === 0) throw new DivisionByZeroError();
+  if (totalAmount === 0) throw new DivisionByZeroError();
 
-  const portionAmount = resolveMinorUnits(portion, currency, 'percent(): part');
+  const valueAmount = resolveMinorUnits(value, currency, 'percent(): part');
 
-  return (portionAmount / baseAmount) * 100;
+  return (valueAmount / totalAmount) * 100;
 }

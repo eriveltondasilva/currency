@@ -194,8 +194,8 @@ export type MoneyParts = [units: number, subunits: number];
  * floating-point errors.
  *
  * Supported countries:
- * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`,
- * `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`.
+ *
+ * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`, `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`.
  */
 export interface MoneyContract {
   // #region Accessors
@@ -315,6 +315,7 @@ export interface MoneyContract {
    * @param input — Amount to add. A `number` is interpreted as major units.
    *
    * @returns A new `MoneyContract` with the sum.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    * @throws `InvalidInputError` — when the result is not a finite number.
    * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
@@ -331,6 +332,7 @@ export interface MoneyContract {
    * @param input — Amount to subtract. A `number` is interpreted as major units.
    *
    * @returns A new `MoneyContract` with the difference.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
@@ -349,6 +351,7 @@ export interface MoneyContract {
    * @param roundingMode — Rounding strategy applied to the minor-unit result. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the product.
+   *
    * @throws `InvalidInputError` — when `factor` is not finite.
    * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
@@ -368,6 +371,7 @@ export interface MoneyContract {
    * @param roundingMode — Rounding strategy applied to the minor-unit result. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the quotient.
+   *
    * @throws `DivisionByZeroError` — when `divisor` is `0`.
    * @throws `InvalidInputError` — when `divisor` is not finite.
    * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
@@ -409,6 +413,7 @@ export interface MoneyContract {
    * @param input — Comparison value. A `number` is interpreted as major units.
    *
    * @returns The larger of the two values as a new `MoneyContract`.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    *
    * @example
@@ -423,6 +428,7 @@ export interface MoneyContract {
    * @param input — Comparison value. A `number` is interpreted as major units.
    *
    * @returns The smaller of the two values as a new `MoneyContract`.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    *
    * @example
@@ -441,6 +447,7 @@ export interface MoneyContract {
    * @param mode — Rounding strategy. Defaults to `'halfExpand'`
    * .
    * @returns A new `MoneyContract` rounded to the nearest `increment`.
+   *
    * @throws `InvalidInputError` — when `increment` is not a positive integer.
    *
    * @example
@@ -471,6 +478,7 @@ export interface MoneyContract {
    * Returns `true` if this instance is strictly greater than `input`.
    *
    * @param input — Comparison value. A `number` is interpreted as major units.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    *
    * @example
@@ -482,6 +490,7 @@ export interface MoneyContract {
    * Returns `true` if this instance is strictly less than `input`.
    *
    * @param input — Comparison value. A `number` is interpreted as major units.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    *
    * @example
@@ -493,6 +502,7 @@ export interface MoneyContract {
    * Returns `true` if this instance is greater than or equal to `input`.
    *
    * @param input — Comparison value. A `number` is interpreted as major units.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    *
    * @example
@@ -504,6 +514,7 @@ export interface MoneyContract {
    * Returns `true` if this instance is less than or equal to `input`.
    *
    * @param input — Comparison value. A `number` is interpreted as major units.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
    *
    * @example
@@ -550,6 +561,7 @@ export interface MoneyContract {
    * @param roundingMode — Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` representing the percentage amount.
+   *
    * @throws `InvalidPercentageError` — when `percent` is negative or not finite.
    *
    * @example
@@ -568,6 +580,7 @@ export interface MoneyContract {
    * @param roundingMode — Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the discount applied.
+   *
    * @throws `InvalidPercentageError` — when `discount` is negative, exceeds 100, or is not finite.
    *
    * @example
@@ -586,6 +599,7 @@ export interface MoneyContract {
    * @param roundingMode — Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the surcharge applied.
+   *
    * @throws `InvalidPercentageError` — when `surcharge` is negative or not finite.
    *
    * @example
@@ -603,6 +617,7 @@ export interface MoneyContract {
    * @param parts — Positive integer number of shares.
    *
    * @returns An array of `parts` new `MoneyContract` instances.
+   *
    * @throws `InvalidAllocationError` — when `parts` is not a positive integer.
    *
    * @example
@@ -621,6 +636,7 @@ export interface MoneyContract {
    * @param ratios — Non-empty array of non-negative integers representing relative shares.
    *
    * @returns An array of new `MoneyContract` instances, one per ratio entry.
+   *
    * @throws `InvalidAllocationError` — when `ratios` is empty, contains non-integers, negative values, sums to zero, or the sum exceeds `Number.MAX_SAFE_INTEGER`.
    * @throws `UnsafeIntegerError` — when an intermediate calculation exceeds the safe integer range.
    *
@@ -638,6 +654,7 @@ export interface MoneyContract {
    * Formats the amount as a locale-aware currency string using `Intl.NumberFormat`.
    *
    * @param options — Optional display overrides. See {@link FormatOptions}.
+   *
    * @returns A formatted string.
    *
    * @example

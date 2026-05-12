@@ -62,6 +62,7 @@ export class Money implements MoneyContract {
    * @param currency — Resolved currency descriptor.
    *
    * @returns A new `MoneyContract` instance.
+   *
    * @throws `InvalidInputError` — when `input` is not finite or not an integer.
    * @throws `UnsafeIntegerError` — when `input` exceeds `Number.MAX_SAFE_INTEGER`.
    */
@@ -94,6 +95,7 @@ export class Money implements MoneyContract {
    * Prefer the top-level `zero(country)` for public usage.
    *
    * @param currency — Resolved currency descriptor.
+   *
    * @returns A new `MoneyContract` instance with `minorUnits === 0`.
    */
   static zero(currency: Currency): MoneyContract {
