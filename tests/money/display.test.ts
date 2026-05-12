@@ -45,8 +45,8 @@ describe('Money.units', () => {
     expect(zero('US').units()).toBe(0);
   });
 
-  it('should return the absolute whole unit for a negative amount', () => {
-    expect(from(-10.5, 'US').units()).toBe(10);
+  it('should return a negative whole unit for a negative amount', () => {
+    expect(from(-10.5, 'US').units()).toBe(-10);
   });
 });
 
@@ -61,8 +61,8 @@ describe('Money.subunits', () => {
     expect(from(10, 'US').subunits()).toBe(0);
   });
 
-  it('should return the absolute fractional part for a negative amount', () => {
-    expect(from(-10.5, 'US').subunits()).toBe(50);
+  it('should return a negative fractional part for a negative amount', () => {
+    expect(from(-10.5, 'US').subunits()).toBe(-50);
   });
 
   it('should return 0 for JPY which has no subunits', () => {
@@ -73,16 +73,20 @@ describe('Money.subunits', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.toParts', () => {
-  it('should return a tuple of [units, subunits]', () => {
-    expect(from(10.99, 'US').toParts()).toEqual([10, 99]);
+  it('should return units, subunits and isNegative for a positive amount', () => {
+    expect(from(10.99, 'US').toParts()).toEqual({ units: 10, subunits: 99, isNegative: false });
   });
 
-  it('should return [0, 0] for zero', () => {
-    expect(zero('US').toParts()).toEqual([0, 0]);
+  it('should return zeroed parts with isNegative false for zero', () => {
+    expect(zero('US').toParts()).toEqual({ units: 0, subunits: 0, isNegative: false });
   });
 
-  it('should return absolute values for a negative amount', () => {
-    expect(from(-10.5, 'US').toParts()).toEqual([10, 50]);
+  it('should return absolute parts with isNegative true for a negative amount', () => {
+    expect(from(-10.5, 'US').toParts()).toEqual({ units: 10, subunits: 50, isNegative: true });
+  });
+
+  it('should preserve sign information when units is zero', () => {
+    expect(from(-0.99, 'US').toParts()).toEqual({ units: 0, subunits: 99, isNegative: true });
   });
 });
 
@@ -118,16 +122,16 @@ describe('Money.locale', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.toString', () => {
-  it('should return a decimal string with the correct fraction digits', () => {
-    expect(from(10.5, 'US').toString()).toBe('10.50');
+  it('should return the currency code followed by the decimal amount', () => {
+    expect(from(10.5, 'US').toString()).toBe('USD 10.50');
   });
 
   it('should return 0 fraction digits for JPY', () => {
-    expect(from(1500, 'JP').toString()).toBe('1500');
+    expect(from(1500, 'JP').toString()).toBe('JPY 1500');
   });
 
   it('should include the minus sign for negative amounts', () => {
-    expect(from(-10.5, 'US').toString()).toBe('-10.50');
+    expect(from(-10.5, 'US').toString()).toBe('USD -10.50');
   });
 });
 
@@ -152,13 +156,11 @@ describe('Money.toJSON', () => {
 
 describe('Money.format', () => {
   it('should format a BRL amount with the default locale', () => {
-    const formatted = from(1234.56, 'BR').format();
-    expect(formatted).toContain('1.234,56');
+    expect(from(1234.56, 'BR').format()).toContain('1.234,56');
   });
 
   it('should format a USD amount with the default locale', () => {
-    const formatted = from(1234.56, 'US').format();
-    expect(formatted).toContain('1,234.56');
+    expect(from(1234.56, 'US').format()).toContain('1,234.56');
   });
 
   it('should format JPY without decimal places', () => {
@@ -172,8 +174,7 @@ describe('Money.format', () => {
   });
 
   it('should display the currency name when currencyDisplay is "name"', () => {
-    const formatted = from(10, 'US').format({ currencyDisplay: 'name' });
-    expect(formatted.toLowerCase()).toContain('dollar');
+    expect(from(10, 'US').format({ currencyDisplay: 'name' }).toLowerCase()).toContain('dollar');
   });
 
   it('should hide the currency symbol when currencyDisplay is "none"', () => {
@@ -182,24 +183,23 @@ describe('Money.format', () => {
     expect(formatted).toContain('10.50');
   });
 
-  it('should render a compact notation for large amounts', () => {
-    const formatted = from(1_500_000, 'US').format({ notation: 'compact' });
-    expect(formatted).toMatch(/1[.,]?5\s?M/);
+  it('should render compact notation for large amounts', () => {
+    expect(from(1_500_000, 'US').format({ notation: 'compact' })).toMatch(/1[.,]?5\s?M/);
   });
 
   it('should show the sign for positive values when signDisplay is "always"', () => {
     expect(from(10, 'US').format({ signDisplay: 'always' })).toContain('+');
   });
 
-  it('should override the locale for display without affecting the amount', () => {
+  it('should override the locale for display without affecting the currency code', () => {
     const money = from(1234.56, 'US');
-    const formatted = money.format({ locale: 'de-DE' });
-    expect(formatted).toContain('1.234,56');
+    expect(money.format({ locale: 'de-DE' })).toContain('1.234,56');
     expect(money.currencyCode()).toBe('USD');
   });
 
-  it('should format with a custom minimumFractionDigits', () => {
-    const formatted = from(10, 'US').format({ minimumFractionDigits: 4, maximumFractionDigits: 4 });
-    expect(formatted).toContain('10.0000');
+  it('should format with a custom number of fraction digits', () => {
+    expect(from(10, 'US').format({ minimumFractionDigits: 4, maximumFractionDigits: 4 })).toContain(
+      '10.0000',
+    );
   });
 });
