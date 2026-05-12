@@ -7,10 +7,15 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.{test,spec}.ts'],
     coverage: {
-      enabled: true,
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/**/examples.ts'],
+      exclude: [
+        'src/types.ts',
+        'src/index.ts',
+        'src/examples.ts',
+        'src/api/index.ts',
+        'src/lib/currencies.ts',
+      ],
     },
   },
 });
