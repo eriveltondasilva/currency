@@ -34,10 +34,10 @@
     "name": "Erivelton Silva",
     "email": "eriveltondasilva13@gmail.com"
   },
-  "homepage": "https://github.com/eriveltondasilva/currency.js#readme",
+  "homepage": "https://github.com/eriveltondasilva/currency#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eriveltondasilva/currency.js.git"
+    "url": "git+https://github.com/eriveltondasilva/currency.git"
   },
   "files": [
     "dist"
