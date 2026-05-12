@@ -46,6 +46,14 @@ describe('numberToMinorUnit', () => {
   it('should throw InvalidInputError when the result exceeds Number.MAX_SAFE_INTEGER', () => {
     expect(() => numberToMinorUnit(Number.MAX_SAFE_INTEGER, 2)).toThrow(InvalidInputError);
   });
+
+  it('should throw InvalidInputError when the result is NaN after exponential conversion', () => {
+    expect(() => numberToMinorUnit(1e308, 2)).toThrow(InvalidInputError);
+  });
+
+  it('should throw InvalidInputError for other large scientific-notation values', () => {
+    expect(() => numberToMinorUnit(9.9e307, 2)).toThrow(InvalidInputError);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
