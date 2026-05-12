@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { averageWith, clamp, max, min, sum } from '@/api/collection';
+import { average, clamp, max, min, sum } from '@/api/collection';
 import { from } from '@/api/creation';
 import { InvalidInputError, InvalidRangeError } from '@/lib/errors';
 
@@ -40,29 +40,29 @@ describe('sum', () => {
 
 describe('average', () => {
   it('should return the average of multiple values', () => {
-    expect(averageWith([10, 20, 30], 'US').minorUnits()).toBe(2000);
+    expect(average([10, 20, 30], 'US').minorUnits()).toBe(2000);
   });
 
   it('should round the result when values do not divide evenly', () => {
-    const result = averageWith([10, 20, 30, 40], 'US').minorUnits();
+    const result = average([10, 20, 30, 40], 'US').minorUnits();
     expect(result).toBe(2500);
   });
 
   it('should apply default rounding when the average is a non-integer minor unit', () => {
     // (100 + 200 + 300) cents / 3 = 200 cents → exact
-    expect(averageWith([1, 2, 3], 'US').minorUnits()).toBe(200);
+    expect(average([1, 2, 3], 'US').minorUnits()).toBe(200);
   });
 
   it('should return zero for an empty array', () => {
-    expect(averageWith([], 'US').isZero()).toBe(true);
+    expect(average([], 'US').isZero()).toBe(true);
   });
 
   it('should return the single value for a one-element array', () => {
-    expect(averageWith([42], 'US').minorUnits()).toBe(4200);
+    expect(average([42], 'US').minorUnits()).toBe(4200);
   });
 
   it('should produce the correct currency code', () => {
-    expect(averageWith([10, 20], 'BR').currencyCode()).toBe('BRL');
+    expect(average([10, 20], 'BR').currencyCode()).toBe('BRL');
   });
 });
 

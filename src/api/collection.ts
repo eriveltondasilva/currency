@@ -63,7 +63,7 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
  * average([10, 20, 30], 'US').amount() // => 20
  * average([1, 2], 'BR').amount()       // => 1.5
  */
-export function averageWith(
+export function average(
   values: MoneyInput[],
   country: CountryCode,
   roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
@@ -84,7 +84,7 @@ export function averageWith(
 /**
  * Returns the largest value in an array of monetary values.
  *
- * Unlike {@link sum} and {@link averageWith}, `max` requires at least one element.
+ * Unlike {@link sum} and {@link average}, `max` requires at least one element.
  *
  * @param values - Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
  * @param country - Supported country code that defines the output currency.
@@ -121,7 +121,7 @@ export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
 /**
  * Returns the smallest value in an array of monetary values.
  *
- * Unlike {@link sum} and {@link averageWith}, `min` requires at least one element.
+ * Unlike {@link sum} and {@link average}, `min` requires at least one element.
  *
  * @param values - Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
  * @param country - Supported country code that defines the output currency.
