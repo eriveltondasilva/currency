@@ -44,6 +44,7 @@ import * as api from './api';
 
 export type {
   FormatOptions,
+  MoneyContract,
   MoneyInput,
   PricedItem,
   RoundingMode,
@@ -104,10 +105,6 @@ export {
  * // Utils
  * Money.isMoney(Money.from(19.99, 'BR'))      // => true
  * Money.isMoneyInput(Money.from(19.99, 'BR')) // => true
- *
- * ## Supported countries
- *
- * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`, `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`
  */
 export const Money: typeof api = Object.freeze({ ...api });
 
@@ -117,6 +114,7 @@ export {
   from as money,
   from,
   fromMinorUnits,
+  parse as fromString,
   parse,
   zero,
 } from './api/creation';
@@ -124,7 +122,7 @@ export {
 // ─── Collection ──────────────────────────────────────────────────────────────
 
 export {
-  averageWith,
+  average,
   clamp,
   max,
   min,
