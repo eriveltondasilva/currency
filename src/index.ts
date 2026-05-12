@@ -1,7 +1,7 @@
 /**
  * @module @eriveltondasilva/currency
  *
- * A lightweight TypeScript library for precise monetary operations.
+ * # A lightweight TypeScript library for precise monetary operations.
  *
  * All values are stored internally as **minor-unit integers** to eliminate
  * floating-point errors. Every operation returns a new instance — the API
@@ -13,15 +13,17 @@
  * import { from, sum, total } from '@eriveltondasilva/currency'
  *
  * const price = from(19.99, 'BR')
- * price.format()                        // => 'R$ 19,99'
- * price.applyDiscount(10).format()      // => 'R$ 17,99'
+ * price.format()                   // => 'R$ 19,99'
+ * price.applyDiscount(10).format() // => 'R$ 17,99'
  *
- * sum([10, 20, 30], 'US').format()      // => '$60.00'
+ * sum([10, 20, 30], 'US').format() // => '$60.00'
  *
- * total([
+ * const items = [
  *   { price: 9.99, quantity: 3 },
  *   { price: 4.99 },
- * ], 'US').format()                     // => '$34.96'
+ * ]
+ * total(items, 'US').format()
+ * // => '$34.96'
  *
  * ## Preset shorthand (optional import)
  *
@@ -33,9 +35,7 @@
  *
  * ## Supported countries
  *
- * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`,
- * `FR`, `GB`, `IN`, `JP`, `MX`, `PT`,
- * `SG`, `US`
+ * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`, `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`
  */
 
 import * as api from './api';
@@ -69,19 +69,47 @@ export {
  * Frozen namespace that exposes the full library API as a single object.
  * Useful when a single import is preferred over named imports.
  *
+ * @remarks
+ * Prefer named imports over this namespace for better tree-shaking.
+ *
+ * ```ts
+ * // ✅ Only `from` and `format` are bundled
+ * import { from } from '@eriveltondasilva/currency'
+ *
+ * // ⚠️  Entire library is bundled
+ * import Money from '@eriveltondasilva/currency'
+ * ```
+ *
  * @example
  * import Money from '@eriveltondasilva/currency'
  *
+ * // Creation
  * Money.from(19.99, 'BR').format()          // => 'R$ 19,99'
- * Money.parse('$20.00').format()            // => '$20.00'
  * Money.fromMinorUnits(2000, 'BR').format() // => 'R$ 20,00'
+ * Money.parse('$20.00', 'US').format()      // => '$20.00'
  * Money.zero('US').format()                 // => '$0.00'
- * Money.average([10, 20], 'US').format()    // => '$15.00'
- * Money.sum([10, 20], 'US').format()        // => '$30.00'
+ *
+ * // Collection
+ * Money.average([10, 20], 'US').format() // => '$15.00'
+ * Money.clamp(100, 1, 20, 'US').format() // => '$20.00'
+ * Money.max([10, 20], 'US').format()     // => '$20.00'
+ * Money.min([10, 20], 'US').format()     // => '$10.00'
+ * Money.sum([10, 20, 30], 'US').format() // => '$60.00'
+ *
+ * // Business
+ * Money.percent(10, 200, 'US') // => 5
  * Money.total([{ price: 5, quantity: 2 }], 'US').format()
  * // => '$10.00'
+ *
+ * // Utils
+ * Money.isMoney(Money.from(19.99, 'BR'))      // => true
+ * Money.isMoneyInput(Money.from(19.99, 'BR')) // => true
+ *
+ * ## Supported countries
+ *
+ * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`, `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`
  */
-export const Money = Object.freeze({ ...api });
+export const Money: typeof api = Object.freeze({ ...api });
 
 // ─── Creation ────────────────────────────────────────────────────────────────
 
@@ -96,7 +124,7 @@ export {
 // ─── Collection ──────────────────────────────────────────────────────────────
 
 export {
-  average,
+  averageWith,
   clamp,
   max,
   min,
@@ -113,5 +141,4 @@ export {
 // ─── Utils ───────────────────────────────────────────────────────────────────
 
 export { isMoney, isMoneyInput } from './lib/utils';
-
 export default Money;

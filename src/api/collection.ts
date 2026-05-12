@@ -1,12 +1,12 @@
 import type { CountryCode } from '@/lib/currencies';
-import type { MoneyContract, MoneyInput } from '@/types';
+import type { MoneyContract, MoneyInput, RoundingMode } from '@/types';
 
 import { hasNoItems, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError, InvalidRangeError } from '@/lib/errors';
-import { DEFAULT_ROUND_FN } from '@/lib/rounding';
+import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from '@/lib/rounding';
 import { Money } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -18,14 +18,14 @@ import { Money } from '@/money';
  * All values must share the same currency as `country` — passing a
  * `MoneyContract` with a different currency throws `CurrencyMismatchError`.
  *
- * @param values — Array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country — Supported country code that defines the output currency.
+ * @param values - Array of amounts as numbers (major units) or `MoneyContract` instances.
+ * @param country - Supported country code that defines the output currency.
  *
  * @returns A new `MoneyContract` with the total sum.
  *
- * @throws `CurrencyMismatchError` — when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
- * @throws `UnsafeIntegerError` — when the accumulated sum exceeds `Number.MAX_SAFE_INTEGER`.
+ * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
+ * @throws `UnsafeIntegerError` - when the accumulated sum exceeds `Number.MAX_SAFE_INTEGER`.
  *
  * @example
  * sum([10, 20.50, 5], 'BR').format() // => 'R$ 35,50'
@@ -51,19 +51,23 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
  * The result is rounded to the nearest minor unit using `'halfExpand'`.
  * Returns `zero(country)` when `values` is empty.
  *
- * @param values — Array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country — Supported country code that defines the output currency.
+ * @param values - Array of amounts as numbers (major units) or `MoneyContract` instances.
+ * @param country - Supported country code that defines the output currency.
  *
  * @returns A new `MoneyContract` with the average amount.
  *
- * @throws `CurrencyMismatchError` — when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * average([10, 20, 30], 'US').amount() // => 20
  * average([1, 2], 'BR').amount()       // => 1.5
  */
-export function average(values: MoneyInput[], country: CountryCode): MoneyContract {
+export function averageWith(
+  values: MoneyInput[],
+  country: CountryCode,
+  roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
+): MoneyContract {
   if (hasNoItems(values)) return zero(country);
 
   const currency = resolveCurrency(country);
@@ -72,7 +76,7 @@ export function average(values: MoneyInput[], country: CountryCode): MoneyContra
     return acc + resolveMinorUnits(value, currency, `average(): index ${i}`);
   }, 0);
 
-  return Money.fromMinorUnits(DEFAULT_ROUND_FN(amount / values.length), currency);
+  return Money.fromMinorUnits(ROUND_FUNCTIONS[roundingMode](amount / values.length), currency);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -80,16 +84,16 @@ export function average(values: MoneyInput[], country: CountryCode): MoneyContra
 /**
  * Returns the largest value in an array of monetary values.
  *
- * Unlike {@link sum} and {@link average}, `max` requires at least one element.
+ * Unlike {@link sum} and {@link averageWith}, `max` requires at least one element.
  *
- * @param values — Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country — Supported country code that defines the output currency.
+ * @param values - Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
+ * @param country - Supported country code that defines the output currency.
  *
  * @returns A new `MoneyContract` representing the maximum amount.
  *
- * @throws `InvalidInputError` — when `values` is empty.
- * @throws `CurrencyMismatchError` — when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `values` is empty.
+ * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * max([5, 30, 10], 'US').amount() // => 30
@@ -117,16 +121,16 @@ export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
 /**
  * Returns the smallest value in an array of monetary values.
  *
- * Unlike {@link sum} and {@link average}, `min` requires at least one element.
+ * Unlike {@link sum} and {@link averageWith}, `min` requires at least one element.
  *
- * @param values — Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country — Supported country code that defines the output currency.
+ * @param values - Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
+ * @param country - Supported country code that defines the output currency.
  *
  * @returns A new `MoneyContract` representing the minimum amount.
  *
- * @throws `InvalidInputError` — when `values` is empty.
- * @throws `CurrencyMismatchError` — when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `values` is empty.
+ * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * min([5, 30, 10], 'US').amount() // => 5
@@ -158,16 +162,16 @@ export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
  * - When `value > max`, returns `max`.
  * - Otherwise, returns `value` unchanged.
  *
- * @param value — The amount to constrain.
- * @param min — Lower bound of the interval.
- * @param max — Upper bound of the interval.
- * @param country — Supported country code that defines the output currency.
+ * @param value - The amount to constrain.
+ * @param min - Lower bound of the interval.
+ * @param max - Upper bound of the interval.
+ * @param country - Supported country code that defines the output currency.
  *
  * @returns A new `MoneyContract` clamped within `[min, max]`.
  *
- * @throws `InvalidRangeError` — when `min` is greater than `max`.
- * @throws `CurrencyMismatchError` — when any `MoneyContract` argument has a different currency.
- * @throws `UnsupportedCurrencyError` — when `country` is not a supported code.
+ * @throws `InvalidRangeError` - when `min` is greater than `max`.
+ * @throws `CurrencyMismatchError` - when any `MoneyContract` argument has a different currency.
+ * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
  *
  * @example
  * clamp(150, 0, 100, 'US').amount() // => 100
