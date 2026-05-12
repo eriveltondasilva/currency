@@ -98,58 +98,84 @@ describe('Money.min', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.round', () => {
-  it('should round up to the nearest 5-unit increment', () => {
-    expect(from(0, 'US').plus(0.03).round(5).minorUnits()).toBe(5);
+  it('should round up to the nearest 5-cent step', () => {
+    expect(from(0.03, 'US').round(0.05).minorUnits()).toBe(5);
   });
 
-  it('should round down to the nearest 5-unit increment', () => {
-    expect(from(0, 'US').plus(0.02).round(5).minorUnits()).toBe(0);
+  it('should round down to the nearest 5-cent step', () => {
+    expect(from(0.02, 'US').round(0.05).minorUnits()).toBe(0);
   });
 
-  it('should return a clone for increment of 1', () => {
-    const original = from(10, 'US');
-    const result = original.round(1);
-    expect(result.minorUnits()).toBe(original.minorUnits());
+  it('should return the same value when step equals the minimum currency unit', () => {
+    expect(from(10.99, 'US').round(0.01).minorUnits()).toBe(from(10.99, 'US').minorUnits());
   });
 
-  it('should return zero unchanged for any increment', () => {
-    expect(zero('US').round(10).isZero()).toBe(true);
+  it('should round to the nearest dollar', () => {
+    expect(from(1.5, 'US').round(1).minorUnits()).toBe(200);
+    expect(from(1.49, 'US').round(1).minorUnits()).toBe(100);
+  });
+
+  it('should return zero unchanged for any step', () => {
+    expect(zero('US').round(0.05).isZero()).toBe(true);
   });
 
   it('should apply the specified rounding mode', () => {
-    const floor = from(0, 'US').plus(0.025).round(5, 'floor').minorUnits();
-    const ceil = from(0, 'US').plus(0.025).round(5, 'ceil').minorUnits();
+    const floor = from(0.025, 'US').round(0.05, 'floor').minorUnits();
+    const ceil = from(0.025, 'US').round(0.05, 'ceil').minorUnits();
     expect(ceil).toBeGreaterThanOrEqual(floor);
   });
 
-  it('should throw InvalidInputError for a non-integer increment', () => {
-    expect(() => from(10, 'US').round(0.5)).toThrow(InvalidInputError);
-  });
-
-  it('should throw InvalidInputError for an increment of 0', () => {
+  it('should throw InvalidInputError for a step of 0', () => {
     expect(() => from(10, 'US').round(0)).toThrow(InvalidInputError);
   });
 
-  it('should throw InvalidInputError for a negative increment', () => {
-    expect(() => from(10, 'US').round(-5)).toThrow(InvalidInputError);
+  it('should throw InvalidInputError for a negative step', () => {
+    expect(() => from(10, 'US').round(-0.05)).toThrow(InvalidInputError);
+  });
+
+  it('should throw InvalidInputError for Infinity', () => {
+    expect(() => from(10, 'US').round(Infinity)).toThrow(InvalidInputError);
   });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('Money.clone', () => {
-  it('should produce a new instance with the same minor units', () => {
-    const original = from(10, 'US');
-    expect(original.clone().minorUnits()).toBe(original.minorUnits());
+describe('Money.compare', () => {
+  it('should return -1 when less than the given value', () => {
+    expect(from(5, 'US').compare(10)).toBe(-1);
   });
 
-  it('should produce a new instance with the same currency code', () => {
-    const original = from(10, 'US');
-    expect(original.clone().currencyCode()).toBe(original.currencyCode());
+  it('should return 0 when equal to the given value', () => {
+    expect(from(10, 'US').compare(10)).toBe(0);
   });
 
-  it('should not return the same reference', () => {
-    const original = from(10, 'US');
-    expect(original.clone()).not.toBe(original);
+  it('should return 1 when greater than the given value', () => {
+    expect(from(20, 'US').compare(10)).toBe(1);
+  });
+
+  it('should accept a MoneyContract as input', () => {
+    expect(from(5, 'US').compare(from(10, 'US'))).toBe(-1);
+  });
+
+  it('should sort an array in ascending order', () => {
+    const prices = [from(30, 'US'), from(10, 'US'), from(20, 'US')];
+    const sorted = prices.sort((a, b) => a.compare(b));
+    expect(sorted.map((p) => p.amount())).toEqual([10, 20, 30]);
+  });
+
+  it('should sort an array in descending order', () => {
+    const prices = [from(30, 'US'), from(10, 'US'), from(20, 'US')];
+    const sorted = prices.sort((a, b) => b.compare(a));
+    expect(sorted.map((p) => p.amount())).toEqual([30, 20, 10]);
+  });
+
+  it('should handle negative values correctly', () => {
+    expect(from(-10, 'US').compare(-5)).toBe(-1);
+    expect(from(-5, 'US').compare(-10)).toBe(1);
+    expect(from(-10, 'US').compare(-10)).toBe(0);
+  });
+
+  it('should throw CurrencyMismatchError for different currencies', () => {
+    expect(() => from(10, 'US').compare(from(10, 'BR'))).toThrow(CurrencyMismatchError);
   });
 });
