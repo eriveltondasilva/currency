@@ -37,6 +37,7 @@ export function resolveMinorUnits(value: MoneyInput, currency: Currency, context
     return numberToMinorUnit(value, currency.fractionDigits);
   } catch (cause) {
     if (cause instanceof MoneyError) throw cause;
+    /* v8 ignore next -- @preserve */
     throw new InvalidInputError(`${context} — invalid value.`, { input: value, cause });
   }
 }

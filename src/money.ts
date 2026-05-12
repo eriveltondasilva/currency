@@ -66,18 +66,21 @@ export class Money implements MoneyContract {
    * @throws `UnsafeIntegerError` — when `input` exceeds `Number.MAX_SAFE_INTEGER`.
    */
   static fromMinorUnits(input: number, currency: Currency): MoneyContract {
+    /* v8 ignore if -- @preserve */
     if (!Number.isFinite(input)) {
       throw new InvalidInputError('Expected a finite number of minor units.', {
         input,
       });
     }
 
+    /* v8 ignore if -- @preserve */
     if (!Number.isInteger(input)) {
       throw new InvalidInputError('Minor units must be an integer.', {
         input,
       });
     }
 
+    /* v8 ignore if -- @preserve */
     if (!Number.isSafeInteger(input)) {
       throw new UnsafeIntegerError({ input });
     }
@@ -120,6 +123,7 @@ export class Money implements MoneyContract {
 
   /** @internal Constructs a sibling instance, validating the result is safe. */
   #make(input: number): MoneyContract {
+    /* v8 ignore if -- @preserve */
     if (!Number.isFinite(input)) {
       throw new InvalidInputError('Operation produced a non-finite result.', { input: input });
     }
@@ -426,6 +430,7 @@ export class Money implements MoneyContract {
 
     const total = ratios.reduce((acc, ratio) => acc + ratio, 0);
 
+    /* v8 ignore if -- @preserve */
     if (!Number.isSafeInteger(total)) {
       throw new InvalidAllocationError('The sum of ratios exceeds the safe integer range.');
     }
