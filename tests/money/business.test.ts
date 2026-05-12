@@ -1,8 +1,8 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: test file */
 import { describe, expect, it } from 'vitest';
 
-import { from, zero } from '@/api/creation';
-import { InvalidAllocationError, InvalidPercentageError } from '@/lib/errors';
+import { from, fromMinorUnits, zero } from '@/api/creation';
+import { InvalidAllocationError, InvalidPercentageError, UnsafeIntegerError } from '@/lib/errors';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -213,5 +213,32 @@ describe('Money.allocateByRatio', () => {
 
   it('should throw InvalidAllocationError for Infinity in ratios', () => {
     expect(() => from(100, 'US').allocateByRatio([1, Infinity])).toThrow(InvalidAllocationError);
+  });
+
+  it('should throw UnsafeIntegerError when absoluteAmount * ratio exceeds safe integer range', () => {
+    // MAX_SAFE_INTEGER * 2 overflows; ratio [2] is valid but the intermediate product is not
+    expect(() => fromMinorUnits(Number.MAX_SAFE_INTEGER, 'US').allocateByRatio([2])).toThrow(
+      UnsafeIntegerError,
+    );
+  });
+
+  it('should distribute a negative amount proportionally', () => {
+    const parts = from(-100, 'US').allocateByRatio([1, 3]);
+    expect(parts[0]!.minorUnits()).toBe(-2500);
+    expect(parts[1]!.minorUnits()).toBe(-7500);
+  });
+
+  it('should ensure the sum of all parts equals the original negative amount', () => {
+    const original = from(-10, 'US');
+    const parts = original.allocateByRatio([1, 2, 3]);
+    const total = parts.reduce((acc, p) => acc + p.minorUnits(), 0);
+    expect(total).toBe(original.minorUnits());
+  });
+
+  it('should distribute remainder into the leading parts for negative amounts', () => {
+    const parts = from(-10, 'US').allocateByRatio([1, 2]);
+    const units = parts.map((p) => p.minorUnits());
+    // -1000 minor units split [1,2]: base=-333 each for first, -334 for second
+    expect(units.reduce((a, b) => a + b, 0)).toBe(-1000);
   });
 });

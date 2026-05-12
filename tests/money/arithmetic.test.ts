@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { from, zero } from '@/api/creation';
-import { CurrencyMismatchError, DivisionByZeroError, InvalidInputError } from '@/lib/errors';
+import {
+  CurrencyMismatchError,
+  DivisionByZeroError,
+  InvalidInputError,
+  UnsafeIntegerError,
+} from '@/lib/errors';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -100,6 +105,11 @@ describe('Money.times', () => {
 
   it('should throw InvalidInputError for an infinite factor', () => {
     expect(() => from(10, 'US').times(Infinity)).toThrow(InvalidInputError);
+  });
+
+  it('should throw UnsafeIntegerError when the product exceeds Number.MAX_SAFE_INTEGER', () => {
+    // 100 minor units (from(1)) * MAX_SAFE_INTEGER overflows the safe integer range
+    expect(() => from(1, 'US').times(Number.MAX_SAFE_INTEGER)).toThrow(UnsafeIntegerError);
   });
 });
 
