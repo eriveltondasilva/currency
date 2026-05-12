@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import type { MoneyContract } from '@/types';
+
 import { from, zero } from '@/api/creation';
 import { CurrencyMismatchError, InvalidRangeError } from '@/lib/errors';
 
@@ -158,5 +160,9 @@ describe('Money.hasSameCurrency', () => {
 
   it('should return true for different countries that share the same currency', () => {
     expect(from(10, 'DE').hasSameCurrency(from(10, 'FR'))).toBe(true);
+  });
+
+  it('should return false for a non-Money value passed as MoneyContract', () => {
+    expect(from(10, 'US').hasSameCurrency(42 as unknown as MoneyContract)).toBe(false);
   });
 });
