@@ -1,6 +1,7 @@
 import type { Currency, CurrencyCode } from './lib/currencies';
 import type {
   FormatOptions,
+  MoneyComparison,
   MoneyContract,
   MoneyInput,
   MoneyJSON,
@@ -137,6 +138,11 @@ export class Money implements MoneyContract {
     return new Money(input, this.#currency);
   }
 
+  /** @inheritdoc */
+  #clone(): MoneyContract {
+    return new Money(this.#minorUnits, this.#currency);
+  }
+
   /** @internal */
   #zero() {
     return Money.zero(this.#currency);
@@ -158,17 +164,21 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   units(): number {
-    return Math.floor(Math.abs(this.#minorUnits) / this.#scaleFactor);
+    return Math.trunc(this.#minorUnits / this.#scaleFactor);
   }
 
   /** @inheritdoc */
   subunits(): number {
-    return Math.abs(this.#minorUnits % this.#scaleFactor);
+    return this.#minorUnits % this.#scaleFactor;
   }
 
   /** @inheritdoc */
   toParts(): MoneyParts {
-    return [this.units(), this.subunits()];
+    return {
+      units: Math.floor(Math.abs(this.#minorUnits) / this.#scaleFactor),
+      subunits: Math.abs(this.#minorUnits) % this.#scaleFactor,
+      isNegative: this.#minorUnits < 0,
+    };
   }
 
   /** @inheritdoc */
@@ -237,7 +247,7 @@ export class Money implements MoneyContract {
       });
     }
 
-    if (divisor === 1) return this.clone();
+    if (divisor === 1) return this.#clone();
 
     return this.#make(ROUND_FUNCTIONS[roundingMode](this.#minorUnits / divisor));
   }
@@ -259,27 +269,38 @@ export class Money implements MoneyContract {
   /** @inheritdoc */
   max(input: MoneyInput): MoneyContract {
     const other = this.#resolve(input);
-    return this.#minorUnits >= other ? this.clone() : this.#make(other);
+    return this.#minorUnits >= other ? this.#clone() : this.#make(other);
   }
 
   /** @inheritdoc */
   min(input: MoneyInput): MoneyContract {
     const other = this.#resolve(input);
-    return this.#minorUnits <= other ? this.clone() : this.#make(other);
+    return this.#minorUnits <= other ? this.#clone() : this.#make(other);
   }
 
   /** @inheritdoc */
-  round(increment: number, mode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
-    const hasInvalidIncrement = !Number.isInteger(increment) || increment < 1;
-    if (hasInvalidIncrement) {
-      throw new InvalidInputError('Step must be a positive integer.', {
-        input: increment,
-      });
+  round(step: number, mode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
+    if (!Number.isFinite(step) || step <= 0) {
+      throw new InvalidInputError('Step must be a positive finite number.', { input: step });
     }
 
-    if (increment === 1 || this.isZero()) return this.clone();
+    if (this.isZero()) return this.#clone();
 
-    return this.#make(ROUND_FUNCTIONS[mode](this.#minorUnits / increment) * increment);
+    const stepInMinorUnits = Math.round(step * this.#scaleFactor);
+
+    /* v8 ignore if -- @preserve */
+    if (stepInMinorUnits < 1) {
+      throw new InvalidInputError(
+        'Step is too small to be represented in minor units for this currency.',
+        { input: step },
+      );
+    }
+
+    if (stepInMinorUnits === 1) return this.#clone();
+
+    return this.#make(
+      ROUND_FUNCTIONS[mode](this.#minorUnits / stepInMinorUnits) * stepInMinorUnits,
+    );
   }
 
   // #endregion
@@ -292,6 +313,16 @@ export class Money implements MoneyContract {
     if (hasDifferentCurrency) return false;
 
     return this.#minorUnits === this.#resolve(input);
+  }
+
+  /** @inheritdoc */
+  compare(other: MoneyInput): MoneyComparison {
+    const otherMinorUnits = this.#resolve(other);
+
+    if (this.#minorUnits < otherMinorUnits) return -1;
+    if (this.#minorUnits > otherMinorUnits) return 1;
+
+    return 0;
   }
 
   /** @inheritdoc */
@@ -326,6 +357,7 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   hasSameCurrency(input: MoneyContract): boolean {
+    if (!isMoney(input)) return false;
     return this.#currency.code === input.currencyCode();
   }
 
@@ -345,7 +377,7 @@ export class Money implements MoneyContract {
 
     if (percent === 0) return this.#zero();
 
-    if (percent === 100) return this.clone();
+    if (percent === 100) return this.#clone();
 
     return this.#make(ROUND_FUNCTIONS[roundingMode](this.#minorUnits * (percent / 100)));
   }
@@ -367,7 +399,7 @@ export class Money implements MoneyContract {
       throw new InvalidPercentageError('Discount cannot exceed 100%.', { input: discount });
     }
 
-    if (discount === 0) return this.clone();
+    if (discount === 0) return this.#clone();
 
     if (discount === 100) return this.#zero();
 
@@ -386,7 +418,7 @@ export class Money implements MoneyContract {
     if (surcharge < 0)
       throw new InvalidPercentageError('Surcharge must be non-negative.', { input: surcharge });
 
-    if (surcharge === 0) return this.clone();
+    if (surcharge === 0) return this.#clone();
 
     return this.plus(this.percentOf(surcharge, roundingMode));
   }
@@ -398,7 +430,7 @@ export class Money implements MoneyContract {
       throw new InvalidAllocationError('Number of parts must be a positive integer.');
     }
 
-    if (parts === 1) return [this.clone()];
+    if (parts === 1) return [this.#clone()];
 
     if (this.isZero()) return Array.from({ length: parts }, () => this.#zero());
 
@@ -475,13 +507,8 @@ export class Money implements MoneyContract {
   }
 
   /** @inheritdoc */
-  clone(): MoneyContract {
-    return new Money(this.#minorUnits, this.#currency);
-  }
-
-  /** @inheritdoc */
   toString(): string {
-    return this.amount().toFixed(this.#currency.fractionDigits);
+    return `${this.#currency.code} ${this.amount().toFixed(this.#currency.fractionDigits)}`;
   }
 
   /** @inheritdoc */

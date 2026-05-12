@@ -174,6 +174,8 @@ export interface MoneyJSON {
   currencyCode: CurrencyCode;
 }
 
+export type MoneyComparison = -1 | 0 | 1;
+
 /**
  * Tuple of `[units, subunits]` returned by {@link MoneyContract.toParts}.
  *
@@ -184,7 +186,12 @@ export interface MoneyJSON {
  * from(19.99, 'BR').toParts() // => [19, 99]
  * from(-5.07, 'US').toParts() // => [5, 7]
  */
-export type MoneyParts = [units: number, subunits: number];
+// export type MoneyParts = [units: number, subunits: number];
+export interface MoneyParts {
+  units: number;
+  subunits: number;
+  isNegative: boolean;
+}
 
 /**
  * Public contract for all monetary value objects produced by this library.
@@ -244,13 +251,18 @@ export interface MoneyContract {
   subunits(): number;
 
   /**
-   * Returns the amount split into `[units, subunits]`.
-   * Both parts are always non-negative. See {@link MoneyParts}.
+   * Returns the amount split into its constituent parts.
    *
-   * @returns A `[units, subunits]` tuple.
+   * `units` and `subunits` are always non-negative integers.
+   * Use `negative` to determine the sign of the original amount.
+   *
+   * @returns A `MoneyParts` object with `units`, `subunits`, and `negative`.
    *
    * @example
-   * from(19.99, 'BR').toParts() // => [19, 99]
+   * from( 19.99, 'BR').toParts() // => { units: 19, subunits: 99, negative: false }
+   * from(-19.99, 'BR').toParts() // => { units: 19, subunits: 99, negative: true  }
+   * from( -0.99, 'US').toParts() // => { units: 0,  subunits: 99, negative: true  }
+   * from(  0,    'US').toParts() // => { units: 0,  subunits: 0,  negative: false }
    */
   toParts(): MoneyParts;
 
@@ -312,13 +324,13 @@ export interface MoneyContract {
   /**
    * Adds a monetary value to this instance.
    *
-   * @param input — Amount to add. A `number` is interpreted as major units.
+   * @param input - Amount to add. A `number` is interpreted as major units.
    *
    * @returns A new `MoneyContract` with the sum.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
-   * @throws `InvalidInputError` — when the result is not a finite number.
-   * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
+   * @throws `InvalidInputError` - when the result is not a finite number.
+   * @throws `UnsafeIntegerError` - when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
    * @example
    * from(10, 'BR').plus(5).amount()             // => 15
@@ -329,12 +341,12 @@ export interface MoneyContract {
   /**
    * Subtracts a monetary value from this instance.
    *
-   * @param input — Amount to subtract. A `number` is interpreted as major units.
+   * @param input - Amount to subtract. A `number` is interpreted as major units.
    *
    * @returns A new `MoneyContract` with the difference.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
-   * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
+   * @throws `UnsafeIntegerError` - when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
    * @example
    * from(10, 'US').minus(3.50).amount() // => 6.5
@@ -347,13 +359,13 @@ export interface MoneyContract {
    * The result is rounded in minor units using the specified `roundingMode`.
    * Defaults to `'halfExpand'`.
    *
-   * @param factor — Finite scalar multiplier.
-   * @param roundingMode — Rounding strategy applied to the minor-unit result. Defaults to `'halfExpand'`.
+   * @param factor - Finite scalar multiplier.
+   * @param roundingMode - Rounding strategy applied to the minor-unit result. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the product.
    *
-   * @throws `InvalidInputError` — when `factor` is not finite.
-   * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
+   * @throws `InvalidInputError` - when `factor` is not finite.
+   * @throws `UnsafeIntegerError` - when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
    * @example
    * from(10, 'BR').times(1.5).amount()              // => 15
@@ -367,14 +379,14 @@ export interface MoneyContract {
    * The result is rounded in minor units using the specified `roundingMode`.
    * Defaults to `'halfExpand'`.
    *
-   * @param divisor — Finite, non-zero scalar.
-   * @param roundingMode — Rounding strategy applied to the minor-unit result. Defaults to `'halfExpand'`.
+   * @param divisor - Finite, non-zero scalar.
+   * @param roundingMode - Rounding strategy applied to the minor-unit result. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the quotient.
    *
-   * @throws `DivisionByZeroError` — when `divisor` is `0`.
-   * @throws `InvalidInputError` — when `divisor` is not finite.
-   * @throws `UnsafeIntegerError` — when the result exceeds `Number.MAX_SAFE_INTEGER`.
+   * @throws `DivisionByZeroError` - when `divisor` is `0`.
+   * @throws `InvalidInputError` - when `divisor` is not finite.
+   * @throws `UnsafeIntegerError` - when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
    * @example
    * from(10, 'BR').divide(4).amount() // => 2.5
@@ -410,11 +422,11 @@ export interface MoneyContract {
   /**
    * Returns the greater of this instance and `input`.
    *
-   * @param input — Comparison value. A `number` is interpreted as major units.
+   * @param input - Comparison value. A `number` is interpreted as major units.
    *
    * @returns The larger of the two values as a new `MoneyContract`.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
    *
    * @example
    * from(5, 'US').max(10).amount() // => 10
@@ -425,11 +437,11 @@ export interface MoneyContract {
   /**
    * Returns the lesser of this instance and `input`.
    *
-   * @param input — Comparison value. A `number` is interpreted as major units.
+   * @param input - Comparison value. A `number` is interpreted as major units.
    *
    * @returns The smaller of the two values as a new `MoneyContract`.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
    *
    * @example
    * from(5, 'US').min(10).amount() // => 5
@@ -438,23 +450,26 @@ export interface MoneyContract {
   min(input: MoneyInput): MoneyContract;
 
   /**
-   * Rounds the amount to the nearest multiple of `increment` minor units.
+   * Rounds the amount to the nearest multiple of `step` in major units.
    *
    * Useful for currencies or payment systems that require rounding to specific
-   * denominations (e.g. rounding to 5-cent increments).
+   * denominations (e.g. rounding to the nearest $0.05 or $1.00).
    *
-   * @param increment — Positive integer specifying the rounding step in minor units.
-   * @param mode — Rounding strategy. Defaults to `'halfExpand'`
-   * .
-   * @returns A new `MoneyContract` rounded to the nearest `increment`.
+   * @param step — Positive number in major units specifying the rounding step.
+   * @param mode — Rounding strategy. Defaults to `'halfExpand'`.
    *
-   * @throws `InvalidInputError` — when `increment` is not a positive integer.
+   * @returns A new `MoneyContract` rounded to the nearest `step`.
+   *
+   * @throws `InvalidInputError` — when `step` is not a positive finite number,
+   * or too small to be represented in minor units for this currency.
    *
    * @example
-   * from(1.03, 'US').round(5).amount() // => 1.05
-   * from(1.02, 'US').round(5).amount() // => 1.00
+   * from(1.03, 'US').round(0.05).amount() // => 1.05  (nearest 5 cents)
+   * from(1.02, 'US').round(0.05).amount() // => 1.00  (nearest 5 cents)
+   * from(1.50, 'US').round(1).amount()    // => 2.00  (nearest dollar)
+   * from(1499, 'BR').round(500).amount()  // => 1500  (nearest R$ 500)
    */
-  round(increment: number, mode?: RoundingMode): MoneyContract;
+  round(step: number, mode?: RoundingMode): MoneyContract;
 
   // #endregion
 
@@ -466,7 +481,7 @@ export interface MoneyContract {
    * When `input` is a `MoneyContract` with a different currency, returns `false`
    * instead of throwing.
    *
-   * @param input — Value to compare. A `number` is interpreted as major units.
+   * @param input - Value to compare. A `number` is interpreted as major units.
    *
    * @example
    * from(10, 'BR').equals(10)          // => true
@@ -475,11 +490,34 @@ export interface MoneyContract {
   equals(input: MoneyInput): boolean;
 
   /**
-   * Returns `true` if this instance is strictly greater than `input`.
+   * Compares this instance to `input` for ordering purposes.
+   *
+   * Returns `-1` when less than, `0` when equal, or `1` when greater than `input`.
+   * Designed for direct use as an `Array.sort` comparator.
    *
    * @param input — Comparison value. A `number` is interpreted as major units.
    *
+   * @returns `-1`, `0`, or `1`.
+   *
    * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
+   *
+   * @example
+   * from(10, 'US').compare(20) // => -1
+   * from(10, 'US').compare(10) // =>  0
+   * from(20, 'US').compare(10) // =>  1
+   *
+   * // Sorting
+   * prices.sort((a, b) => a.compare(b)) // ascending
+   * prices.sort((a, b) => b.compare(a)) // descending
+   */
+  compare(other: MoneyInput): MoneyComparison;
+
+  /**
+   * Returns `true` if this instance is strictly greater than `input`.
+   *
+   * @param input - Comparison value. A `number` is interpreted as major units.
+   *
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
    *
    * @example
    * from(10, 'US').greaterThan(5) // => true
@@ -489,9 +527,9 @@ export interface MoneyContract {
   /**
    * Returns `true` if this instance is strictly less than `input`.
    *
-   * @param input — Comparison value. A `number` is interpreted as major units.
+   * @param input - Comparison value. A `number` is interpreted as major units.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
    *
    * @example
    * from(3, 'US').lessThan(10) // => true
@@ -501,9 +539,9 @@ export interface MoneyContract {
   /**
    * Returns `true` if this instance is greater than or equal to `input`.
    *
-   * @param input — Comparison value. A `number` is interpreted as major units.
+   * @param input - Comparison value. A `number` is interpreted as major units.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
    *
    * @example
    * from(10, 'US').greaterThanOrEqual(10) // => true
@@ -513,9 +551,9 @@ export interface MoneyContract {
   /**
    * Returns `true` if this instance is less than or equal to `input`.
    *
-   * @param input — Comparison value. A `number` is interpreted as major units.
+   * @param input - Comparison value. A `number` is interpreted as major units.
    *
-   * @throws `CurrencyMismatchError` — when `input` is a `MoneyContract` with a different currency.
+   * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
    *
    * @example
    * from(5, 'US').lessThanOrEqual(10) // => true
@@ -525,11 +563,11 @@ export interface MoneyContract {
   /**
    * Returns `true` if this instance falls within the closed interval `[min, max]`.
    *
-   * @param min — Lower bound. A `number` is interpreted as major units.
-   * @param max — Upper bound. A `number` is interpreted as major units.
+   * @param min - Lower bound. A `number` is interpreted as major units.
+   * @param max - Upper bound. A `number` is interpreted as major units.
    *
-   * @throws `InvalidRangeError` — when `min` is greater than `max`.
-   * @throws `CurrencyMismatchError` — when either bound is a `MoneyContract` with a different currency.
+   * @throws `InvalidRangeError` - when `min` is greater than `max`.
+   * @throws `CurrencyMismatchError` - when either bound is a `MoneyContract` with a different currency.
    *
    * @example
    * from(5, 'US').isBetween(1, 10)  // => true
@@ -540,13 +578,13 @@ export interface MoneyContract {
   /**
    * Returns `true` if `input` shares the same currency as this instance.
    *
-   * @param input — Another `MoneyContract` to compare against.
+   * @param other - Another `MoneyContract` to compare against.
    *
    * @example
    * from(10, 'BR').hasSameCurrency(from(20, 'BR')) // => true
    * from(10, 'BR').hasSameCurrency(from(20, 'US')) // => false
    */
-  hasSameCurrency(input: MoneyContract): boolean;
+  hasSameCurrency(other: MoneyContract): boolean;
 
   // #endregion
 
@@ -557,12 +595,12 @@ export interface MoneyContract {
    *
    * The result is rounded in minor units. Defaults to `'halfExpand'`.
    *
-   * @param percent — Non-negative finite number representing a percentage (e.g. `15` for 15%).
-   * @param roundingMode — Rounding strategy. Defaults to `'halfExpand'`.
+   * @param percent - Non-negative finite number representing a percentage (e.g. `15` for 15%).
+   * @param roundingMode - Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` representing the percentage amount.
    *
-   * @throws `InvalidPercentageError` — when `percent` is negative or not finite.
+   * @throws `InvalidPercentageError` - when `percent` is negative or not finite.
    *
    * @example
    * from(200, 'BR').percentOf(15).amount() // => 30
@@ -576,12 +614,12 @@ export interface MoneyContract {
    * Equivalent to `minus(percentOf(discount))`. The result is rounded in minor
    * units using `roundingMode`. Defaults to `'halfExpand'`.
    *
-   * @param discount — Discount percentage between `0` and `100` inclusive.
-   * @param roundingMode — Rounding strategy. Defaults to `'halfExpand'`.
+   * @param discount - Discount percentage between `0` and `100` inclusive.
+   * @param roundingMode - Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the discount applied.
    *
-   * @throws `InvalidPercentageError` — when `discount` is negative, exceeds 100, or is not finite.
+   * @throws `InvalidPercentageError` - when `discount` is negative, exceeds 100, or is not finite.
    *
    * @example
    * from(100, 'US').applyDiscount(20).amount() // => 80
@@ -595,12 +633,12 @@ export interface MoneyContract {
    * Equivalent to `plus(percentOf(surcharge))`. The result is rounded in minor
    * units using `roundingMode`. Defaults to `'halfExpand'`.
    *
-   * @param surcharge — Non-negative surcharge percentage (e.g. `10` for +10%).
-   * @param roundingMode — Rounding strategy. Defaults to `'halfExpand'`.
+   * @param surcharge - Non-negative surcharge percentage (e.g. `10` for +10%).
+   * @param roundingMode - Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @returns A new `MoneyContract` with the surcharge applied.
    *
-   * @throws `InvalidPercentageError` — when `surcharge` is negative or not finite.
+   * @throws `InvalidPercentageError` - when `surcharge` is negative or not finite.
    *
    * @example
    * from(100, 'US').applySurcharge(10).amount() // => 110
@@ -614,11 +652,11 @@ export interface MoneyContract {
    *
    * Guarantees that the sum of all parts equals the original amount.
    *
-   * @param parts — Positive integer number of shares.
+   * @param parts - Positive integer number of shares.
    *
    * @returns An array of `parts` new `MoneyContract` instances.
    *
-   * @throws `InvalidAllocationError` — when `parts` is not a positive integer.
+   * @throws `InvalidAllocationError` - when `parts` is not a positive integer.
    *
    * @example
    * from(10, 'BR').allocate(3).map((m) => m.amount())
@@ -633,12 +671,12 @@ export interface MoneyContract {
    * Ratios must be **non-negative integers** (e.g. `[1, 2, 3]` or `[30, 70]`).
    * Guarantees that the sum of all parts equals the original amount.
    *
-   * @param ratios — Non-empty array of non-negative integers representing relative shares.
+   * @param ratios - Non-empty array of non-negative integers representing relative shares.
    *
    * @returns An array of new `MoneyContract` instances, one per ratio entry.
    *
-   * @throws `InvalidAllocationError` — when `ratios` is empty, contains non-integers, negative values, sums to zero, or the sum exceeds `Number.MAX_SAFE_INTEGER`.
-   * @throws `UnsafeIntegerError` — when an intermediate calculation exceeds the safe integer range.
+   * @throws `InvalidAllocationError` - when `ratios` is empty, contains non-integers, negative values, sums to zero, or the sum exceeds `Number.MAX_SAFE_INTEGER`.
+   * @throws `UnsafeIntegerError` - when an intermediate calculation exceeds the safe integer range.
    *
    * @example
    * from(100, 'US').allocateByRatio([1, 3]).map((m) => m.amount())
@@ -653,7 +691,7 @@ export interface MoneyContract {
   /**
    * Formats the amount as a locale-aware currency string using `Intl.NumberFormat`.
    *
-   * @param options — Optional display overrides. See {@link FormatOptions}.
+   * @param options - Optional display overrides. See {@link FormatOptions}.
    *
    * @returns A formatted string.
    *
@@ -663,20 +701,6 @@ export interface MoneyContract {
    * // => 'USD 2K'
    */
   format(options?: FormatOptions): string;
-
-  /**
-   * Returns a new `MoneyContract` with the same amount and currency.
-   *
-   * @returns A new independent instance (same minor units and currency).
-   *
-   * @example
-   * const a = from(10, 'US');
-   * const b = a.clone();
-   *
-   * a === b     // => false
-   * a.equals(b) // => true
-   */
-  clone(): MoneyContract;
 
   /**
    * Returns the amount as a fixed-decimal string in major units.
