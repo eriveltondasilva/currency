@@ -13,7 +13,6 @@ A lightweight TypeScript library for precise monetary operations. All values are
   <img src="https://raw.githubusercontent.com/eriveltondasilva/currency.js/main/src/assets/currency-banner.png" alt="Currency.js Banner" width="600">
 </p>
 
-
 ## Features
 
 - 💰 **Precise calculations** — integer-based math eliminates floating-point errors
@@ -22,6 +21,7 @@ A lightweight TypeScript library for precise monetary operations. All values are
 - 🧮 **Business operations** — discounts, surcharges, allocations, and more
 - 📦 **Zero dependencies** — lightweight and focused (< 5KB min+gzip)
 - 🎯 **Type-safe** — full TypeScript support with comprehensive type definitions
+
 ## Quick Start
 
 ### Installation
