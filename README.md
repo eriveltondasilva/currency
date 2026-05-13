@@ -9,11 +9,7 @@
 
 A lightweight TypeScript library for precise monetary operations. All values are stored internally as **minor-unit integers** to eliminate floating-point errors. Every operation returns a new instance — the API is fully immutable.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/eriveltondasilva/currency.js/main/src/assets/currency-banner.png" alt="Currency.js Banner" width="600">
-</p>
-
-## Features
+### Features
 
 - 💰 **Precise calculations** — integer-based math eliminates floating-point errors
 - 🔒 **Immutable API** — every operation returns a new instance
@@ -22,9 +18,9 @@ A lightweight TypeScript library for precise monetary operations. All values are
 - 📦 **Zero dependencies** — lightweight and focused (< 5KB min+gzip)
 - 🎯 **Type-safe** — full TypeScript support with comprehensive type definitions
 
-## Quick Start
+### Quick Start
 
-### Installation
+#### Installation
 
 ```bash
 npm install @eriveltonsilva/currency.js
@@ -34,7 +30,7 @@ npm install @eriveltonsilva/currency.js
 bun add @eriveltonsilva/currency.js
 ```
 
-### Import
+#### Import
 
 ```typescript
 // Named imports (recommended — better tree-shaking)
@@ -50,7 +46,7 @@ import { br, us, ... } from '@eriveltonsilva/currency.js/presets'
 import type { MoneyContract, MoneyInput, FormatOptions, RoundingMode, PricedItem } from '@eriveltonsilva/currency.js'
 ```
 
-### Basic Usage
+#### Basic Usage
 
 ```typescript
 // Create instances
@@ -83,7 +79,7 @@ from(100, 'US').allocateByRatio([1, 3]).map((m) => m.amount())
 // => [25, 75]
 ```
 
-### Collection Functions
+#### Collection Functions
 
 ```typescript
 import { sum, average, max, min, clamp } from '@eriveltonsilva/currency.js'
@@ -95,7 +91,7 @@ min([5, 30, 10], 'US').format()      // => '$5.00'
 clamp(150, 0, 100, 'US').format()    // => '$100.00'
 ```
 
-### Business Functions
+#### Business Functions
 
 ```typescript
 import { total, percent } from '@eriveltonsilva/currency.js'
@@ -109,7 +105,7 @@ total(items, 'US').format() // => '$34.96'
 percent(25, 200, 'US') // => 12.5  (25 is 12.5% of 200)
 ```
 
-### Country Presets
+#### Country Presets
 
 ```typescript
 import { br, us, de, jp } from '@eriveltonsilva/currency.js/presets'
@@ -125,7 +121,7 @@ de(1500).format()           // => '1.500,00 €'
 jp(500).format()            // => '¥500'
 ```
 
-### Formatting
+#### Formatting
 
 ```typescript
 const price = from(1999.9, 'BR')
@@ -138,7 +134,7 @@ price.format({ signDisplay: 'always' })           // => '+R$ 1.999,90'
 price.format({ currencySign: 'accounting' })      // => 'R$ 1.999,90'
 ```
 
-### Serialization
+#### Serialization
 
 ```typescript
 const price = from(19.99, 'BR')
@@ -155,7 +151,7 @@ price.toString()  // => '19.99'
 price.format()    // => 'R$ 19,99'
 ```
 
-### Error Handling
+#### Error Handling
 
 ```typescript
 import { from, MoneyError, CurrencyMismatchError } from '@eriveltonsilva/currency.js'
@@ -183,7 +179,7 @@ All errors extend `MoneyError` and expose a `code` property for programmatic han
 | `UnsupportedCurrencyError` | `'UNSUPPORTED_CURRENCY'` |
 | `UnsafeIntegerError`       | `'UNSAFE_INTEGER'`       |
 
-## Supported Countries
+### Supported Countries
 
 | Code | Country        | Currency |
 | ---- | -------------- | -------- |
@@ -202,14 +198,14 @@ All errors extend `MoneyError` and expose a `code` property for programmatic han
 | `SG` | Singapore      | SGD      |
 | `US` | United States  | USD      |
 
-## Changelog
+### Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each release.
 
-## Contributing
+### Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details.
 
-## License
+### License
 
 MIT © [Erivelton Silva](https://github.com/eriveltondasilva)
