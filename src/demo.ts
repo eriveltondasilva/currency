@@ -1,11 +1,12 @@
+/** biome-ignore-all lint/suspicious/noConsole: demo file */
+/** biome-ignore-all assist/source/organizeImports: demo file */
+
 /**
  * @eriveltondasilva/currency — Demo
  *
  * A quick tour of the library's main features.
  * Run with: bun demo.ts  |  npx tsx demo.ts
  */
-/** biome-ignore-all lint/suspicious/noConsole: demo file */
-/** biome-ignore-all assist/source/organizeImports: demo file */
 
 import {
   // Creation
