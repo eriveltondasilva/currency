@@ -1,7 +1,7 @@
 {
   "name": "@eriveltondasilva/currency",
   "description": "A lightweight and reliable JavaScript library for precise currency operations, built to safely handle monetary values without floating point errors.",
-  "version": "1.0.0",
+  "version": "0.1.4",
   "keywords": [
     "currency",
     "money",
