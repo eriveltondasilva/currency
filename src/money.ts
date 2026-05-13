@@ -128,7 +128,7 @@ export class Money implements MoneyContract {
   #make(input: number): MoneyContract {
     /* v8 ignore if -- @preserve */
     if (!Number.isFinite(input)) {
-      throw new InvalidInputError('Operation produced a non-finite result.', { input: input });
+      throw new InvalidInputError('Operation produced a non-finite result.', { input });
     }
 
     if (!Number.isSafeInteger(input)) {
@@ -138,8 +138,8 @@ export class Money implements MoneyContract {
     return new Money(input, this.#currency);
   }
 
-  /** @inheritdoc */
-  #clone(): MoneyContract {
+  /** @internal Copies the current instance without revalidation — only use when #minorUnits is already known to be safe. */
+  #copy(): MoneyContract {
     return new Money(this.#minorUnits, this.#currency);
   }
 
@@ -164,20 +164,20 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   units(): number {
-    return Math.trunc(this.#minorUnits / this.#scaleFactor);
+    return Math.floor(Math.abs(this.#minorUnits) / this.#scaleFactor);
   }
 
   /** @inheritdoc */
   subunits(): number {
-    return this.#minorUnits % this.#scaleFactor;
+    return Math.abs(this.#minorUnits) % this.#scaleFactor;
   }
 
   /** @inheritdoc */
   toParts(): MoneyParts {
     return {
-      units: Math.floor(Math.abs(this.#minorUnits) / this.#scaleFactor),
-      subunits: Math.abs(this.#minorUnits) % this.#scaleFactor,
-      isNegative: this.#minorUnits < 0,
+      units: this.units(),
+      subunits: this.subunits(),
+      isNegative: this.isNegative(),
     };
   }
 
@@ -233,6 +233,7 @@ export class Money implements MoneyContract {
     }
 
     if (factor === 0) return this.#zero();
+    if (factor === 1) return this.#copy();
 
     return this.#make(ROUND_FUNCTIONS[roundingMode](this.#minorUnits * factor));
   }
@@ -247,7 +248,7 @@ export class Money implements MoneyContract {
       });
     }
 
-    if (divisor === 1) return this.#clone();
+    if (divisor === 1) return this.#copy();
 
     return this.#make(ROUND_FUNCTIONS[roundingMode](this.#minorUnits / divisor));
   }
@@ -269,13 +270,13 @@ export class Money implements MoneyContract {
   /** @inheritdoc */
   max(input: MoneyInput): MoneyContract {
     const other = this.#resolve(input);
-    return this.#minorUnits >= other ? this.#clone() : this.#make(other);
+    return this.#minorUnits >= other ? this.#copy() : this.#make(other);
   }
 
   /** @inheritdoc */
   min(input: MoneyInput): MoneyContract {
     const other = this.#resolve(input);
-    return this.#minorUnits <= other ? this.#clone() : this.#make(other);
+    return this.#minorUnits <= other ? this.#copy() : this.#make(other);
   }
 
   /** @inheritdoc */
@@ -284,7 +285,7 @@ export class Money implements MoneyContract {
       throw new InvalidInputError('Step must be a positive finite number.', { input: step });
     }
 
-    if (this.isZero()) return this.#clone();
+    if (this.isZero()) return this.#copy();
 
     const stepInMinorUnits = Math.round(step * this.#scaleFactor);
 
@@ -296,7 +297,7 @@ export class Money implements MoneyContract {
       );
     }
 
-    if (stepInMinorUnits === 1) return this.#clone();
+    if (stepInMinorUnits === 1) return this.#copy();
 
     return this.#make(
       ROUND_FUNCTIONS[mode](this.#minorUnits / stepInMinorUnits) * stepInMinorUnits,
@@ -377,7 +378,7 @@ export class Money implements MoneyContract {
 
     if (percent === 0) return this.#zero();
 
-    if (percent === 100) return this.#clone();
+    if (percent === 100) return this.#copy();
 
     return this.#make(ROUND_FUNCTIONS[roundingMode](this.#minorUnits * (percent / 100)));
   }
@@ -399,7 +400,7 @@ export class Money implements MoneyContract {
       throw new InvalidPercentageError('Discount cannot exceed 100%.', { input: discount });
     }
 
-    if (discount === 0) return this.#clone();
+    if (discount === 0) return this.#copy();
 
     if (discount === 100) return this.#zero();
 
@@ -418,7 +419,7 @@ export class Money implements MoneyContract {
     if (surcharge < 0)
       throw new InvalidPercentageError('Surcharge must be non-negative.', { input: surcharge });
 
-    if (surcharge === 0) return this.#clone();
+    if (surcharge === 0) return this.#copy();
 
     return this.plus(this.percentOf(surcharge, roundingMode));
   }
@@ -430,7 +431,7 @@ export class Money implements MoneyContract {
       throw new InvalidAllocationError('Number of parts must be a positive integer.');
     }
 
-    if (parts === 1) return [this.#clone()];
+    if (parts === 1) return [this.#copy()];
 
     if (this.isZero()) return Array.from({ length: parts }, () => this.#zero());
 

@@ -45,8 +45,8 @@ describe('Money.units', () => {
     expect(zero('US').units()).toBe(0);
   });
 
-  it('should return a negative whole unit for a negative amount', () => {
-    expect(from(-10.5, 'US').units()).toBe(-10);
+  it('should return a positive whole unit for a negative amount', () => {
+    expect(from(-10.5, 'US').units()).toBe(10);
   });
 });
 
@@ -61,8 +61,8 @@ describe('Money.subunits', () => {
     expect(from(10, 'US').subunits()).toBe(0);
   });
 
-  it('should return a negative fractional part for a negative amount', () => {
-    expect(from(-10.5, 'US').subunits()).toBe(-50);
+  it('should return a positive fractional part for a negative amount', () => {
+    expect(from(-10.5, 'US').subunits()).toBe(50);
   });
 
   it('should return 0 for JPY which has no subunits', () => {

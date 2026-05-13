@@ -29,7 +29,6 @@ export type MoneyErrorCode =
  * Extends the native `ErrorOptions` (which includes `cause`).
  */
 export interface MoneyErrorOptions extends ErrorOptions {
-  /** The original input value that triggered the error, preserved for debugging. */
   input?: unknown;
 }
 
@@ -55,16 +54,14 @@ export interface MoneyErrorOptions extends ErrorOptions {
  * }
  */
 export abstract class MoneyError extends Error {
-  /** Machine-readable error code. Use for programmatic error handling. */
-  readonly code: MoneyErrorCode;
+  abstract override name: string;
 
-  /** The input value that caused the error, if available. */
+  readonly code: MoneyErrorCode;
   readonly input?: unknown;
 
   constructor(message: string, code: MoneyErrorCode, options?: MoneyErrorOptions) {
     super(message, options);
 
-    this.name = 'MoneyError';
     this.code = code;
     this.input = options?.input;
   }
@@ -79,10 +76,10 @@ export abstract class MoneyError extends Error {
  * `code`: `'INVALID_INPUT'`
  */
 export class InvalidInputError extends MoneyError {
+  override readonly name = 'InvalidInputError';
+
   constructor(message: string, options?: MoneyErrorOptions) {
     super(message, 'INVALID_INPUT', options);
-
-    this.name = 'InvalidInputError';
   }
 }
 
@@ -93,10 +90,10 @@ export class InvalidInputError extends MoneyError {
  * `code`: `'INVALID_PERCENTAGE'`
  */
 export class InvalidPercentageError extends MoneyError {
+  override readonly name = 'InvalidPercentageError';
+
   constructor(message: string, options?: MoneyErrorOptions) {
     super(message, 'INVALID_PERCENTAGE', options);
-
-    this.name = 'InvalidPercentageError';
   }
 }
 
@@ -111,10 +108,10 @@ export class InvalidPercentageError extends MoneyError {
  * percent(5, 0, 'US')      // throws DivisionByZeroError
  */
 export class DivisionByZeroError extends MoneyError {
+  override readonly name = 'DivisionByZeroError';
+
   constructor(options?: MoneyErrorOptions) {
     super('Cannot divide by zero.', 'DIVISION_BY_ZERO', options);
-
-    this.name = 'DivisionByZeroError';
   }
 }
 
@@ -126,10 +123,10 @@ export class DivisionByZeroError extends MoneyError {
  * `code`: `'INVALID_ALLOCATION'`
  */
 export class InvalidAllocationError extends MoneyError {
+  override readonly name = 'InvalidAllocationError';
+
   constructor(message: string, options?: MoneyErrorOptions) {
     super(message, 'INVALID_ALLOCATION', options);
-
-    this.name = 'InvalidAllocationError';
   }
 }
 
@@ -143,10 +140,10 @@ export class InvalidAllocationError extends MoneyError {
  * from(5, 'US').isBetween(10, 1) // throws InvalidRangeError
  */
 export class InvalidRangeError extends MoneyError {
+  override readonly name = 'InvalidRangeError';
+
   constructor(options?: MoneyErrorOptions) {
     super('The minimum value cannot be greater than the maximum value.', 'INVALID_RANGE', options);
-
-    this.name = 'InvalidRangeError';
   }
 }
 
@@ -160,23 +157,19 @@ export class InvalidRangeError extends MoneyError {
  * from(10, 'BR').plus(from(10, 'US')) // throws CurrencyMismatchError
  */
 export class CurrencyMismatchError extends MoneyError {
+  override readonly name = 'CurrencyMismatchError';
+
   constructor(baseCode: string, otherCode: string, options?: MoneyErrorOptions) {
     super(
       `Cannot operate on mismatched currencies: ${baseCode} and ${otherCode}.`,
       'CURRENCY_MISMATCH',
       options,
     );
-
-    this.name = 'CurrencyMismatchError';
   }
 }
 
 /**
  * Thrown when an unsupported country code is passed to any API function.
- *
- * Supported codes:
- * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`,
- * `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`.
  *
  * `code`: `'UNSUPPORTED_CURRENCY'`
  *
@@ -184,14 +177,14 @@ export class CurrencyMismatchError extends MoneyError {
  * from(10, 'XX' as any) // throws UnsupportedCurrencyError
  */
 export class UnsupportedCurrencyError extends MoneyError {
+  override readonly name = 'UnsupportedCurrencyError';
+
   constructor(country: string, supportedCodes: string, options?: MoneyErrorOptions) {
     super(
       `'${country}' is not a supported currency country. Supported codes: ${supportedCodes}.`,
       'UNSUPPORTED_CURRENCY',
       options,
     );
-
-    this.name = 'UnsupportedCurrencyError';
   }
 }
 
@@ -203,13 +196,13 @@ export class UnsupportedCurrencyError extends MoneyError {
  * `code`: `'UNSAFE_INTEGER'`
  */
 export class UnsafeIntegerError extends MoneyError {
+  override readonly name = 'UnsafeIntegerError';
+
   constructor(options?: MoneyErrorOptions) {
     super(
       'The resulting amount exceeds the safe integer limit for precision.',
       'UNSAFE_INTEGER',
       options,
     );
-
-    this.name = 'UnsafeIntegerError';
   }
 }
