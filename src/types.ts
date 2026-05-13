@@ -703,16 +703,16 @@ export interface MoneyContract {
   format(options?: FormatOptions): string;
 
   /**
-   * Returns the amount as a fixed-decimal string in major units.
+   * Returns a string with the currency code and amount in major units.
    *
    * The number of decimal places matches the currency's `fractionDigits`.
    * For display purposes, prefer {@link format}.
    *
-   * @returns A string such as `'19.99'` or `'100'` (for JPY).
+   * @returns A string such as `'BRL 19.99'` or `'JPY 100'`.
    *
    * @example
-   * from(19.99, 'BR').toString() // => '19.99'
-   * from(500, 'JP').toString()   // => '500'
+   * from(19.99, 'BR').toString() // => 'BRL 19.99'
+   * from(500, 'JP').toString()   // => 'JPY 500'
    */
   toString(): string;
 
