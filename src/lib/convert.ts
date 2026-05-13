@@ -10,7 +10,7 @@ const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$
 const regexCache = new Map<string, RegExp>();
 
 function getAllowedPattern(group: string, decimal: string): RegExp {
-  const key = `${group}|${decimal}`;
+  const key = `${group}\x00${decimal}`;
 
   if (!regexCache.has(key)) {
     regexCache.set(key, new RegExp(`[^\\d${escapeRegex(group)}${escapeRegex(decimal)}]`, 'g'));
