@@ -23,27 +23,27 @@ A lightweight TypeScript library for precise monetary operations. All values are
 #### Installation
 
 ```bash
-npm install @eriveltonsilva/currency
+npm install @eriveltondasilva/currency
 ```
 
 ```bash
-bun add @eriveltonsilva/currency
+bun add @eriveltondasilva/currency
 ```
 
 #### Import
 
 ```typescript
 // Named imports (recommended — better tree-shaking)
-import { from, parse, sum, total, isMoney, ... } from '@eriveltonsilva/currency'
+import { from, parse, sum, total, isMoney, ... } from '@eriveltondasilva/currency'
 
 // Default namespace
-import Money from '@eriveltonsilva/currency'
+import Money from '@eriveltondasilva/currency'
 
 // Country presets
-import { br, us, ... } from '@eriveltonsilva/currency/presets'
+import { br, us, ... } from '@eriveltondasilva/currency/presets'
 
 // Types
-import type { MoneyContract, MoneyInput, FormatOptions, RoundingMode, PricedItem } from '@eriveltonsilva/currency'
+import type { MoneyContract, MoneyInput, FormatOptions, RoundingMode, PricedItem } from '@eriveltondasilva/currency'
 ```
 
 #### Basic Usage
@@ -82,7 +82,7 @@ from(100, 'US').allocateByRatio([1, 3]).map((m) => m.amount())
 #### Collection Functions
 
 ```typescript
-import { sum, average, max, min, clamp } from '@eriveltonsilva/currency'
+import { sum, average, max, min, clamp } from '@eriveltondasilva/currency'
 
 sum([10, 20.50, 5], 'BR').format()   // => 'R$ 35,50'
 average([10, 20, 30], 'US').format() // => '$20.00'
@@ -94,7 +94,7 @@ clamp(150, 0, 100, 'US').format()    // => '$100.00'
 #### Business Functions
 
 ```typescript
-import { total, percent } from '@eriveltonsilva/currency'
+import { total, percent } from '@eriveltondasilva/currency'
 
 const items = [
   { price: 9.99, quantity: 3 },
@@ -108,7 +108,7 @@ percent(25, 200, 'US') // => 12.5  (25 is 12.5% of 200)
 #### Country Presets
 
 ```typescript
-import { br, us, de, jp } from '@eriveltonsilva/currency/presets'
+import { br, us, de, jp } from '@eriveltondasilva/currency/presets'
 
 // Accepts number (major units) or locale-formatted string
 br(19.99).format()          // => 'R$ 19,99'
@@ -154,7 +154,7 @@ price.format()    // => 'R$ 19,99'
 #### Error Handling
 
 ```typescript
-import { from, MoneyError, CurrencyMismatchError } from '@eriveltonsilva/currency'
+import { from, MoneyError, CurrencyMismatchError } from '@eriveltondasilva/currency'
 
 try {
   from(10, 'BR').plus(from(10, 'US'))
