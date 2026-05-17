@@ -6,8 +6,8 @@ import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError, InvalidRangeError } from '@/lib/errors';
+import { Money } from '@/lib/money';
 import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from '@/lib/rounding';
-import { Money } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
 

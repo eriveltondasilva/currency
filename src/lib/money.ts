@@ -1,4 +1,3 @@
-import type { Currency, CurrencyCode } from './lib/currencies';
 import type {
   FormatOptions,
   MoneyComparison,
@@ -7,9 +6,10 @@ import type {
   MoneyJSON,
   MoneyParts,
   RoundingMode,
-} from './types';
+} from '@/types';
+import type { Currency, CurrencyCode } from './currencies';
 
-import { numberToMinorUnit } from './lib/convert';
+import { numberToMinorUnit } from './convert';
 import {
   CurrencyMismatchError,
   DivisionByZeroError,
@@ -18,10 +18,12 @@ import {
   InvalidPercentageError,
   InvalidRangeError,
   UnsafeIntegerError,
-} from './lib/errors';
-import { formatMoney } from './lib/format';
-import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from './lib/rounding';
-import { isMoney, tag } from './lib/utils';
+} from './errors';
+import { formatMoney } from './format';
+import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from './rounding';
+import { TAG } from './utils';
+
+import { isMoney } from '@/api/type-guards';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -42,7 +44,7 @@ export class Money implements MoneyContract {
   readonly #scaleFactor: number;
   readonly #minorUnits: number;
 
-  readonly [tag] = true;
+  readonly [TAG] = true;
 
   constructor(input: number, currency: Currency) {
     this.#scaleFactor = 10 ** currency.fractionDigits;

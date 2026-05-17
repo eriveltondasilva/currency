@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pages: write
   id-token: write
 
 jobs:
@@ -17,7 +18,7 @@ jobs:
     uses: ./.github/workflows/tests.yml
 
   publish:
-    needs: [ quality, tests ]
+    needs: [quality, tests]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 
@@ -109,3 +110,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         # O bun não tem suporte oficial a provenance, então usar o npm para publicar
         # Quando provenance estiver disponível, migrar para bun publish
+
+  deploy-docs:
+    needs: [publish]
+    uses: ./.github/workflows/deploy-docs.yml
+    secrets: inherit
