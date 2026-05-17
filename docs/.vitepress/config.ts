@@ -8,7 +8,7 @@ export default defineConfig({
   base: '/currency/',
 
   head: [
-    ['link', { rel: 'icon', href: '/money-bag.png', type: 'image/x-icon' }],
+    ['link', { rel: 'icon', href: '/currency/favicon.ico' }],
     ['meta', { name: 'theme-color', content: '#3eaf7c' }],
     ['meta', { property: 'og:title', content: 'Currency' }],
     [
