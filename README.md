@@ -30,6 +30,10 @@ npm install @eriveltondasilva/currency
 bun add @eriveltondasilva/currency
 ```
 
+```bash
+pnpm add @eriveltondasilva/currency
+```
+
 #### Import
 
 ```typescript
@@ -79,6 +83,19 @@ from(100, 'US').allocateByRatio([1, 3]).map((m) => m.amount())
 // => [25, 75]
 ```
 
+#### Formatting
+
+```typescript
+const price = from(1999.9, 'BR')
+
+price.format()                               // => 'R$ 1.999,90'
+price.format({ currencyDisplay: 'code' })    // => 'BRL 1.999,90'
+price.format({ currencyDisplay: 'none' })    // => '1.999,90'
+price.format({ notation: 'compact' })        // => 'R$ 2 mil'
+price.format({ signDisplay: 'always' })      // => '+R$ 1.999,90'
+price.format({ currencySign: 'accounting' }) // => 'R$ 1.999,90'
+```
+
 #### Collection Functions
 
 ```typescript
@@ -108,76 +125,18 @@ percent(25, 200, 'US') // => 12.5  (25 is 12.5% of 200)
 #### Country Presets
 
 ```typescript
-import { br, us, de, jp } from '@eriveltondasilva/currency/presets'
+import { br, us, de, jp, ... } from '@eriveltondasilva/currency/presets'
 
 // Accepts number (major units) or locale-formatted string
-br(19.99).format()          // => 'R$ 19,99'
-us(19.99).format()          // => '$19.99'
+br(19.99).format()         // => 'R$ 19,99'
+us(19.99).format()         // => '$19.99'
 
-br('R$ 1.999,99').amount()  // => 1999.99
-us('$1,999.99').amount()    // => 1999.99
+br('R$ 1.999,99').amount() // => 1999.99
+us('$1,999.99').amount()   // => 1999.99
 
-de(1500).format()           // => '1.500,00 €'
-jp(500).format()            // => '¥500'
+de(1500).format()          // => '1.500,00 €'
+jp(500).format()           // => '¥500'
 ```
-
-#### Formatting
-
-```typescript
-const price = from(1999.9, 'BR')
-
-price.format()                                    // => 'R$ 1.999,90'
-price.format({ currencyDisplay: 'code' })         // => 'BRL 1.999,90'
-price.format({ currencyDisplay: 'none' })         // => '1.999,90'
-price.format({ notation: 'compact' })             // => 'R$ 2 mil'
-price.format({ signDisplay: 'always' })           // => '+R$ 1.999,90'
-price.format({ currencySign: 'accounting' })      // => 'R$ 1.999,90'
-```
-
-#### Serialization
-
-```typescript
-const price = from(19.99, 'BR')
-
-// JSON round-trip
-const json = price.toJSON()
-// => { minorUnits: 1999, currencyCode: 'BRL' }
-
-const restored = fromMinorUnits(json.minorUnits, 'BR')
-restored.equals(price)  // => true
-
-// String output
-price.toString()  // => '19.99'
-price.format()    // => 'R$ 19,99'
-```
-
-#### Error Handling
-
-```typescript
-import { from, MoneyError, CurrencyMismatchError } from '@eriveltondasilva/currency'
-
-try {
-  from(10, 'BR').plus(from(10, 'US'))
-} catch (err) {
-  if (err instanceof MoneyError) {
-    console.error(err.code)     // => 'CURRENCY_MISMATCH'
-    console.error(err.message)  // => 'Cannot operate on mismatched currencies: BRL and USD.'
-  }
-}
-```
-
-All errors extend `MoneyError` and expose a `code` property for programmatic handling:
-
-| Error                      | Code                     |
-| -------------------------- | ------------------------ |
-| `InvalidInputError`        | `'INVALID_INPUT'`        |
-| `InvalidPercentageError`   | `'INVALID_PERCENTAGE'`   |
-| `DivisionByZeroError`      | `'DIVISION_BY_ZERO'`     |
-| `InvalidAllocationError`   | `'INVALID_ALLOCATION'`   |
-| `InvalidRangeError`        | `'INVALID_RANGE'`        |
-| `CurrencyMismatchError`    | `'CURRENCY_MISMATCH'`    |
-| `UnsupportedCurrencyError` | `'UNSUPPORTED_CURRENCY'` |
-| `UnsafeIntegerError`       | `'UNSAFE_INTEGER'`       |
 
 ### Supported Countries
 
@@ -198,6 +157,10 @@ All errors extend `MoneyError` and expose a `code` property for programmatic han
 | `SG` | Singapore      | SGD      |
 | `US` | United States  | USD      |
 
+### Documentation
+
+You can find the documentation at [eriveltondasilva.github.io/currency](https://eriveltondasilva.github.io/currency).
+
 ### Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each release.
@@ -209,3 +172,7 @@ Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.m
 ### License
 
 MIT © [Erivelton Silva](https://github.com/eriveltondasilva)
+
+### Inspired by:
+
+@see https://github.com/scurker/currency.js
