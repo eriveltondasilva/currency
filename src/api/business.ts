@@ -6,8 +6,8 @@ import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
 import { DivisionByZeroError, InvalidInputError } from '@/lib/errors';
+import { Money } from '@/lib/money';
 import { isRecord } from '@/lib/utils';
-import { Money } from '@/money';
 
 // ─────────────────────────────────────────────────────────────────────────────
 

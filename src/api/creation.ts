@@ -4,7 +4,7 @@ import type { MoneyContract } from '@/types';
 import { numberToMinorUnit, stringToMinorUnit } from '@/lib/convert';
 import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError } from '@/lib/errors';
-import { Money } from '@/money';
+import { Money } from '@/lib/money';
 
 function assertNotNull(value: unknown): void {
   if (value != null) return;
