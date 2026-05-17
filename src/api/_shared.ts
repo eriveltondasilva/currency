@@ -1,9 +1,10 @@
 import type { Currency } from '@/lib/currencies';
 import type { MoneyInput } from '@/types';
 
+import { isMoney } from './type-guards';
+
 import { numberToMinorUnit } from '@/lib/convert';
 import { CurrencyMismatchError, InvalidInputError, MoneyError } from '@/lib/errors';
-import { isMoney } from '@/lib/utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
