@@ -214,15 +214,4 @@ For currencies with 0 fraction digits (e.g. JPY), `step` must be at least `1`. S
 from(150, 'JP').round(50).amount()   // => 150  ✅
 from(150, 'JP').round(0.05).amount() // ❌ InvalidInputError
 ```
-
 :::
-
-## Quick reference
-
-| Method               | Description                          |
-| -------------------- | ------------------------------------ |
-| `abs()`              | Non-negative value — sign is removed |
-| `negate()`           | Flipped sign                         |
-| `max(x)`             | Greater of `this` and `x`            |
-| `min(x)`             | Lesser of `this` and `x`             |
-| `round(step, mode?)` | Nearest multiple of `step`           |

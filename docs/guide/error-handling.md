@@ -105,17 +105,6 @@ This is useful for logging and debugging, but not all errors populate `.input` â
 
 ## Error reference
 
-| Class                      | Code                   | Thrown when                                                               |
-| -------------------------- | ---------------------- | ------------------------------------------------------------------------- |
-| `InvalidInputError`        | `INVALID_INPUT`        | Value is wrong type, `null`, `undefined`, non-finite, or cannot be parsed |
-| `InvalidPercentageError`   | `INVALID_PERCENTAGE`   | Percentage is negative, non-finite, or exceeds `100`                      |
-| `DivisionByZeroError`      | `DIVISION_BY_ZERO`     | Divisor or denominator resolves to zero                                   |
-| `InvalidAllocationError`   | `INVALID_ALLOCATION`   | `allocate` / `allocateByRatio` receives invalid arguments                 |
-| `InvalidRangeError`        | `INVALID_RANGE`        | `min` is greater than `max` in range-based operations                     |
-| `CurrencyMismatchError`    | `CURRENCY_MISMATCH`    | Operation between two `MoneyContract` instances with different currencies |
-| `UnsupportedCurrencyError` | `UNSUPPORTED_CURRENCY` | Country code is not in the supported list                                 |
-| `UnsafeIntegerError`       | `UNSAFE_INTEGER`       | Result exceeds `Number.MAX_SAFE_INTEGER`                                  |
-
 See [Errors](/reference/errors) for the full per-class documentation, including which methods throw each error.
 
 ## Validating inputs upfront
