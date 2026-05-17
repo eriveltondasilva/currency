@@ -1,51 +1,15 @@
-/**
- * @module @eriveltondasilva/currency
- *
- * # A lightweight TypeScript library for precise monetary operations.
- *
- * All values are stored internally as **minor-unit integers** to eliminate
- * floating-point errors. Every operation returns a new instance — the API
- * is fully immutable.
- *
- * ## Quick start
- *
- * @example
- * import { from, sum, total } from '@eriveltondasilva/currency'
- *
- * const price = from(19.99, 'BR')
- * price.format()                   // => 'R$ 19,99'
- * price.applyDiscount(10).format() // => 'R$ 17,99'
- *
- * sum([10, 20, 30], 'US').format() // => '$60.00'
- *
- * const items = [
- *   { price: 9.99, quantity: 3 },
- *   { price: 4.99 },
- * ]
- * total(items, 'US').format()
- * // => '$34.96'
- *
- * ## Preset shorthand (optional import)
- *
- * @example
- * import { br, us } from '@eriveltondasilva/currency/presets'
- *
- * br(19.99).format() // => 'R$ 19,99'
- * us(9.99).format()  // => '$9.99'
- *
- * ## Supported countries
- *
- * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`, `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`
- */
-
 import * as api from './api';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+export type { CountryCode, CurrencyCode } from './lib/currencies';
 export type {
   FormatOptions,
+  MoneyComparison,
   MoneyContract,
   MoneyInput,
+  MoneyJSON,
+  MoneyParts,
   PricedItem,
   RoundingMode,
 } from './types';
@@ -136,7 +100,13 @@ export {
   total,
 } from './api/business';
 
-// ─── Utils ───────────────────────────────────────────────────────────────────
+// ─── Type Guards ─────────────────────────────────────────────────────────────
 
-export { isMoney, isMoneyInput } from './lib/utils';
+export {
+  isMoney,
+  isMoneyInput,
+} from './api/type-guards';
+
+// ─── Other ───────────────────────────────────────────────────────────────────
+
 export default Money;

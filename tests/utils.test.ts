@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { from } from '@/api/creation';
-import { isMoneyInput } from '@/lib/utils';
+import { isMoneyInput } from '@/api/type-guards';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
