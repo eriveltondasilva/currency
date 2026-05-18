@@ -1,61 +1,5 @@
 import { UnsupportedCurrencyError } from './errors';
 
-// #region Types
-
-export type CountryCode =
-  | 'AE'
-  | 'AR'
-  | 'AU'
-  | 'BR'
-  | 'CA'
-  | 'CH'
-  | 'CL'
-  | 'CN'
-  | 'CO'
-  | 'DE'
-  | 'FR'
-  | 'GB'
-  | 'IN'
-  | 'JP'
-  | 'KR'
-  | 'MX'
-  | 'NO'
-  | 'NZ'
-  | 'PT'
-  | 'RU'
-  | 'SA'
-  | 'SE'
-  | 'SG'
-  | 'US'
-  | 'ZA';
-
-export type CurrencyCode =
-  | 'AED'
-  | 'ARS'
-  | 'AUD'
-  | 'BRL'
-  | 'CAD'
-  | 'CHF'
-  | 'CLP'
-  | 'CNY'
-  | 'COP'
-  | 'EUR'
-  | 'GBP'
-  | 'INR'
-  | 'JPY'
-  | 'KRW'
-  | 'MXN'
-  | 'NOK'
-  | 'NZD'
-  | 'RUB'
-  | 'SAR'
-  | 'SEK'
-  | 'SGD'
-  | 'USD'
-  | 'ZAR';
-
-// #endregion
-
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface CurrencyDef {
@@ -63,23 +7,51 @@ interface CurrencyDef {
   fractionDigits: number;
 }
 
-interface CountryDef {
-  name: string;
+interface FormattingDef {
   locale: string;
-  currency: CurrencyCode;
   decimal: string;
   group: string;
 }
 
-export interface Currency {
-  locale: string;
+interface CountryDef extends FormattingDef {
+  name: string;
+  currency: CurrencyCode;
+}
+
+export interface Currency extends FormattingDef {
   code: CurrencyCode;
   fractionDigits: number;
-  decimal: string;
-  group: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+
+const CURRENCY_DEFS = {
+  AED: { name: 'UAE Dirham', fractionDigits: 2 },
+  ARS: { name: 'Argentine Peso', fractionDigits: 2 },
+  AUD: { name: 'Australian Dollar', fractionDigits: 2 },
+  BRL: { name: 'Brazilian Real', fractionDigits: 2 },
+  CAD: { name: 'Canadian Dollar', fractionDigits: 2 },
+  CHF: { name: 'Swiss Franc', fractionDigits: 2 },
+  CLP: { name: 'Chilean Peso', fractionDigits: 0 },
+  CNY: { name: 'Chinese Yuan', fractionDigits: 2 },
+  COP: { name: 'Colombian Peso', fractionDigits: 0 },
+  EUR: { name: 'Euro', fractionDigits: 2 },
+  GBP: { name: 'British Pound', fractionDigits: 2 },
+  INR: { name: 'Indian Rupee', fractionDigits: 2 },
+  JPY: { name: 'Japanese Yen', fractionDigits: 0 },
+  KRW: { name: 'South Korean Won', fractionDigits: 0 },
+  MXN: { name: 'Mexican Peso', fractionDigits: 2 },
+  NOK: { name: 'Norwegian Krone', fractionDigits: 2 },
+  NZD: { name: 'New Zealand Dollar', fractionDigits: 2 },
+  RUB: { name: 'Russian Ruble', fractionDigits: 2 },
+  SAR: { name: 'Saudi Riyal', fractionDigits: 2 },
+  SEK: { name: 'Swedish Krona', fractionDigits: 2 },
+  SGD: { name: 'Singapore Dollar', fractionDigits: 2 },
+  USD: { name: 'US Dollar', fractionDigits: 2 },
+  ZAR: { name: 'South African Rand', fractionDigits: 2 },
+} as const satisfies Record<string, CurrencyDef>;
+
+export type CurrencyCode = keyof typeof CURRENCY_DEFS;
 
 const COUNTRY_DEFS = {
   AE: { name: 'United Arab Emirates', locale: 'ar-AE', currency: 'AED', decimal: '.', group: ',' },
@@ -107,33 +79,9 @@ const COUNTRY_DEFS = {
   SG: { name: 'Singapore', locale: 'en-SG', currency: 'SGD', decimal: '.', group: ',' },
   US: { name: 'United States', locale: 'en-US', currency: 'USD', decimal: '.', group: ',' },
   ZA: { name: 'South Africa', locale: 'en-ZA', currency: 'ZAR', decimal: '.', group: ',' },
-} as const satisfies Record<CountryCode, CountryDef>;
+} as const satisfies Record<string, CountryDef>;
 
-const CURRENCY_DEFS = {
-  AED: { name: 'UAE Dirham', fractionDigits: 2 },
-  ARS: { name: 'Argentine Peso', fractionDigits: 2 },
-  AUD: { name: 'Australian Dollar', fractionDigits: 2 },
-  BRL: { name: 'Brazilian Real', fractionDigits: 2 },
-  CAD: { name: 'Canadian Dollar', fractionDigits: 2 },
-  CHF: { name: 'Swiss Franc', fractionDigits: 2 },
-  CLP: { name: 'Chilean Peso', fractionDigits: 0 },
-  CNY: { name: 'Chinese Yuan', fractionDigits: 2 },
-  COP: { name: 'Colombian Peso', fractionDigits: 0 },
-  EUR: { name: 'Euro', fractionDigits: 2 },
-  GBP: { name: 'British Pound', fractionDigits: 2 },
-  INR: { name: 'Indian Rupee', fractionDigits: 2 },
-  JPY: { name: 'Japanese Yen', fractionDigits: 0 },
-  KRW: { name: 'South Korean Won', fractionDigits: 0 },
-  MXN: { name: 'Mexican Peso', fractionDigits: 2 },
-  NOK: { name: 'Norwegian Krone', fractionDigits: 2 },
-  NZD: { name: 'New Zealand Dollar', fractionDigits: 2 },
-  RUB: { name: 'Russian Ruble', fractionDigits: 2 },
-  SAR: { name: 'Saudi Riyal', fractionDigits: 2 },
-  SEK: { name: 'Swedish Krona', fractionDigits: 2 },
-  SGD: { name: 'Singapore Dollar', fractionDigits: 2 },
-  USD: { name: 'US Dollar', fractionDigits: 2 },
-  ZAR: { name: 'South African Rand', fractionDigits: 2 },
-} as const satisfies Record<CurrencyCode, CurrencyDef>;
+export type CountryCode = keyof typeof COUNTRY_DEFS;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
