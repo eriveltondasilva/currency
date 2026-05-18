@@ -5,16 +5,20 @@ import { DEFAULT_ROUND_FN } from './rounding';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const ASCII_0 = 48;
+const ASCII_9 = 57;
+const ASCII_MINUS = 45;
+const ASCII_PLUS = 43;
+
 function normalizeNumericString(value: string, decimal: string): string | null {
   let result = '';
   let decimalCount = 0;
-  let i = 0;
   const decimalCode = decimal.charCodeAt(0);
 
-  for (; i < value.length; i++) {
+  for (let i = 0; i < value.length; i++) {
     const code = value.charCodeAt(i);
 
-    if (code >= 48 && code <= 57) {
+    if (code >= ASCII_0 && code <= ASCII_9) {
       result += value[i];
     } else if (code === decimalCode) {
       if (++decimalCount > 1) return null;
@@ -34,8 +38,7 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
 
   if (input === 0) return 0;
 
-  // biome-ignore lint/style/useTemplate: micro-otimization
-  const result = DEFAULT_ROUND_FN(Number(input + 'e' + fractionDigits));
+  const result = DEFAULT_ROUND_FN(Number(`${input}e${fractionDigits}`));
 
   if (!Number.isFinite(result)) {
     throw new InvalidInputError('Value is too large to be represented as a monetary amount.', {
@@ -55,10 +58,10 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
 
 export function stringToMinorUnit(input: string, currency: Currency): number {
   const { decimal, fractionDigits } = currency;
-  // const [, sign = '', rest = ''] = /^([+-]?)(.*)$/.exec(input.trim()) ?? [];
+
   const trimmed = input.trim();
   const firstCode = trimmed.charCodeAt(0);
-  const sign = firstCode === 45 ? '-' : '';
+  const sign = firstCode === ASCII_MINUS ? '-' : firstCode === ASCII_PLUS ? '+' : '';
   const rest = sign ? trimmed.slice(1) : trimmed;
 
   const normalized = normalizeNumericString(rest, decimal);
