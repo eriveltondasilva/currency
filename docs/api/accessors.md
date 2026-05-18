@@ -225,15 +225,3 @@ new Intl.NumberFormat(price.locale(), {
 }).format(price.amount())
 // => 'R$ 1.999,99'
 ```
-
-## Quick reference
-
-| Accessor         | Returns                                  | Example (`from(19.99, 'BR')`)                    |
-| ---------------- | ---------------------------------------- | ------------------------------------------------ |
-| `amount()`       | `number` — major units                   | `19.99`                                          |
-| `minorUnits()`   | `number` — internal integer              | `1999`                                           |
-| `units()`        | `number` — whole-unit part, non-negative | `19`                                             |
-| `subunits()`     | `number` — sub-unit part, non-negative   | `99`                                             |
-| `toParts()`      | `MoneyParts` — structured breakdown      | `{ units: 19, subunits: 99, isNegative: false }` |
-| `currencyCode()` | `CurrencyCode` — ISO 4217                | `'BRL'`                                          |
-| `locale()`       | `string` — BCP 47                        | `'pt-BR'`                                        |
