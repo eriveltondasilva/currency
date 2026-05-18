@@ -5,8 +5,8 @@ import type { Currency } from '@/lib/currencies';
 import { numberToMinorUnit, stringToMinorUnit } from '@/lib/convert';
 
 // Mocks de moedas
-const usd: Currency = { locale: 'en-US', code: 'USD', decimal: '.', group: ',', fractionDigits: 2 };
-const brl: Currency = { locale: 'pt-BR', code: 'BRL', decimal: ',', group: '.', fractionDigits: 2 };
+const usd: Currency = { locale: 'en-US', code: 'USD', decimal: '.', fractionDigits: 2 };
+const brl: Currency = { locale: 'pt-BR', code: 'BRL', decimal: ',', fractionDigits: 2 };
 
 describe('Perfil de Performance: stringToMinorUnit', () => {
   // Cenário 1: O "Caminho Feliz" absoluto (sem espaços, sem sinal, decimal simples)

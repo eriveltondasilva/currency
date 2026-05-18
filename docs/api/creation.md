@@ -79,7 +79,7 @@ The parser strips currency symbols and non-numeric characters, then interprets t
 | Name      | Type          | Description                                          |
 | --------- | ------------- | ---------------------------------------------------- |
 | `value`   | `string`      | A locale-formatted string (e.g. `'R$ 1.999,99'`)     |
-| `country` | `CountryCode` | Country that defines the decimal/grouping separators |
+| `country` | `CountryCode` | Country that defines the decimal separators |
 
 ### Returns
 
@@ -238,7 +238,7 @@ const total = items.reduce(
 For single-currency applications, country-specific preset functions offer a more concise alternative to `from` and `parse`.
 
 ```ts
-import { br, us, de, jp, ... } from '@eriveltondasilva/currency/presets'
+import { br, us, de, jp } from '@eriveltondasilva/currency/presets'
 ```
 
 Each preset accepts either a `number` (major units) or a `string` (locale-formatted):

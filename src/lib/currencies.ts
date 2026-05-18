@@ -7,20 +7,18 @@ interface CurrencyDef {
   fractionDigits: number;
 }
 
-interface FormattingDef {
-  locale: string;
-  decimal: string;
-  group: string;
-}
-
-interface CountryDef extends FormattingDef {
+interface CountryDef {
   name: string;
   currency: CurrencyCode;
+  locale: string;
+  decimal: string;
 }
 
-export interface Currency extends FormattingDef {
+export interface Currency {
   code: CurrencyCode;
   fractionDigits: number;
+  locale: string;
+  decimal: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,31 +52,31 @@ const CURRENCY_DEFS = {
 export type CurrencyCode = keyof typeof CURRENCY_DEFS;
 
 const COUNTRY_DEFS = {
-  AE: { name: 'United Arab Emirates', locale: 'ar-AE', currency: 'AED', decimal: '.', group: ',' },
-  AR: { name: 'Argentina', locale: 'es-AR', currency: 'ARS', decimal: ',', group: '.' },
-  AU: { name: 'Australia', locale: 'en-AU', currency: 'AUD', decimal: '.', group: ',' },
-  BR: { name: 'Brazil', locale: 'pt-BR', currency: 'BRL', decimal: ',', group: '.' },
-  CA: { name: 'Canada', locale: 'en-CA', currency: 'CAD', decimal: '.', group: ',' },
-  CH: { name: 'Switzerland', locale: 'de-CH', currency: 'CHF', decimal: '.', group: "'" },
-  CL: { name: 'Chile', locale: 'es-CL', currency: 'CLP', decimal: ',', group: '.' },
-  CN: { name: 'China', locale: 'zh-CN', currency: 'CNY', decimal: '.', group: ',' },
-  CO: { name: 'Colombia', locale: 'es-CO', currency: 'COP', decimal: ',', group: '.' },
-  DE: { name: 'Germany', locale: 'de-DE', currency: 'EUR', decimal: ',', group: '.' },
-  FR: { name: 'France', locale: 'fr-FR', currency: 'EUR', decimal: ',', group: ' ' },
-  GB: { name: 'United Kingdom', locale: 'en-GB', currency: 'GBP', decimal: '.', group: ',' },
-  IN: { name: 'India', locale: 'en-IN', currency: 'INR', decimal: '.', group: ',' },
-  JP: { name: 'Japan', locale: 'ja-JP', currency: 'JPY', decimal: '.', group: ',' },
-  KR: { name: 'South Korea', locale: 'ko-KR', currency: 'KRW', decimal: '.', group: ',' },
-  MX: { name: 'Mexico', locale: 'es-MX', currency: 'MXN', decimal: '.', group: ',' },
-  NO: { name: 'Norway', locale: 'nb-NO', currency: 'NOK', decimal: ',', group: ' ' },
-  NZ: { name: 'New Zealand', locale: 'en-NZ', currency: 'NZD', decimal: '.', group: ',' },
-  PT: { name: 'Portugal', locale: 'pt-PT', currency: 'EUR', decimal: ',', group: '.' },
-  RU: { name: 'Russia', locale: 'ru-RU', currency: 'RUB', decimal: ',', group: ' ' },
-  SA: { name: 'Saudi Arabia', locale: 'ar-SA', currency: 'SAR', decimal: '.', group: ',' },
-  SE: { name: 'Sweden', locale: 'sv-SE', currency: 'SEK', decimal: ',', group: ' ' },
-  SG: { name: 'Singapore', locale: 'en-SG', currency: 'SGD', decimal: '.', group: ',' },
-  US: { name: 'United States', locale: 'en-US', currency: 'USD', decimal: '.', group: ',' },
-  ZA: { name: 'South Africa', locale: 'en-ZA', currency: 'ZAR', decimal: '.', group: ',' },
+  AE: { name: 'United Arab Emirates', locale: 'ar-AE', currency: 'AED', decimal: '.' },
+  AR: { name: 'Argentina', locale: 'es-AR', currency: 'ARS', decimal: ',' },
+  AU: { name: 'Australia', locale: 'en-AU', currency: 'AUD', decimal: '.' },
+  BR: { name: 'Brazil', locale: 'pt-BR', currency: 'BRL', decimal: ',' },
+  CA: { name: 'Canada', locale: 'en-CA', currency: 'CAD', decimal: '.' },
+  CH: { name: 'Switzerland', locale: 'de-CH', currency: 'CHF', decimal: '.' },
+  CL: { name: 'Chile', locale: 'es-CL', currency: 'CLP', decimal: ',' },
+  CN: { name: 'China', locale: 'zh-CN', currency: 'CNY', decimal: '.' },
+  CO: { name: 'Colombia', locale: 'es-CO', currency: 'COP', decimal: ',' },
+  DE: { name: 'Germany', locale: 'de-DE', currency: 'EUR', decimal: ',' },
+  FR: { name: 'France', locale: 'fr-FR', currency: 'EUR', decimal: ',' },
+  GB: { name: 'United Kingdom', locale: 'en-GB', currency: 'GBP', decimal: '.' },
+  IN: { name: 'India', locale: 'en-IN', currency: 'INR', decimal: '.' },
+  JP: { name: 'Japan', locale: 'ja-JP', currency: 'JPY', decimal: '.' },
+  KR: { name: 'South Korea', locale: 'ko-KR', currency: 'KRW', decimal: '.' },
+  MX: { name: 'Mexico', locale: 'es-MX', currency: 'MXN', decimal: '.' },
+  NO: { name: 'Norway', locale: 'nb-NO', currency: 'NOK', decimal: ',' },
+  NZ: { name: 'New Zealand', locale: 'en-NZ', currency: 'NZD', decimal: '.' },
+  PT: { name: 'Portugal', locale: 'pt-PT', currency: 'EUR', decimal: ',' },
+  RU: { name: 'Russia', locale: 'ru-RU', currency: 'RUB', decimal: ',' },
+  SA: { name: 'Saudi Arabia', locale: 'ar-SA', currency: 'SAR', decimal: '.' },
+  SE: { name: 'Sweden', locale: 'sv-SE', currency: 'SEK', decimal: ',' },
+  SG: { name: 'Singapore', locale: 'en-SG', currency: 'SGD', decimal: '.' },
+  US: { name: 'United States', locale: 'en-US', currency: 'USD', decimal: '.' },
+  ZA: { name: 'South Africa', locale: 'en-ZA', currency: 'ZAR', decimal: '.' },
 } as const satisfies Record<string, CountryDef>;
 
 export type CountryCode = keyof typeof COUNTRY_DEFS;
@@ -92,8 +90,8 @@ export function resolveCurrency(country: CountryCode): Currency {
 
   if (!countryDef) throw new UnsupportedCurrencyError(country, SUPPORTED_CODES);
 
-  const { locale, currency, decimal, group } = countryDef;
+  const { locale, currency, decimal } = countryDef;
   const { fractionDigits } = CURRENCY_DEFS[currency];
 
-  return { locale, code: currency, decimal, group, fractionDigits };
+  return { locale, code: currency, decimal, fractionDigits };
 }
