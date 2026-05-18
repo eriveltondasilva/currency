@@ -254,8 +254,4 @@ br('R$ 1.999,99').amount() // => 1999.99
 us('$9.99').amount()       // => 9.99
 ```
 
-**Available presets:** `au`, `br`, `ca`, `ch`, `cn`, `de`, `fr`, `gb`, `ind`, `jp`, `mx`, `pt`, `sg`, `us`.
-
-::: info
-`in` is a reserved keyword in JavaScript, so the India preset is exported as `ind`.
-:::
+**All available [Presets](presets.md)**

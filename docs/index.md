@@ -24,8 +24,8 @@ features:
     details: Every operation returns a new instance. Safe to reuse, share, and compose without side effects.
 
   - icon: 🌍
-    title: 14 countries out of the box
-    details: Supports AU, BR, CA, CH, CN, DE, FR, GB, IN, JP, MX, PT, SG, and US with correct locale, separators, and fraction digits.
+    title: 25 countries out of the box
+    details: Correct locale, separators, and fraction digits for BR, US, JP, DE, and more. <a href="/reference/supported-countries">See all →</a>
 
   - icon: 🌲
     title: Tree-shakeable
