@@ -36,8 +36,8 @@ export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
 
   const currency = resolveCurrency(country);
 
-  const amount = values.reduce<number>((acc, value, i) => {
-    return acc + resolveMinorUnits(value, currency, `sum(): index ${i}`);
+  const amount = values.reduce<number>((acc, value) => {
+    return acc + resolveMinorUnits(value, currency, 'sum()');
   }, 0);
 
   return Money.fromMinorUnits(amount, currency);
@@ -72,8 +72,8 @@ export function average(
 
   const currency = resolveCurrency(country);
 
-  const amount = values.reduce<number>((acc, value, i) => {
-    return acc + resolveMinorUnits(value, currency, `average(): index ${i}`);
+  const amount = values.reduce<number>((acc, value) => {
+    return acc + resolveMinorUnits(value, currency, 'sum()');
   }, 0);
 
   return Money.fromMinorUnits(ROUND_FUNCTIONS[roundingMode](amount / values.length), currency);
@@ -104,14 +104,12 @@ export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
   }
 
   const currency = resolveCurrency(country);
+  let amount = resolveMinorUnits(values[0] as MoneyInput, currency, 'max(): index 0');
 
-  const amount = values.slice(1).reduce<number>(
-    (acc, value, i) => {
-      const current = resolveMinorUnits(value, currency, `max(): index ${i + 1}`);
-      return current > acc ? current : acc;
-    },
-    resolveMinorUnits(values[0] as MoneyInput, currency, 'max(): index 0'),
-  );
+  for (let i = 1; i < values.length; i++) {
+    const current = resolveMinorUnits(values[i] as MoneyInput, currency, `max(): index ${i}`);
+    if (current > amount) amount = current;
+  }
 
   return Money.fromMinorUnits(amount, currency);
 }
@@ -141,14 +139,12 @@ export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
   }
 
   const currency = resolveCurrency(country);
+  let amount = resolveMinorUnits(values[0] as MoneyInput, currency, 'min(): index 0');
 
-  const amount = values.slice(1).reduce<number>(
-    (acc, value, i) => {
-      const current = resolveMinorUnits(value, currency, `min(): index ${i + 1}`);
-      return current < acc ? current : acc;
-    },
-    resolveMinorUnits(values[0] as MoneyInput, currency, 'min(): index 0'),
-  );
+  for (let i = 1; i < values.length; i++) {
+    const current = resolveMinorUnits(values[i] as MoneyInput, currency, `min(): index ${i}`);
+    if (current < amount) amount = current;
+  }
 
   return Money.fromMinorUnits(amount, currency);
 }
