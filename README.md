@@ -147,7 +147,7 @@ jp(500).format()           // => '¥500'
 #### Americas
 
 | Country         | Code  | Currency |
-| --------------- | :---: | :------: |
+| :-------------- | :---: | :------: |
 | 🇦🇷 Argentina     | `AR`  |  `ARS`   |
 | 🇧🇷 Brazil        | `BR`  |  `BRL`   |
 | 🇨🇦 Canada        | `CA`  |  `CAD`   |
@@ -159,7 +159,7 @@ jp(500).format()           // => '¥500'
 #### Europe
 
 | Country          | Code  | Currency |
-| ---------------- | :---: | :------: |
+| :--------------- | :---: | :------: |
 | 🇨🇭 Switzerland    | `CH`  |  `CHF`   |
 | 🇩🇪 Germany        | `DE`  |  `EUR`   |
 | 🇫🇷 France         | `FR`  |  `EUR`   |
@@ -172,7 +172,7 @@ jp(500).format()           // => '¥500'
 #### Asia
 
 | Country                | Code  | Currency |
-| ---------------------- | :---: | :------: |
+| :--------------------- | :---: | :------: |
 | 🇨🇳 China                | `CN`  |  `CNY`   |
 | 🇮🇳 India                | `IN`  |  `INR`   |
 | 🇯🇵 Japan                | `JP`  |  `JPY`   |
@@ -184,7 +184,7 @@ jp(500).format()           // => '¥500'
 #### Oceania & Africa
 
 | Country        | Code  | Currency |
-| -------------- | :---: | :------: |
+| :------------- | :---: | :------: |
 | 🇦🇺 Australia    | `AU`  |  `AUD`   |
 | 🇳🇿 New Zealand  | `NZ`  |  `NZD`   |
 | 🇿🇦 South Africa | `ZA`  |  `ZAR`   |
