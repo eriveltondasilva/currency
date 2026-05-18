@@ -180,4 +180,4 @@ See [Error Handling](/guide/error-handling) for the full list of error codes and
 
 - [Core concepts](/guide/concepts) — understand minor units, immutability, and MoneyInput
 - [API Reference](/api/creation) — full method signatures and examples
-- [Supported countries](/reference/supported-countries) — all 14 country codes and their currencies
+- [Supported countries](/reference/supported-countries) — all country codes and their currencies

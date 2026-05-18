@@ -206,20 +206,4 @@ When multiple countries share the same currency (e.g. `'EUR'` for `'DE'`, `'FR'`
 
 ## FormatOptions reference
 
-Full list of options accepted by `format()`. All properties are optional.
-
-| Property                | Type                                                       | Default                   | Description                          |
-| ----------------------- | ---------------------------------------------------------- | ------------------------- | ------------------------------------ |
-| `locale`                | `string`                                                   | currency locale           | BCP 47 locale tag for display only   |
-| `currencyDisplay`       | `'symbol' \| 'narrowSymbol' \| 'code' \| 'name' \| 'none'` | `'symbol'`                | How the currency identifier is shown |
-| `notation`              | `'standard' \| 'compact'`                                  | `'standard'`              | Number format style                  |
-| `compactDisplay`        | `'short' \| 'long'`                                        | `'short'`                 | Unit label for compact notation      |
-| `signDisplay`           | `'auto' \| 'always' \| 'exceptZero' \| 'negative'`         | `'auto'`                  | When to show the sign character      |
-| `currencySign`          | `'standard' \| 'accounting'`                               | `'standard'`              | Accounting notation for negatives    |
-| `useGrouping`           | `boolean \| 'always' \| 'auto' \| 'min2'`                  | `true`                    | Whether to show grouping separators  |
-| `trailingZeroDisplay`   | `'auto' \| 'stripIfInteger'`                               | `'auto'`                  | Whether to strip trailing zeros      |
-| `roundingMode`          | `RoundingMode`                                             | `'halfExpand'`            | Rounding applied during formatting   |
-| `minimumFractionDigits` | `number`                                                   | `currency.fractionDigits` | Minimum decimal places               |
-| `maximumFractionDigits` | `number`                                                   | `currency.fractionDigits` | Maximum decimal places               |
-
 See [Format Options](/reference/format-options) for a full reference with output examples for every option and value.

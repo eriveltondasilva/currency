@@ -15,6 +15,7 @@
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -69,6 +70,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:cover": "vitest run --coverage",
+    "test:bench": "vitest bench",
+    "test:size": "bunx esbuild --bundle --format=esm --minify 'tests/treeshake-check.ts' | wc -c",
     "5xxx": "",
     "dev": "bun run types && bun run check:fix && bun run test",
     "types": "tsc --noEmit -p tsconfig.json",

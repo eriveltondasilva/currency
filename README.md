@@ -13,10 +13,12 @@ A lightweight TypeScript library for precise monetary operations. All values are
 
 - 💰 **Precise calculations** — integer-based math eliminates floating-point errors
 - 🔒 **Immutable API** — every operation returns a new instance
-- 🌍 **Internationalization** — formatting support for 14 countries and 100+ locales
+- 🌍 **Internationalization** — formatting support for 25 countries and 100+ locales
 - 🧮 **Business operations** — discounts, surcharges, allocations, and more
 - 📦 **Zero dependencies** — lightweight and focused (< 5KB min+gzip)
 - 🎯 **Type-safe** — full TypeScript support with comprehensive type definitions
+
+---
 
 ### Quick Start
 
@@ -138,40 +140,80 @@ de(1500).format()          // => '1.500,00 €'
 jp(500).format()           // => '¥500'
 ```
 
+---
+
 ### Supported Countries
 
-| Code | Country        | Currency |
-| ---- | -------------- | -------- |
-| `AU` | Australia      | AUD      |
-| `BR` | Brazil         | BRL      |
-| `CA` | Canada         | CAD      |
-| `CH` | Switzerland    | CHF      |
-| `CN` | China          | CNY      |
-| `DE` | Germany        | EUR      |
-| `FR` | France         | EUR      |
-| `GB` | United Kingdom | GBP      |
-| `IN` | India          | INR      |
-| `JP` | Japan          | JPY      |
-| `MX` | Mexico         | MXN      |
-| `PT` | Portugal       | EUR      |
-| `SG` | Singapore      | SGD      |
-| `US` | United States  | USD      |
+#### Americas
+
+| Country         | Code  | Currency |
+| --------------- | :---: | :------: |
+| 🇦🇷 Argentina     | `AR`  |  `ARS`   |
+| 🇧🇷 Brazil        | `BR`  |  `BRL`   |
+| 🇨🇦 Canada        | `CA`  |  `CAD`   |
+| 🇨🇱 Chile         | `CL`  |  `CLP`   |
+| 🇨🇴 Colombia      | `CO`  |  `COP`   |
+| 🇲🇽 Mexico        | `MX`  |  `MXN`   |
+| 🇺🇸 United States | `US`  |  `USD`   |
+
+#### Europe
+
+| Country          | Code  | Currency |
+| ---------------- | :---: | :------: |
+| 🇨🇭 Switzerland    | `CH`  |  `CHF`   |
+| 🇩🇪 Germany        | `DE`  |  `EUR`   |
+| 🇫🇷 France         | `FR`  |  `EUR`   |
+| 🇬🇧 United Kingdom | `GB`  |  `GBP`   |
+| 🇳🇴 Norway         | `NO`  |  `NOK`   |
+| 🇵🇹 Portugal       | `PT`  |  `EUR`   |
+| 🇷🇺 Russia         | `RU`  |  `RUB`   |
+| 🇸🇪 Sweden         | `SE`  |  `SEK`   |
+
+#### Asia
+
+| Country                | Code  | Currency |
+| ---------------------- | :---: | :------: |
+| 🇨🇳 China                | `CN`  |  `CNY`   |
+| 🇮🇳 India                | `IN`  |  `INR`   |
+| 🇯🇵 Japan                | `JP`  |  `JPY`   |
+| 🇰🇷 South Korea          | `KR`  |  `KRW`   |
+| 🇸🇦 Saudi Arabia         | `SA`  |  `SAR`   |
+| 🇦🇪 United Arab Emirates | `AE`  |  `AED`   |
+| 🇸🇬 Singapore            | `SG`  |  `SGD`   |
+
+#### Oceania & Africa
+
+| Country        | Code  | Currency |
+| -------------- | :---: | :------: |
+| 🇦🇺 Australia    | `AU`  |  `AUD`   |
+| 🇳🇿 New Zealand  | `NZ`  |  `NZD`   |
+| 🇿🇦 South Africa | `ZA`  |  `ZAR`   |
+
+---
 
 ### Documentation
 
 You can find the documentation at [eriveltondasilva.github.io/currency](https://eriveltondasilva.github.io/currency).
 
+---
+
 ### Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each release.
+
+---
 
 ### Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details.
 
+---
+
 ### License
 
 MIT © [Erivelton Silva](https://github.com/eriveltondasilva)
+
+---
 
 ### Inspired by:
 

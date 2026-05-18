@@ -66,27 +66,12 @@ export class Money implements MoneyContract {
    *
    * @returns A new `MoneyContract` instance.
    *
-   * @throws `InvalidInputError` — when `input` is not finite or not an integer.
-   * @throws `UnsafeIntegerError` — when `input` exceeds `Number.MAX_SAFE_INTEGER`.
+   * @throws `InvalidInputError` — when `input` is not a safe integer.
    */
   static fromMinorUnits(input: number, currency: Currency): MoneyContract {
     /* v8 ignore if -- @preserve */
-    if (!Number.isFinite(input)) {
-      throw new InvalidInputError('Expected a finite number of minor units.', {
-        input,
-      });
-    }
-
-    /* v8 ignore if -- @preserve */
-    if (!Number.isInteger(input)) {
-      throw new InvalidInputError('Minor units must be an integer.', {
-        input,
-      });
-    }
-
-    /* v8 ignore if -- @preserve */
     if (!Number.isSafeInteger(input)) {
-      throw new UnsafeIntegerError({ input });
+      throw new InvalidInputError('Minor units must be a safe integer.', { input });
     }
 
     return new Money(input, currency);
@@ -128,11 +113,6 @@ export class Money implements MoneyContract {
 
   /** @internal Constructs a sibling instance, validating the result is safe. */
   #make(input: number): MoneyContract {
-    /* v8 ignore if -- @preserve */
-    if (!Number.isFinite(input)) {
-      throw new InvalidInputError('Operation produced a non-finite result.', { input });
-    }
-
     if (!Number.isSafeInteger(input)) {
       throw new UnsafeIntegerError({ input });
     }
@@ -176,10 +156,11 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   toParts(): MoneyParts {
+    const abs = Math.abs(this.#minorUnits);
     return {
-      units: this.units(),
-      subunits: this.subunits(),
-      isNegative: this.isNegative(),
+      units: Math.floor(abs / this.#scaleFactor),
+      subunits: abs % this.#scaleFactor,
+      isNegative: this.#minorUnits < 0,
     };
   }
 
@@ -312,10 +293,13 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   equals(input: MoneyInput): boolean {
-    const hasDifferentCurrency = isMoney(input) && input.currencyCode() !== this.#currency.code;
-    if (hasDifferentCurrency) return false;
+    if (isMoney(input)) {
+      return (
+        input.currencyCode() === this.#currency.code && this.#minorUnits === input.minorUnits()
+      );
+    }
 
-    return this.#minorUnits === this.#resolve(input);
+    return this.#minorUnits === numberToMinorUnit(input, this.#currency.fractionDigits);
   }
 
   /** @inheritdoc */
@@ -361,6 +345,7 @@ export class Money implements MoneyContract {
   /** @inheritdoc */
   hasSameCurrency(input: MoneyContract): boolean {
     if (!isMoney(input)) return false;
+
     return this.#currency.code === input.currencyCode();
   }
 
@@ -370,12 +355,10 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   percentOf(percent: number, roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE): MoneyContract {
-    if (!Number.isFinite(percent)) {
-      throw new InvalidPercentageError('Percentage must be a finite number.', { input: percent });
-    }
-
-    if (percent < 0) {
-      throw new InvalidPercentageError('Percentage must be non-negative.', { input: percent });
+    if (!Number.isFinite(percent) || percent < 0) {
+      throw new InvalidPercentageError('Percentage must be a non-negative finite number.', {
+        input: percent,
+      });
     }
 
     if (percent === 0) return this.#zero();
@@ -390,23 +373,18 @@ export class Money implements MoneyContract {
     discount: number,
     roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
   ): MoneyContract {
-    if (!Number.isFinite(discount)) {
-      throw new InvalidPercentageError('Discount must be a finite number.', { input: discount });
-    }
-
-    if (discount < 0) {
-      throw new InvalidPercentageError('Discount cannot be negative.', { input: discount });
-    }
-
-    if (discount > 100) {
-      throw new InvalidPercentageError('Discount cannot exceed 100%.', { input: discount });
+    if (!Number.isFinite(discount) || discount < 0 || discount > 100) {
+      throw new InvalidPercentageError('Discount must be a finite number between 0 and 100.', {
+        input: discount,
+      });
     }
 
     if (discount === 0) return this.#copy();
 
     if (discount === 100) return this.#zero();
 
-    return this.minus(this.percentOf(discount, roundingMode));
+    const discountAmount = ROUND_FUNCTIONS[roundingMode](this.#minorUnits * (discount / 100));
+    return this.#make(this.#minorUnits - discountAmount);
   }
 
   /** @inheritdoc */
@@ -414,16 +392,16 @@ export class Money implements MoneyContract {
     surcharge: number,
     roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
   ): MoneyContract {
-    if (!Number.isFinite(surcharge)) {
-      throw new InvalidPercentageError('Surcharge must be a finite number.', { input: surcharge });
+    if (!Number.isFinite(surcharge) || surcharge < 0) {
+      throw new InvalidPercentageError('Surcharge must be a non-negative finite number.', {
+        input: surcharge,
+      });
     }
-
-    if (surcharge < 0)
-      throw new InvalidPercentageError('Surcharge must be non-negative.', { input: surcharge });
 
     if (surcharge === 0) return this.#copy();
 
-    return this.plus(this.percentOf(surcharge, roundingMode));
+    const surchargeAmount = ROUND_FUNCTIONS[roundingMode](this.#minorUnits * (surcharge / 100));
+    return this.#make(this.#minorUnits + surchargeAmount);
   }
 
   /** @inheritdoc */
@@ -450,49 +428,49 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   allocateByRatio(ratios: number[]): MoneyContract[] {
-    const hasInvalidRatios =
-      ratios.length === 0 || ratios.some((ratio) => !Number.isFinite(ratio) || ratio < 0);
-    if (hasInvalidRatios) {
-      throw new InvalidAllocationError(
-        'Ratios must be a non-empty array of non-negative finite numbers.',
-      );
+    if (!Array.isArray(ratios) || ratios.length === 0) {
+      throw new InvalidAllocationError('Ratios must be a non-empty array.');
     }
 
-    const hasNonIntegerRatios = ratios.some((ratio) => !Number.isInteger(ratio));
-    if (hasNonIntegerRatios) {
-      throw new InvalidAllocationError(
-        'Ratios must be integers. Use whole numbers like [1, 2, 3] or [30, 70].',
-      );
+    let total = 0;
+
+    for (const ratio of ratios) {
+      if (!Number.isInteger(ratio) || ratio < 0) {
+        throw new InvalidAllocationError(
+          'Ratios must be integers. Use whole numbers like [1, 2, 3] or [30, 70].',
+        );
+      }
+      total += ratio;
     }
 
-    const total = ratios.reduce((acc, ratio) => acc + ratio, 0);
-
-    /* v8 ignore if -- @preserve */
     if (!Number.isSafeInteger(total)) {
+      /* v8 ignore if -- @preserve */
       throw new InvalidAllocationError('The sum of ratios exceeds the safe integer range.');
     }
 
-    if (total === 0) {
-      throw new InvalidAllocationError('The sum of ratios cannot be zero.');
-    }
+    if (total === 0) throw new InvalidAllocationError('The sum of ratios cannot be zero.');
 
     if (this.isZero()) return ratios.map(() => this.#zero());
 
     const isNegative = this.isNegative();
-    const absoluteAmount = Math.abs(this.#minorUnits);
+    const absoluteValue = Math.abs(this.#minorUnits);
+
+    let distributed = 0;
 
     const shares = ratios.map((ratio) => {
-      const intermediate = absoluteAmount * ratio;
+      const calculated = absoluteValue * ratio;
 
-      if (!Number.isSafeInteger(intermediate)) {
-        throw new UnsafeIntegerError({ input: intermediate });
+      if (!Number.isSafeInteger(calculated)) {
+        throw new UnsafeIntegerError({ input: calculated });
       }
 
-      return Math.floor(intermediate / total);
+      const share = Math.floor(calculated / total);
+      distributed += share;
+
+      return share;
     });
 
-    const distributed = shares.reduce((acc, share) => acc + share, 0);
-    const remainder = absoluteAmount - distributed;
+    const remainder = absoluteValue - distributed;
 
     return shares.map((share, i) => {
       const value = share + (i < remainder ? 1 : 0);

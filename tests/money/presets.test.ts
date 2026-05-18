@@ -1,6 +1,32 @@
 import { describe, expect, it } from 'vitest';
 
-import { au, br, ca, ch, cn, de, fr, gb, ind, jp, mx, pt, sg, us } from '@/presets';
+import {
+  ae,
+  ar,
+  au,
+  br,
+  ca,
+  ch,
+  cl,
+  cn,
+  co,
+  de,
+  fr,
+  gb,
+  ind,
+  jp,
+  kr,
+  mx,
+  no,
+  nz,
+  pt,
+  ru,
+  sa,
+  se,
+  sg,
+  us,
+  za,
+} from '@/presets';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -54,21 +80,34 @@ describe('presets', () => {
   });
 
   describe('currency code coverage', () => {
-    it('should assign correct currency codes for all presets', () => {
-      expect(au(1).currencyCode()).toBe('AUD');
-      expect(br(1).currencyCode()).toBe('BRL');
-      expect(ca(1).currencyCode()).toBe('CAD');
-      expect(ch(1).currencyCode()).toBe('CHF');
-      expect(cn(1).currencyCode()).toBe('CNY');
-      expect(de(1).currencyCode()).toBe('EUR');
-      expect(fr(1).currencyCode()).toBe('EUR');
-      expect(gb(1).currencyCode()).toBe('GBP');
-      expect(ind(1).currencyCode()).toBe('INR');
-      expect(jp(1).currencyCode()).toBe('JPY');
-      expect(mx(1).currencyCode()).toBe('MXN');
-      expect(pt(1).currencyCode()).toBe('EUR');
-      expect(sg(1).currencyCode()).toBe('SGD');
-      expect(us(1).currencyCode()).toBe('USD');
+    it.each([
+      [ae, 'AED'],
+      [ar, 'ARS'],
+      [au, 'AUD'],
+      [br, 'BRL'],
+      [ca, 'CAD'],
+      [ch, 'CHF'],
+      [cl, 'CLP'],
+      [cn, 'CNY'],
+      [co, 'COP'],
+      [de, 'EUR'],
+      [fr, 'EUR'],
+      [gb, 'GBP'],
+      [ind, 'INR'],
+      [jp, 'JPY'],
+      [kr, 'KRW'],
+      [mx, 'MXN'],
+      [no, 'NOK'],
+      [nz, 'NZD'],
+      [pt, 'EUR'],
+      [ru, 'RUB'],
+      [sa, 'SAR'],
+      [se, 'SEK'],
+      [sg, 'SGD'],
+      [us, 'USD'],
+      [za, 'ZAR'],
+    ])('should assign correct currency codes for all presets', (fn, code) => {
+      expect(fn(1).currencyCode()).toBe(code);
     });
   });
 });

@@ -133,21 +133,6 @@ GBP.format()  // => '£34.99'
 
 ## Preset vs from — side by side
 
-```ts
-import { from, sum, total } from '@eriveltondasilva/currency'
-import { br } from '@eriveltondasilva/currency/presets'
-
-// With from()
-from(19.99, 'BR')
-sum([10, 20, 30], 'BR')
-total([{ price: 9.99, quantity: 2 }], 'BR')
-
-// With presets
-br(19.99)
-sum([10, 20, 30], 'BR')      // collection functions still require country
-total([{ price: 9.99, quantity: 2 }], 'BR')
-```
-
 ::: info
 Presets only shorten the creation step — `from()` and `parse()`. Collection functions like `sum()`, `average()`, and `total()` always require an explicit country argument and do not have preset equivalents.
 :::

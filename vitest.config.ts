@@ -6,6 +6,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.{test,spec}.ts'],
+    benchmark: {
+      include: ['benchmarks/**/*.ts'],
+    },
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],

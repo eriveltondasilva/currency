@@ -179,27 +179,3 @@ const response = await fetch('/products/1').then(r => r.json())
 const price = fromMinorUnits(response.price.minorUnits, 'BR')
 price.format()  // => 'R$ 349,90'
 ```
-
-## Zod schema (optional)
-
-If your project uses [Zod](https://zod.dev) for validation, define a schema for `MoneyJSON` and transform it on parse:
-
-```ts
-import { z } from 'zod'
-import { fromMinorUnits } from '@eriveltondasilva/currency'
-
-const MoneySchema = z
-  .object({
-    minorUnits:   z.number().int(),
-    currencyCode: z.string().length(3),
-  })
-  .transform(({ minorUnits }) => fromMinorUnits(minorUnits, 'BR'))
-
-const ProductSchema = z.object({
-  name:  z.string(),
-  price: MoneySchema,
-})
-
-const product = ProductSchema.parse(apiResponse)
-product.price.format()  // => 'R$ 349,90'
-```

@@ -33,6 +33,7 @@ export default defineConfig([
     format: 'esm',
     target: 'esnext',
     treeshake: true,
+    splitting: true,
     clean: true,
     sourcemap: !isProduction,
     minify: isProduction,

@@ -104,18 +104,8 @@ export function parse(value: string, country: CountryCode): MoneyContract {
 export function fromMinorUnits(value: number, country: CountryCode): MoneyContract {
   assertNotNull(value);
 
-  if (!Number.isFinite(value)) {
-    throw new InvalidInputError('fromMinorUnits(): value must be a finite number.', {
-      input: value,
-    });
-  }
-
-  if (!Number.isInteger(value)) {
-    throw new InvalidInputError('fromMinorUnits(): value must be an integer.', { input: value });
-  }
-
   if (!Number.isSafeInteger(value)) {
-    throw new InvalidInputError('fromMinorUnits(): value exceeds safe integer range.', {
+    throw new InvalidInputError('fromMinorUnits(): value must be a safe integer.', {
       input: value,
     });
   }

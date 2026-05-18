@@ -5,19 +5,28 @@ import { DEFAULT_ROUND_FN } from './rounding';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const ASCII_0 = 48;
+const ASCII_9 = 57;
+const ASCII_MINUS = 45;
+const ASCII_PLUS = 43;
 
-const regexCache = new Map<string, RegExp>();
+function normalizeNumericString(value: string, decimal: string): string | null {
+  let result = '';
+  let decimalCount = 0;
+  const decimalCode = decimal.charCodeAt(0);
 
-function getAllowedPattern(group: string, decimal: string): RegExp {
-  const key = `${group}\x00${decimal}`;
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
 
-  if (!regexCache.has(key)) {
-    regexCache.set(key, new RegExp(`[^\\d${escapeRegex(group)}${escapeRegex(decimal)}]`, 'g'));
+    if (code >= ASCII_0 && code <= ASCII_9) {
+      result += value[i];
+    } else if (code === decimalCode) {
+      if (++decimalCount > 1) return null;
+      result += '.';
+    }
   }
 
-  // biome-ignore lint/style/noNonNullAssertion: map never returns null
-  return regexCache.get(key)!;
+  return result;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,28 +56,24 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
   return result;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function stringToMinorUnit(input: string, currency: Currency): number {
-  const { group, decimal, fractionDigits } = currency;
+  const { decimal, fractionDigits } = currency;
 
-  const [, sign = '', rest = ''] = /^([+-]?)(.*)$/.exec(input.trim()) ?? [];
+  const trimmed = input.trim();
+  const firstCode = trimmed.charCodeAt(0);
+  const sign = firstCode === ASCII_MINUS ? '-' : firstCode === ASCII_PLUS ? '+' : '';
+  const rest = sign ? trimmed.slice(1) : trimmed;
 
-  const allowedPattern = getAllowedPattern(group, decimal);
-  const sanitizedValue = rest.replace(allowedPattern, '');
-  const withoutGroup = sanitizedValue.replaceAll(group, '');
+  const normalized = normalizeNumericString(rest, decimal);
 
-  const hasMultipleDecimals = withoutGroup.indexOf(decimal) !== withoutGroup.lastIndexOf(decimal);
-
-  if (hasMultipleDecimals) {
+  if (normalized === null) {
     throw new InvalidInputError(
       'Cannot parse value as a monetary amount: multiple decimal separators found.',
       { input },
     );
   }
 
-  const normalized = sign + withoutGroup.replace(decimal, '.');
-  const parsed = Number.parseFloat(normalized);
+  const parsed = Number.parseFloat(sign + normalized);
 
   if (Number.isNaN(parsed)) {
     throw new InvalidInputError(
