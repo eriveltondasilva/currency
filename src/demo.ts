@@ -35,6 +35,8 @@ import {
   InvalidPercentageError,
   InvalidRangeError,
   MoneyError,
+  fromCents,
+  fromInt,
 } from '.';
 
 import { br, us, jp, de, gb } from './presets';
@@ -67,6 +69,12 @@ log('fromString("$1,999.99", "US").amount()', parsedUS.amount());
 // fromMinorUnits() — already in minor units (e.g. from database)
 const restored = fromMinorUnits(1999, 'BR');
 log('fromMinorUnits(1999, "BR").amount()', restored.amount());
+
+const restoredCents = fromCents(1999, 'BR');
+log('fromCents(1999, "BR").amount()', restoredCents.amount());
+
+const restoredInt = fromInt(1999, 'BR');
+log('fromInt(1999, "BR").amount()', restoredInt.amount());
 
 // zero()
 const empty = zero('US');
