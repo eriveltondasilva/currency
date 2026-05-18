@@ -199,10 +199,6 @@ export interface MoneyParts {
  * Instances are **immutable**: every operation returns a new `MoneyContract`.
  * Values are stored internally as minor units (safe integers) to prevent
  * floating-point errors.
- *
- * Supported countries:
- *
- * `AU`, `BR`, `CA`, `CH`, `CN`, `DE`, `FR`, `GB`, `IN`, `JP`, `MX`, `PT`, `SG`, `US`.
  */
 export interface MoneyContract {
   // #region Accessors
@@ -329,7 +325,6 @@ export interface MoneyContract {
    * @returns A new `MoneyContract` with the sum.
    *
    * @throws `CurrencyMismatchError` - when `input` is a `MoneyContract` with a different currency.
-   * @throws `InvalidInputError` - when the result is not a finite number.
    * @throws `UnsafeIntegerError` - when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
    * @example
@@ -385,7 +380,6 @@ export interface MoneyContract {
    * @returns A new `MoneyContract` with the quotient.
    *
    * @throws `DivisionByZeroError` - when `divisor` is `0`.
-   * @throws `InvalidInputError` - when `divisor` is not finite.
    * @throws `UnsafeIntegerError` - when the result exceeds `Number.MAX_SAFE_INTEGER`.
    *
    * @example
