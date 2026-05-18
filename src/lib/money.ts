@@ -428,7 +428,9 @@ export class Money implements MoneyContract {
 
   /** @inheritdoc */
   allocateByRatio(ratios: number[]): MoneyContract[] {
-    if (ratios.length === 0) throw new InvalidAllocationError('Ratios must be a non-empty array.');
+    if (!Array.isArray(ratios) || ratios.length === 0) {
+      throw new InvalidAllocationError('Ratios must be a non-empty array.');
+    }
 
     let total = 0;
 
