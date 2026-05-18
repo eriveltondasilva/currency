@@ -303,18 +303,3 @@ function formatWithSign(value: MoneyContract): string {
   return value.format({ signDisplay: 'always' })
 }
 ```
-
-## Quick reference
-
-| Method                  | Returns `true` when                                   |
-| ----------------------- | ----------------------------------------------------- |
-| `equals(x)`             | `this === x` (by value); `false` on currency mismatch |
-| `greaterThan(x)`        | `this > x`                                            |
-| `lessThan(x)`           | `this < x`                                            |
-| `greaterThanOrEqual(x)` | `this >= x`                                           |
-| `lessThanOrEqual(x)`    | `this <= x`                                           |
-| `isBetween(min, max)`   | `min <= this <= max`                                  |
-| `hasSameCurrency(x)`    | Same ISO 4217 code                                    |
-| `isZero()`              | Amount is exactly `0`                                 |
-| `isPositive()`          | Amount is `> 0`                                       |
-| `isNegative()`          | Amount is `< 0`                                       |

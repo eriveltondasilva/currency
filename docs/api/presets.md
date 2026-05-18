@@ -24,22 +24,33 @@ br('R$ 1.999,99').amount()  // => 1999.99
 
 ## Available presets
 
-| Export | Country        | Currency |
-| ------ | -------------- | -------- |
-| `au`   | Australia      | AUD      |
-| `br`   | Brazil         | BRL      |
-| `ca`   | Canada         | CAD      |
-| `ch`   | Switzerland    | CHF      |
-| `cn`   | China          | CNY      |
-| `de`   | Germany        | EUR      |
-| `fr`   | France         | EUR      |
-| `gb`   | United Kingdom | GBP      |
-| `ind`  | India          | INR      |
-| `jp`   | Japan          | JPY      |
-| `mx`   | Mexico         | MXN      |
-| `pt`   | Portugal       | EUR      |
-| `sg`   | Singapore      | SGD      |
-| `us`   | United States  | USD      |
+| Export | Country              | Currency |
+| ------ | -------------------- | -------- |
+| `ae`   | United Arab Emirates | AED      |
+| `ar`   | Argentina            | ARS      |
+| `au`   | Australia            | AUD      |
+| `br`   | Brazil               | BRL      |
+| `ca`   | Canada               | CAD      |
+| `ch`   | Switzerland          | CHF      |
+| `cl`   | Chile                | CLP      |
+| `cn`   | China                | CNY      |
+| `co`   | Colombia             | COP      |
+| `de`   | Germany              | EUR      |
+| `fr`   | France               | EUR      |
+| `gb`   | United Kingdom       | GBP      |
+| `ind`  | India                | INR      |
+| `jp`   | Japan                | JPY      |
+| `kr`   | South Korea          | KRW      |
+| `mx`   | Mexico               | MXN      |
+| `no`   | Norway               | NOK      |
+| `nz`   | New Zealand          | NZD      |
+| `pt`   | Portugal             | EUR      |
+| `ru`   | Russia               | RUB      |
+| `sa`   | Saudi Arabia         | SAR      |
+| `se`   | Sweden               | SEK      |
+| `sg`   | Singapore            | SGD      |
+| `us`   | United States        | USD      |
+| `za`   | South Africa         | ZAR      |
 
 ::: info
 `in` is a reserved keyword in JavaScript. The India preset is exported as `ind`.
@@ -111,7 +122,7 @@ function parseFormPrice(raw: string): MoneyContract | null {
   }
 }
 
-parseFormPrice('R$ 49,90')   // => MoneyContract
+parseFormPrice('R$ 49,90')    // => MoneyContract
 parseFormPrice('not-a-price') // => null
 ```
 

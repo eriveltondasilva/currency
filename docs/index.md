@@ -25,7 +25,7 @@ features:
 
   - icon: 🌍
     title: 25 countries out of the box
-    details: Correct locale, separators, and fraction digits for BR, US, JP, DE, and more. <a href="/reference/supported-countries">See all →</a>
+    details: Correct locale, separators, and fraction digits for BR, US, JP, DE, and more. <a href="/currency/reference/supported-countries">See all →</a>
 
   - icon: 🌲
     title: Tree-shakeable
@@ -60,21 +60,3 @@ const items = [
 ]
 total(items, 'US').format() // => '$34.96'
 ```
-
-## Installation
-
-::: code-group
-
-```sh [npm]
-npm install @eriveltondasilva/currency
-```
-
-```sh [bun]
-bun add @eriveltondasilva/currency
-```
-
-```sh [pnpm]
-pnpm add @eriveltondasilva/currency
-```
-
-:::

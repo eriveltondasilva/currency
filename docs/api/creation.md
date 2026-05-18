@@ -76,10 +76,10 @@ The parser strips currency symbols and non-numeric characters, then interprets t
 
 ### Parameters
 
-| Name      | Type          | Description                                          |
-| --------- | ------------- | ---------------------------------------------------- |
-| `value`   | `string`      | A locale-formatted string (e.g. `'R$ 1.999,99'`)     |
-| `country` | `CountryCode` | Country that defines the decimal separators |
+| Name      | Type          | Description                                      |
+| --------- | ------------- | ------------------------------------------------ |
+| `value`   | `string`      | A locale-formatted string (e.g. `'R$ 1.999,99'`) |
+| `country` | `CountryCode` | Country that defines the decimal separators      |
 
 ### Returns
 
@@ -139,8 +139,12 @@ Creates a `MoneyContract` directly from an integer in minor units.
 
 Use this when the value is already in minor units — for example, when reconstructing from a database column or a `toJSON()` payload.
 
+Also exported as `fromCents` and `fromInt` — aliases for contexts where one name reads more naturally than the other.
+
 ```ts
 function fromMinorUnits(value: number, country: CountryCode): MoneyContract
+function fromCents(value: number, country: CountryCode): MoneyContract // alias
+function fromInt(value: number, country: CountryCode): MoneyContract   // alias
 ```
 
 ### Parameters
@@ -165,13 +169,17 @@ A new `MoneyContract` instance.
 ### Examples
 
 ```ts
-import { fromMinorUnits } from '@eriveltondasilva/currency'
+import { fromMinorUnits, fromCents, fromInt } from '@eriveltondasilva/currency'
 
 fromMinorUnits(1999, 'BR').amount() // => 19.99
 fromMinorUnits(1999, 'BR').format() // => 'R$ 19,99'
 
 fromMinorUnits(500, 'JP').amount()  // => 500 (JPY has 0 fraction digits)
 fromMinorUnits(500, 'US').amount()  // => 5   (USD has 2 fraction digits)
+
+// Aliases — identical behavior
+fromCents(1999, 'US').amount() // => 19.99
+fromInt(1999, 'US').amount()   // => 19.99
 ```
 
 ```ts
@@ -254,4 +262,4 @@ br('R$ 1.999,99').amount() // => 1999.99
 us('$9.99').amount()       // => 9.99
 ```
 
-**All available [Presets](presets.md)**
+See [Presets](presets.md) for the full list of available country shorthands.
