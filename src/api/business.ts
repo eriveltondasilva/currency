@@ -1,11 +1,11 @@
 import type { CountryCode } from '@/lib/currencies';
-import type { MoneyContract, MoneyInput, PricedItem } from '@/types';
+import type { MoneyContract, PricedItem } from '@/types';
 
 import { hasNoItems, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
-import { DivisionByZeroError, InvalidInputError } from '@/lib/errors';
+import { InvalidInputError } from '@/lib/errors';
 import { Money } from '@/lib/money';
 import { isRecord } from '@/lib/utils';
 
@@ -66,37 +66,4 @@ export function total(items: PricedItem[], country: CountryCode): MoneyContract 
   }, 0);
 
   return Money.fromMinorUnits(rawAmount, currency);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Calculates what percentage `portion` represents of `base`.
- *
- * Both arguments are resolved to minor units before division, ensuring
- * precision. The result is a plain `number`, not a `MoneyContract`.
- *
- * @param value - The partial amount (numerator).
- * @param total - The reference amount (denominator). Must be non-zero.
- * @param country - Supported country code used to resolve both amounts.
- *
- * @returns The percentage as a `number` (e.g. `25` for 25%).
- *
- * @throws `DivisionByZeroError` - when `base` resolves to zero.
- * @throws `CurrencyMismatchError` - when either argument is a `MoneyContract` with a different currency.
- * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
- *
- * @example
- * percent(25, 200, 'US') // => 12.5
- * percent(1, 3, 'BR')    // => 33.333...
- */
-export function percent(value: MoneyInput, total: MoneyInput, country: CountryCode): number {
-  const currency = resolveCurrency(country);
-  const totalAmount = resolveMinorUnits(total, currency, 'percent(): total');
-
-  if (totalAmount === 0) throw new DivisionByZeroError();
-
-  const valueAmount = resolveMinorUnits(value, currency, 'percent(): part');
-
-  return (valueAmount / totalAmount) * 100;
 }
