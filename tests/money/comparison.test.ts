@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { MoneyContract } from '@/types';
+import type { MoneyContract } from '@/index';
 
-import { from, zero } from '@/api/creation';
-import { CurrencyMismatchError, InvalidRangeError } from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { CurrencyMismatchError, from, InvalidRangeError, zero } from '@/index';
 
 describe('Money.equals', () => {
   it('should return true for the same amount and currency', () => {
@@ -29,8 +26,6 @@ describe('Money.equals', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.greaterThan', () => {
   it('should return true when the amount is greater than a number', () => {
     expect(from(10, 'US').greaterThan(9)).toBe(true);
@@ -52,8 +47,6 @@ describe('Money.greaterThan', () => {
     expect(() => from(10, 'US').greaterThan(from(5, 'BR'))).toThrow(CurrencyMismatchError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.lessThan', () => {
   it('should return true when the amount is less than a number', () => {
@@ -77,8 +70,6 @@ describe('Money.lessThan', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.greaterThanOrEqual', () => {
   it('should return true when the amount is greater', () => {
     expect(from(10, 'US').greaterThanOrEqual(9)).toBe(true);
@@ -93,8 +84,6 @@ describe('Money.greaterThanOrEqual', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.lessThanOrEqual', () => {
   it('should return true when the amount is less', () => {
     expect(from(5, 'US').lessThanOrEqual(10)).toBe(true);
@@ -108,8 +97,6 @@ describe('Money.lessThanOrEqual', () => {
     expect(from(10, 'US').lessThanOrEqual(5)).toBe(false);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.isBetween', () => {
   it('should return true when the amount is strictly between min and max', () => {
@@ -146,8 +133,6 @@ describe('Money.isBetween', () => {
     );
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.hasSameCurrency', () => {
   it('should return true for two instances of the same currency', () => {

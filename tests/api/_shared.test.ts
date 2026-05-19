@@ -7,8 +7,6 @@ import { CurrencyMismatchError, InvalidInputError } from '@/lib/errors';
 
 const usd = resolveCurrency('US');
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('resolveMinorUnits', () => {
   it('should throw InvalidInputError when value is null', () => {
     expect(() => resolveMinorUnits(null as never, usd, 'test')).toThrow(InvalidInputError);

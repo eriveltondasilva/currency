@@ -4,8 +4,6 @@ import { numberToMinorUnit, stringToMinorUnit } from '@/lib/convert';
 import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError } from '@/lib/errors';
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('numberToMinorUnit', () => {
   it('should convert a standard decimal to minor units', () => {
     expect(numberToMinorUnit(10.5, 2)).toBe(1050);
@@ -55,8 +53,6 @@ describe('numberToMinorUnit', () => {
     expect(() => numberToMinorUnit(9.9e307, 2)).toThrow(InvalidInputError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('stringToMinorUnit', () => {
   it('should parse a BRL-formatted string (comma decimal, dot group)', () => {

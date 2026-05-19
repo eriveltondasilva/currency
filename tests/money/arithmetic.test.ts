@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { from, zero } from '@/api/creation';
 import {
   CurrencyMismatchError,
   DivisionByZeroError,
+  from,
   InvalidInputError,
   UnsafeIntegerError,
-} from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+  zero,
+} from '@/index';
 
 describe('Money.plus', () => {
   it('should add a number to the current amount', () => {
@@ -38,8 +37,6 @@ describe('Money.plus', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.minus', () => {
   it('should subtract a number from the current amount', () => {
     expect(from(10, 'US').minus(3).minorUnits()).toBe(700);
@@ -67,8 +64,6 @@ describe('Money.minus', () => {
     expect(() => from(10, 'US').minus(from(5, 'BR'))).toThrow(CurrencyMismatchError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.times', () => {
   it('should multiply the amount by an integer factor', () => {
@@ -113,8 +108,6 @@ describe('Money.times', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.divide', () => {
   it('should divide the amount by an integer divisor', () => {
     expect(from(10, 'US').divide(2).minorUnits()).toBe(500);
@@ -155,8 +148,6 @@ describe('Money.divide', () => {
     expect(() => from(10, 'US').divide(Infinity)).toThrow(InvalidInputError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('arithmetic composition', () => {
   it('should chain plus and minus and return the correct result', () => {

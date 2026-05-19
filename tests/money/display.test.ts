@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { from, zero } from '@/api/creation';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { from, zero } from '@/index';
 
 describe('Money.minorUnits', () => {
   it('should return the raw integer minor unit value', () => {
@@ -18,8 +16,6 @@ describe('Money.minorUnits', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.amount', () => {
   it('should return the decimal representation of the amount', () => {
     expect(from(10.5, 'US').amount()).toBe(10.5);
@@ -34,8 +30,6 @@ describe('Money.amount', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.units', () => {
   it('should return the whole unit part of the amount', () => {
     expect(from(10.99, 'US').units()).toBe(10);
@@ -49,8 +43,6 @@ describe('Money.units', () => {
     expect(from(-10.5, 'US').units()).toBe(10);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.subunits', () => {
   it('should return the fractional part as an integer in minor units', () => {
@@ -70,8 +62,6 @@ describe('Money.subunits', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.toParts', () => {
   it('should return units, subunits and isNegative for a positive amount', () => {
     expect(from(10.99, 'US').toParts()).toEqual({ units: 10, subunits: 99, isNegative: false });
@@ -90,8 +80,6 @@ describe('Money.toParts', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.currencyCode', () => {
   it('should return the correct currency code for BR', () => {
     expect(from(10, 'BR').currencyCode()).toBe('BRL');
@@ -107,8 +95,6 @@ describe('Money.currencyCode', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.locale', () => {
   it('should return the locale for BR', () => {
     expect(from(10, 'BR').locale()).toBe('pt-BR');
@@ -118,8 +104,6 @@ describe('Money.locale', () => {
     expect(from(10, 'US').locale()).toBe('en-US');
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.toString', () => {
   it('should return the currency code followed by the decimal amount', () => {
@@ -135,8 +119,6 @@ describe('Money.toString', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.toJSON', () => {
   it('should return an object with minorUnits and currencyCode', () => {
     expect(from(10.5, 'US').toJSON()).toEqual({ minorUnits: 1050, currencyCode: 'USD' });
@@ -151,8 +133,6 @@ describe('Money.toJSON', () => {
     expect(zero('BR').toJSON()).toEqual({ minorUnits: 0, currencyCode: 'BRL' });
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.format', () => {
   it('should format a BRL amount with the default locale', () => {

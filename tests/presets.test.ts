@@ -28,8 +28,6 @@ import {
   za,
 } from '@/presets';
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('presets', () => {
   describe('when called with a number', () => {
     it('should create a BRL instance via br()', () => {

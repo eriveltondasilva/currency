@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { from, zero } from '@/api/creation';
-import { CurrencyMismatchError, InvalidInputError } from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { CurrencyMismatchError, from, InvalidInputError, zero } from '@/index';
 
 describe('Money.abs', () => {
   it('should return the same amount for a positive value', () => {
@@ -25,8 +22,6 @@ describe('Money.abs', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.negate', () => {
   it('should turn a positive amount into a negative one', () => {
     expect(from(10, 'US').negate().minorUnits()).toBe(-1000);
@@ -46,8 +41,6 @@ describe('Money.negate', () => {
     expect(original.minorUnits()).toBe(1000);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.max', () => {
   it('should return the current instance when it is greater', () => {
@@ -71,8 +64,6 @@ describe('Money.max', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.min', () => {
   it('should return the current instance when it is less', () => {
     expect(from(5, 'US').min(10).minorUnits()).toBe(500);
@@ -94,8 +85,6 @@ describe('Money.min', () => {
     expect(() => from(10, 'US').min(from(5, 'BR'))).toThrow(CurrencyMismatchError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.round', () => {
   it('should round up to the nearest 5-cent step', () => {
@@ -137,8 +126,6 @@ describe('Money.round', () => {
     expect(() => from(10, 'US').round(Infinity)).toThrow(InvalidInputError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.compare', () => {
   it('should return -1 when less than the given value', () => {

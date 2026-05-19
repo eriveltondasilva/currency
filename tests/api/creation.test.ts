@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { from, fromMinorUnits, parse, zero } from '@/api/creation';
-import { InvalidInputError } from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { from, fromMinorUnits, InvalidInputError, parse, zero } from '@/index';
 
 describe('from', () => {
   it('should create a Money instance with the correct minor units', () => {
@@ -43,8 +40,6 @@ describe('from', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('parse', () => {
   it('should parse a BRL-formatted string', () => {
     expect(parse('1.234,56', 'BR').minorUnits()).toBe(123456);
@@ -78,8 +73,6 @@ describe('parse', () => {
     expect(() => parse('not-a-value', 'US')).toThrow(InvalidInputError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('fromMinorUnits', () => {
   it('should create a Money instance directly from minor units', () => {
@@ -118,8 +111,6 @@ describe('fromMinorUnits', () => {
     expect(() => fromMinorUnits(Number.MAX_SAFE_INTEGER + 1, 'US')).toThrow(InvalidInputError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('zero', () => {
   it('should produce an instance with zero minor units', () => {

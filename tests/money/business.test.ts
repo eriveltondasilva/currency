@@ -1,10 +1,14 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: test file */
 import { describe, expect, it } from 'vitest';
 
-import { from, fromMinorUnits, zero } from '@/api/creation';
-import { InvalidAllocationError, InvalidPercentageError, UnsafeIntegerError } from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import {
+  from,
+  fromMinorUnits,
+  InvalidAllocationError,
+  InvalidPercentageError,
+  UnsafeIntegerError,
+  zero,
+} from '@/index';
 
 describe('Money.percentOf', () => {
   it('should return half of the amount for 50%', () => {
@@ -42,8 +46,6 @@ describe('Money.percentOf', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.applyDiscount', () => {
   it('should reduce the amount by the given percentage', () => {
     expect(from(100, 'US').applyDiscount(10).minorUnits()).toBe(9000);
@@ -80,8 +82,6 @@ describe('Money.applyDiscount', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.applySurcharge', () => {
   it('should increase the amount by the given percentage', () => {
     expect(from(100, 'US').applySurcharge(10).minorUnits()).toBe(11000);
@@ -109,8 +109,6 @@ describe('Money.applySurcharge', () => {
     expect(() => from(100, 'US').applySurcharge(Infinity)).toThrow(InvalidPercentageError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.allocate', () => {
   it('should split the amount into equal parts', () => {
@@ -161,8 +159,6 @@ describe('Money.allocate', () => {
     expect(() => from(100, 'US').allocate(1.5)).toThrow(InvalidAllocationError);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('Money.allocateByRatio', () => {
   it('should distribute amounts proportionally by ratio', () => {
