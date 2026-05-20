@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { from, zero } from '@/api/creation';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { from, zero } from '@/index';
 
 describe('Money.isZero', () => {
   it('should return true for a zero instance', () => {
@@ -26,8 +24,6 @@ describe('Money.isZero', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.isPositive', () => {
   it('should return true for a positive amount', () => {
     expect(from(1, 'US').isPositive()).toBe(true);
@@ -42,8 +38,6 @@ describe('Money.isPositive', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Money.isNegative', () => {
   it('should return true for a negative amount', () => {
     expect(from(-1, 'US').isNegative()).toBe(true);
@@ -57,8 +51,6 @@ describe('Money.isNegative', () => {
     expect(from(1, 'US').isNegative()).toBe(false);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('state after arithmetic', () => {
   it('should become zero after subtracting the full amount', () => {

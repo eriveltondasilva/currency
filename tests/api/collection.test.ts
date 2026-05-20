@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { average, clamp, max, min, sum } from '@/api/collection';
-import { from } from '@/api/creation';
-import { InvalidInputError, InvalidRangeError } from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { average, from, InvalidInputError, max, min, sum } from '@/index';
 
 describe('sum', () => {
   it('should return the sum of multiple values', () => {
@@ -36,8 +32,6 @@ describe('sum', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('average', () => {
   it('should return the average of multiple values', () => {
     expect(average([10, 20, 30], 'US').minorUnits()).toBe(2000);
@@ -66,8 +60,6 @@ describe('average', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('max', () => {
   it('should return the largest value in the array', () => {
     expect(max([10, 50, 20], 'US').minorUnits()).toBe(5000);
@@ -94,8 +86,6 @@ describe('max', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('min', () => {
   it('should return the smallest value in the array', () => {
     expect(min([10, 50, 20], 'US').minorUnits()).toBe(1000);
@@ -119,41 +109,5 @@ describe('min', () => {
 
   it('should throw InvalidInputError for an empty array', () => {
     expect(() => min([], 'US')).toThrow(InvalidInputError);
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe('clamp', () => {
-  it('should return the value unchanged when it is within the range', () => {
-    expect(clamp(5, 1, 10, 'US').minorUnits()).toBe(500);
-  });
-
-  it('should return the minimum when the value is below the range', () => {
-    expect(clamp(0, 1, 10, 'US').minorUnits()).toBe(100);
-  });
-
-  it('should return the maximum when the value is above the range', () => {
-    expect(clamp(20, 1, 10, 'US').minorUnits()).toBe(1000);
-  });
-
-  it('should return the value when it equals the minimum boundary', () => {
-    expect(clamp(1, 1, 10, 'US').minorUnits()).toBe(100);
-  });
-
-  it('should return the value when it equals the maximum boundary', () => {
-    expect(clamp(10, 1, 10, 'US').minorUnits()).toBe(1000);
-  });
-
-  it('should accept Money instances as value, min and max', () => {
-    expect(clamp(from(5, 'US'), from(1, 'US'), from(10, 'US'), 'US').minorUnits()).toBe(500);
-  });
-
-  it('should produce the correct currency code', () => {
-    expect(clamp(5, 1, 10, 'BR').currencyCode()).toBe('BRL');
-  });
-
-  it('should throw InvalidRangeError when min is greater than max', () => {
-    expect(() => clamp(5, 10, 1, 'US')).toThrow(InvalidRangeError);
   });
 });

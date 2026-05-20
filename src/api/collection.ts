@@ -5,7 +5,7 @@ import { hasNoItems, resolveMinorUnits } from './_shared';
 import { zero } from './creation';
 
 import { resolveCurrency } from '@/lib/currencies';
-import { InvalidInputError, InvalidRangeError } from '@/lib/errors';
+import { InvalidInputError } from '@/lib/errors';
 import { Money } from '@/lib/money';
 import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from '@/lib/rounding';
 
@@ -147,48 +147,4 @@ export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
   }
 
   return Money.fromMinorUnits(amount, currency);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Constrains a monetary value within a `[min, max]` closed interval.
- *
- * - When `value < min`, returns `min`.
- * - When `value > max`, returns `max`.
- * - Otherwise, returns `value` unchanged.
- *
- * @param value - The amount to constrain.
- * @param min - Lower bound of the interval.
- * @param max - Upper bound of the interval.
- * @param country - Supported country code that defines the output currency.
- *
- * @returns A new `MoneyContract` clamped within `[min, max]`.
- *
- * @throws `InvalidRangeError` - when `min` is greater than `max`.
- * @throws `CurrencyMismatchError` - when any `MoneyContract` argument has a different currency.
- * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
- *
- * @example
- * clamp(150, 0, 100, 'US').amount() // => 100
- * clamp(-10, 0, 100, 'US').amount() // => 0
- * clamp(50, 0, 100, 'US').amount()  // => 50
- */
-export function clamp(
-  value: MoneyInput,
-  min: MoneyInput,
-  max: MoneyInput,
-  country: CountryCode,
-): MoneyContract {
-  const currency = resolveCurrency(country);
-
-  const minAmount = resolveMinorUnits(min, currency, 'clamp(): min');
-  const maxAmount = resolveMinorUnits(max, currency, 'clamp(): max');
-
-  if (minAmount > maxAmount) throw new InvalidRangeError();
-
-  return Money.fromMinorUnits(
-    Math.min(Math.max(resolveMinorUnits(value, currency, 'clamp(): value'), minAmount), maxAmount),
-    currency,
-  );
 }

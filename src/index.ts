@@ -28,8 +28,19 @@ export {
   UnsupportedCurrencyError,
 } from './lib/errors';
 
-// ─── Creation ────────────────────────────────────────────────────────────────
+// ─── API ────────────────────────────────────────────────────────────────
 
+export {
+  clamp,
+  percent,
+} from './api/arithmetic';
+export { total } from './api/business';
+export {
+  average,
+  max,
+  min,
+  sum,
+} from './api/collection';
 export {
   from as money,
   from,
@@ -40,26 +51,6 @@ export {
   parse,
   zero,
 } from './api/creation';
-
-// ─── Collection ──────────────────────────────────────────────────────────────
-
-export {
-  average,
-  clamp,
-  max,
-  min,
-  sum,
-} from './api/collection';
-
-// ─── Business ────────────────────────────────────────────────────────────────
-
-export {
-  percent,
-  total,
-} from './api/business';
-
-// ─── Type Guards ─────────────────────────────────────────────────────────────
-
 export {
   isMoney,
   isMoneyInput,

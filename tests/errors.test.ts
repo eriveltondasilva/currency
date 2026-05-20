@@ -10,9 +10,7 @@ import {
   MoneyError,
   UnsafeIntegerError,
   UnsupportedCurrencyError,
-} from '@/lib/errors';
-
-// ─────────────────────────────────────────────────────────────────────────────
+} from '@/index';
 
 describe('MoneyError', () => {
   it('should be the base class for all money errors', () => {
@@ -20,8 +18,6 @@ describe('MoneyError', () => {
     expect(new InvalidInputError('x')).toBeInstanceOf(Error);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('InvalidInputError', () => {
   it('should have the INVALID_INPUT code', () => {
@@ -42,8 +38,6 @@ describe('InvalidInputError', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('InvalidPercentageError', () => {
   it('should have the INVALID_PERCENTAGE code', () => {
     expect(new InvalidPercentageError('msg').code).toBe('INVALID_PERCENTAGE');
@@ -57,8 +51,6 @@ describe('InvalidPercentageError', () => {
     expect(new InvalidPercentageError('msg', { input: -5 }).input).toBe(-5);
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('DivisionByZeroError', () => {
   it('should have the DIVISION_BY_ZERO code', () => {
@@ -74,8 +66,6 @@ describe('DivisionByZeroError', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('InvalidAllocationError', () => {
   it('should have the INVALID_ALLOCATION code', () => {
     expect(new InvalidAllocationError('msg').code).toBe('INVALID_ALLOCATION');
@@ -85,8 +75,6 @@ describe('InvalidAllocationError', () => {
     expect(new InvalidAllocationError('msg').name).toBe('InvalidAllocationError');
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('InvalidRangeError', () => {
   it('should have the INVALID_RANGE code', () => {
@@ -104,8 +92,6 @@ describe('InvalidRangeError', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('CurrencyMismatchError', () => {
   it('should have the CURRENCY_MISMATCH code', () => {
     expect(new CurrencyMismatchError('BRL', 'USD').code).toBe('CURRENCY_MISMATCH');
@@ -122,8 +108,6 @@ describe('CurrencyMismatchError', () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('UnsupportedCurrencyError', () => {
   it('should have the UNSUPPORTED_CURRENCY code', () => {
     expect(new UnsupportedCurrencyError('ZZZ', 'BR, US').code).toBe('UNSUPPORTED_CURRENCY');
@@ -139,8 +123,6 @@ describe('UnsupportedCurrencyError', () => {
     expect(message).toContain('BR, US');
   });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe('UnsafeIntegerError', () => {
   it('should have the UNSAFE_INTEGER code', () => {

@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { from } from '@/api/creation';
-import { isMoneyInput } from '@/api/type-guards';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { from, isMoneyInput } from '@/index';
 
 describe('isMoneyInput', () => {
   it('should return true for a number', () => {
