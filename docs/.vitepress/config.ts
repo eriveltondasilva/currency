@@ -5,7 +5,7 @@ export default defineConfig({
   description: 'A lightweight TypeScript library for precise monetary operations.',
 
   lang: 'en-US',
-  base: '/currency/',
+  base: '/currency',
 
   head: [
     ['link', { rel: 'icon', href: '/currency/favicon.ico' }],
@@ -37,6 +37,7 @@ export default defineConfig({
           items: [
             { text: 'Getting Started', link: '/guide/getting-started' },
             { text: 'Core Concepts', link: '/guide/concepts' },
+            { text: 'Precision Model', link: '/guide/precision' },
             { text: 'Error Handling', link: '/guide/error-handling' },
           ],
         },
