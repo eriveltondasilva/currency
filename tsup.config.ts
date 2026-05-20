@@ -8,19 +8,15 @@ const year = new Date().getFullYear();
 const isProduction = process.env.NODE_ENV === 'production';
 
 const banner = `/**
- * ${name?.toUpperCase()} v${version}
+ * ${name} v${version}
+ * ${description || 'No description provided.'}
  *
- * ${description || 'no description'}
- *
- * @author ${author.name} <${author.email}>
- * @license ${license?.toUpperCase()}
+ * @author    ${author.name} <${author.email}>
+ * @license   ${license?.toUpperCase()}
  * @copyright ${year} ${author.name}
- * @version ${version}
+ * @see       ${homepage}
  *
- * @see ${homepage} - Documentation
- *
- * Inspired by:
- * @see https://github.com/scurker/currency.js
+ * Inspired by currency.js — {@link https://github.com/scurker/currency.js}
  */
 `;
 
