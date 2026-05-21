@@ -48,10 +48,10 @@ That rounding happens **on the result**, not on the input, and it is controlled 
 
 ```ts
 // 100 minor units ÷ 3 = 33.333... → halfExpand → 33
-from(1, 'US').divide(3).amount()              // => 0.33
+from(1, 'US').divide(3).amount() // => 0.33
 
 // 100 minor units ÷ 3 = 33.333... → ceil → 34
-from(1, 'US').divide(3, 'ceil').amount()      // => 0.34
+from(1, 'US').divide(3, 'ceil').amount() // => 0.34
 ```
 
 See [Arithmetic — Rounding in arithmetic](/api/arithmetic#rounding-in-arithmetic) and the full [Rounding Modes](/reference/rounding-modes) reference.
