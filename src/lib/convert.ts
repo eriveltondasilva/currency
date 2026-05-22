@@ -5,28 +5,40 @@ import { DEFAULT_ROUND_FN } from './rounding';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ASCII_0 = 48;
-const ASCII_9 = 57;
-const ASCII_MINUS = 45;
-const ASCII_PLUS = 43;
+const ASCII = {
+  DIGIT_0: 48,
+  DIGIT_9: 57,
+  MINUS: 45,
+  PLUS: 43,
+} as const;
 
-function normalizeNumericString(value: string, decimal: string): string | null {
+function parseNumericString(value: string, decimalChar: string): string | null {
+  const trimmed = value.trim();
+
+  if (!trimmed) return null;
+
+  const decimalCode = decimalChar.charCodeAt(0);
+  const first = trimmed.charCodeAt(0);
+  const hasSign = first === ASCII.MINUS || first === ASCII.PLUS;
+  const sign = first === ASCII.MINUS ? '-' : '';
+
   let result = '';
   let decimalCount = 0;
-  const decimalCode = decimal.charCodeAt(0);
+  let hasDigits = false;
 
-  for (let i = 0; i < value.length; i++) {
-    const code = value.charCodeAt(i);
+  for (let i = hasSign ? 1 : 0; i < trimmed.length; i++) {
+    const code = trimmed.charCodeAt(i);
 
-    if (code >= ASCII_0 && code <= ASCII_9) {
-      result += value[i];
+    if (code >= ASCII.DIGIT_0 && code <= ASCII.DIGIT_9) {
+      result += trimmed[i];
+      hasDigits = true;
     } else if (code === decimalCode) {
       if (++decimalCount > 1) return null;
       result += '.';
     }
   }
 
-  return result;
+  return hasDigits ? sign + result : null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -38,17 +50,15 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
 
   if (input === 0) return 0;
 
+  /**
+   * Uses scientific notation string trick to avoid floating-point errors.
+   * @example 19.99 with fractionDigits=2 → Number("19.99e2") → 1999 (exact)
+   */
   const result = DEFAULT_ROUND_FN(Number(`${input}e${fractionDigits}`));
-
-  if (!Number.isFinite(result)) {
-    throw new InvalidInputError('Value is too large to be represented as a monetary amount.', {
-      input,
-    });
-  }
 
   if (!Number.isSafeInteger(result)) {
     throw new InvalidInputError(
-      'Value exceeds safe integer range after conversion to minor units.',
+      'Value cannot be represented as a monetary amount in minor units.',
       { input },
     );
   }
@@ -58,29 +68,16 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
 
 export function stringToMinorUnit(input: string, currency: Currency): number {
   const { decimal, fractionDigits } = currency;
-
-  const trimmed = input.trim();
-  const firstCode = trimmed.charCodeAt(0);
-  const sign = firstCode === ASCII_MINUS ? '-' : firstCode === ASCII_PLUS ? '+' : '';
-  const rest = sign ? trimmed.slice(1) : trimmed;
-
-  const normalized = normalizeNumericString(rest, decimal);
+  const normalized = parseNumericString(input, decimal);
 
   if (normalized === null) {
-    throw new InvalidInputError(
-      'Cannot parse value as a monetary amount: multiple decimal separators found.',
-      { input },
-    );
-  }
-
-  const parsed = Number.parseFloat(sign + normalized);
-
-  if (Number.isNaN(parsed)) {
     throw new InvalidInputError(
       `Cannot parse value as a monetary amount. Expected "${decimal}" as decimal separator.`,
       { input },
     );
   }
+
+  const parsed = Number.parseFloat(normalized);
 
   return numberToMinorUnit(parsed, fractionDigits);
 }
