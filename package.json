@@ -74,23 +74,23 @@
     "test:size": "bunx esbuild --bundle --format=esm --minify 'tests/treeshake-check.ts' | wc -c",
     "5xxx": "",
     "dev": "bun run types && bun run check:fix && bun run test",
-    "types": "tsc --noEmit -p tsconfig.json",
+    "types": "tsc --noEmit",
     "init:hooks": "husky"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15",
-    "@tsconfig/bun": "^1.0.10",
-    "@types/bun": "^1.3.14",
-    "@vitest/coverage-v8": "^4.1.7",
-    "@vitest/ui": "^4.1.7",
+    "@biomejs/biome": "^2.5.10",
+    "@tsconfig/bun": "^1.0.11",
+    "@types/bun": "^1.4.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/ui": "^4.1.11",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.5",
-    "publint": "^0.3.21",
+    "lint-staged": "^17.3.0",
+    "publint": "^0.3.24",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitepress": "^2.0.0-alpha.17",
-    "vitest": "^4.1.7"
+    "vitepress": "^2.0.0-alpha.19",
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=20"
@@ -98,7 +98,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "bun@1.3.14",
+  "packageManager": "bun@1.4.0",
   "lint-staged": {
     "*.{js,ts,json,md}": "bunx --bun @biomejs/biome check --write --no-errors-on-unmatched"
   }
