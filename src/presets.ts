@@ -1,88 +1,40 @@
 import type { CountryCode } from './lib/currencies';
-import type { MoneyContract } from './types';
 
-import { from, parse } from './api/creation';
+import { from, fromMinorUnits, parse, zero } from './api/creation';
+
+function createPreset(country: CountryCode) {
+  return {
+    from: (value: number) => from(value, country),
+    parse: (value: string) => parse(value, country),
+    zero: () => zero(country),
+    fromMinorUnits: (value: number) => fromMinorUnits(value, country),
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function preset(value: number | string, country: CountryCode): MoneyContract {
-  return typeof value === 'string' ? parse(value, country) : from(value, country);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function ae(value: number | string): MoneyContract {
-  return preset(value, 'AE');
-}
-export function ar(value: number | string): MoneyContract {
-  return preset(value, 'AR');
-}
-export function au(value: number | string): MoneyContract {
-  return preset(value, 'AU');
-}
-export function br(value: number | string): MoneyContract {
-  return preset(value, 'BR');
-}
-export function ca(value: number | string): MoneyContract {
-  return preset(value, 'CA');
-}
-export function ch(value: number | string): MoneyContract {
-  return preset(value, 'CH');
-}
-export function cl(value: number | string): MoneyContract {
-  return preset(value, 'CL');
-}
-export function cn(value: number | string): MoneyContract {
-  return preset(value, 'CN');
-}
-export function co(value: number | string): MoneyContract {
-  return preset(value, 'CO');
-}
-export function de(value: number | string): MoneyContract {
-  return preset(value, 'DE');
-}
-export function fr(value: number | string): MoneyContract {
-  return preset(value, 'FR');
-}
-export function gb(value: number | string): MoneyContract {
-  return preset(value, 'GB');
-}
-export function ind(value: number | string): MoneyContract {
-  return preset(value, 'IN');
-}
-export function jp(value: number | string): MoneyContract {
-  return preset(value, 'JP');
-}
-export function kr(value: number | string): MoneyContract {
-  return preset(value, 'KR');
-}
-export function mx(value: number | string): MoneyContract {
-  return preset(value, 'MX');
-}
-export function no(value: number | string): MoneyContract {
-  return preset(value, 'NO');
-}
-export function nz(value: number | string): MoneyContract {
-  return preset(value, 'NZ');
-}
-export function pt(value: number | string): MoneyContract {
-  return preset(value, 'PT');
-}
-export function ru(value: number | string): MoneyContract {
-  return preset(value, 'RU');
-}
-export function sa(value: number | string): MoneyContract {
-  return preset(value, 'SA');
-}
-export function se(value: number | string): MoneyContract {
-  return preset(value, 'SE');
-}
-export function sg(value: number | string): MoneyContract {
-  return preset(value, 'SG');
-}
-export function us(value: number | string): MoneyContract {
-  return preset(value, 'US');
-}
-export function za(value: number | string): MoneyContract {
-  return preset(value, 'ZA');
-}
+export const ae = createPreset('AE')
+export const ar = createPreset('AR')
+export const au = createPreset('AU')
+export const br = createPreset('BR')
+export const ca = createPreset('CA')
+export const ch = createPreset('CH')
+export const cl = createPreset('CL')
+export const cn = createPreset('CN')
+export const co = createPreset('CO')
+export const de = createPreset('DE')
+export const fr = createPreset('FR')
+export const gb = createPreset('GB')
+export const ind = createPreset('IN')
+export const jp = createPreset('JP')
+export const kr = createPreset('KR')
+export const mx = createPreset('MX')
+export const no = createPreset('NO')
+export const nz = createPreset('NZ')
+export const pt = createPreset('PT')
+export const ru = createPreset('RU')
+export const sa = createPreset('SA')
+export const se = createPreset('SE')
+export const sg = createPreset('SG')
+export const us = createPreset('US')
+export const za = createPreset('ZA')
