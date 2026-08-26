@@ -5,23 +5,29 @@
   "keywords": [
     "currency",
     "money",
-    "finance",
     "rounding",
     "decimal",
-    "precision",
-    "format",
-    "monetary"
+    "precision"
   ],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "import": {
+    "#src": "./src/*",
+    "#lib": "./src/lib/*"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./calc": {
+      "types": "./dist/calc.d.ts",
+      "import": "./dist/calc.js",
+      "default": "./dist/calc.js"
     },
     "./presets": {
       "types": "./dist/presets.d.ts",
@@ -58,9 +64,8 @@
     "lint:fix": "bunx --bun @biomejs/biome lint --write .",
     "check": "bunx --bun @biomejs/biome check .",
     "check:fix": "bunx --bun @biomejs/biome check --write .",
-    "check:ci": "bunx --bun @biomejs/biome ci .",
+    "ci": "bunx --bun @biomejs/biome ci .",
     "3xxx": "",
-    "release": "sh scripts/create-release.sh",
     "release:patch": "sh scripts/create-release.sh patch",
     "release:minor": "sh scripts/create-release.sh minor",
     "release:major": "sh scripts/create-release.sh major",

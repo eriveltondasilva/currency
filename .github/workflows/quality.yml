@@ -21,4 +21,4 @@ jobs:
         run: bun run types
 
       - name: Biome check
-        run: bun run check:ci
+        run: bun run ci

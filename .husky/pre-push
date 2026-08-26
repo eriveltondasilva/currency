@@ -1,2 +1,2 @@
 # .husky/pre-push
-bun run types && bun run check:ci && bun run test
+bun run types && bun run ci && bun run test
