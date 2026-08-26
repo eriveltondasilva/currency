@@ -6,8 +6,8 @@ function createPreset(country: CountryCode) {
   return {
     from: (value: number) => from(value, country),
     parse: (value: string) => parse(value, country),
-    zero: () => zero(country),
     fromMinorUnits: (value: number) => fromMinorUnits(value, country),
+    zero: () => zero(country),
   }
 }
 
