@@ -2,7 +2,6 @@ import type {
   FormatOptions,
   MoneyComparison,
   MoneyContract,
-  MoneyInput,
   MoneyJSON,
   MoneyParts,
   RoundingMode,
@@ -21,9 +20,7 @@ import {
 } from './errors';
 import { formatMoney } from './format';
 import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from './rounding';
-import { TAG } from './utils';
-
-import { isMoney } from '@/api/type-guards';
+import { TAG, isMoney } from './utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -34,21 +31,19 @@ import { isMoney } from '@/api/type-guards';
  * (`Number.isSafeInteger`) to eliminate floating-point errors.
  * Every arithmetic and transformation method returns a **new instance** —
  * this class is fully immutable.
- *
- * Instantiate via the static factories ({@link Money.fromMinorUnits},
- * {@link Money.zero}) or the top-level API functions (`from`, `parse`,
- * `fromMinorUnits`, `zero`). Do not call `new Money()` directly.
  */
 export class Money implements MoneyContract {
+  readonly [TAG] = true;
+
   readonly #currency: Currency;
+
   readonly #scaleFactor: number;
   readonly #minorUnits: number;
 
-  readonly [TAG] = true;
-
   constructor(input: number, currency: Currency) {
-    this.#scaleFactor = 10 ** currency.fractionDigits;
     this.#currency = currency;
+
+    this.#scaleFactor = 10 ** currency.fractionDigits;
     this.#minorUnits = input;
   }
 
@@ -57,16 +52,8 @@ export class Money implements MoneyContract {
   /**
    * Creates a `Money` instance from a raw integer in minor units.
    *
-   * Prefer the top-level `fromMinorUnits(value, country)` for public usage.
-   * This factory is intended for internal construction where a resolved
-   * {@link Currency} object is already available.
-   *
    * @param input — Integer minor-unit value (e.g. `1999` for R$ 19,99).
    * @param currency — Resolved currency descriptor.
-   *
-   * @returns A new `MoneyContract` instance.
-   *
-   * @throws `InvalidInputError` — when `input` is not a safe integer.
    */
   static fromMinorUnits(input: number, currency: Currency): MoneyContract {
     /* v8 ignore if -- @preserve */
@@ -79,12 +66,6 @@ export class Money implements MoneyContract {
 
   /**
    * Creates a `Money` instance with an amount of zero for the given currency.
-   *
-   * Prefer the top-level `zero(country)` for public usage.
-   *
-   * @param currency — Resolved currency descriptor.
-   *
-   * @returns A new `MoneyContract` instance with `minorUnits === 0`.
    */
   static zero(currency: Currency): MoneyContract {
     return new Money(0, currency);
@@ -96,19 +77,9 @@ export class Money implements MoneyContract {
 
   /** @internal */
   #assertSameCurrency(input: MoneyContract): void {
-    if (input.currencyCode() === this.#currency.code) return;
+    if (isMoney(input) && this.#currency.code === input.currencyCode()) return;
 
     throw new CurrencyMismatchError(this.#currency.code, input.currencyCode());
-  }
-
-  /** @internal Resolves a `MoneyInput` to its minor-unit integer. */
-  #resolve(input: MoneyInput): number {
-    if (isMoney(input)) {
-      this.#assertSameCurrency(input);
-      return input.minorUnits();
-    }
-
-    return numberToMinorUnit(input, this.#currency.fractionDigits);
   }
 
   /** @internal Constructs a sibling instance, validating the result is safe. */
@@ -142,16 +113,6 @@ export class Money implements MoneyContract {
   /** @inheritdoc */
   amount(): number {
     return this.#minorUnits / this.#scaleFactor;
-  }
-
-  /** @inheritdoc */
-  units(): number {
-    return Math.floor(Math.abs(this.#minorUnits) / this.#scaleFactor);
-  }
-
-  /** @inheritdoc */
-  subunits(): number {
-    return Math.abs(this.#minorUnits) % this.#scaleFactor;
   }
 
   /** @inheritdoc */
@@ -193,18 +154,27 @@ export class Money implements MoneyContract {
     return this.#minorUnits < 0;
   }
 
+  /** @inheritdoc */
+  isInteger(): boolean {
+  return this.#minorUnits % this.#scaleFactor === 0;
+}
+
   // #endregion
 
   // #region Arithmetic
 
   /** @inheritdoc */
-  plus(input: MoneyInput): MoneyContract {
-    return this.#make(this.#minorUnits + this.#resolve(input));
+  plus(other: MoneyContract): MoneyContract {
+    this.#assertSameCurrency(other);
+
+    return this.#make(this.#minorUnits + other.minorUnits());
   }
 
   /** @inheritdoc */
-  minus(input: MoneyInput): MoneyContract {
-    return this.#make(this.#minorUnits - this.#resolve(input));
+  minus(other: MoneyContract): MoneyContract {
+     this.#assertSameCurrency(other);
+
+    return this.#make(this.#minorUnits - other.minorUnits());
   }
 
   /** @inheritdoc */
@@ -251,15 +221,17 @@ export class Money implements MoneyContract {
   }
 
   /** @inheritdoc */
-  max(input: MoneyInput): MoneyContract {
-    const other = this.#resolve(input);
-    return this.#minorUnits >= other ? this.#copy() : this.#make(other);
+  max(other: MoneyContract): MoneyContract {
+    this.#assertSameCurrency(other);
+
+    return this.#minorUnits >= other.minorUnits() ? this.#copy() : this.#make(other.minorUnits());
   }
 
   /** @inheritdoc */
-  min(input: MoneyInput): MoneyContract {
-    const other = this.#resolve(input);
-    return this.#minorUnits <= other ? this.#copy() : this.#make(other);
+  min(other: MoneyContract): MoneyContract {
+     this.#assertSameCurrency(other);
+
+    return this.#minorUnits <= other.minorUnits() ? this.#copy() : this.#make(other.minorUnits());
   }
 
   /** @inheritdoc */
@@ -287,12 +259,23 @@ export class Money implements MoneyContract {
     );
   }
 
+  clamp(min: MoneyContract, max: MoneyContract): MoneyContract {
+  this.#assertSameCurrency(min);
+  this.#assertSameCurrency(max);
+
+  if (min.minorUnits() > max.minorUnits()) throw new InvalidRangeError();
+
+  return this.#make(
+    Math.min(Math.max(this.#minorUnits, min.minorUnits()), max.minorUnits()),
+  );
+}
+
   // #endregion
 
   // #region Comparison
 
   /** @inheritdoc */
-  equals(input: MoneyInput): boolean {
+  equals(input: MoneyContract): boolean {
     if (isMoney(input)) {
       return (
         input.currencyCode() === this.#currency.code && this.#minorUnits === input.minorUnits()
@@ -303,50 +286,54 @@ export class Money implements MoneyContract {
   }
 
   /** @inheritdoc */
-  compare(other: MoneyInput): MoneyComparison {
-    const otherMinorUnits = this.#resolve(other);
+  compare(other: MoneyContract): MoneyComparison {
+     this.#assertSameCurrency(other);
 
-    if (this.#minorUnits < otherMinorUnits) return -1;
-    if (this.#minorUnits > otherMinorUnits) return 1;
+    if (this.#minorUnits < other.minorUnits()) return -1;
+    if (this.#minorUnits > other.minorUnits()) return 1;
 
     return 0;
   }
 
   /** @inheritdoc */
-  greaterThan(input: MoneyInput): boolean {
-    return this.#minorUnits > this.#resolve(input);
+  greaterThan(other: MoneyContract): boolean {
+    this.#assertSameCurrency(other);
+    return this.#minorUnits > other.minorUnits();
   }
 
   /** @inheritdoc */
-  lessThan(input: MoneyInput): boolean {
-    return this.#minorUnits < this.#resolve(input);
+  lessThan(other: MoneyContract): boolean {
+    this.#assertSameCurrency(other);
+    return this.#minorUnits < other.minorUnits();
   }
 
   /** @inheritdoc */
-  greaterThanOrEqual(input: MoneyInput): boolean {
-    return this.#minorUnits >= this.#resolve(input);
+  greaterThanOrEqual(other: MoneyContract): boolean {
+    this.#assertSameCurrency(other);
+    return this.#minorUnits >= other.minorUnits();
   }
 
   /** @inheritdoc */
-  lessThanOrEqual(input: MoneyInput): boolean {
-    return this.#minorUnits <= this.#resolve(input);
+  lessThanOrEqual(other: MoneyContract): boolean {
+    this.#assertSameCurrency(other);
+    return this.#minorUnits <= other.minorUnits();
   }
 
   /** @inheritdoc */
-  isBetween(min: MoneyInput, max: MoneyInput): boolean {
-    const minAmount = this.#resolve(min);
-    const maxAmount = this.#resolve(max);
+  isBetween(min: MoneyContract, max: MoneyContract): boolean {
+   this.#assertSameCurrency(min);
+   this.#assertSameCurrency(max);
 
-    if (minAmount > maxAmount) throw new InvalidRangeError();
+    if (min.minorUnits() > max.minorUnits()) throw new InvalidRangeError();
 
-    return this.#minorUnits >= minAmount && this.#minorUnits <= maxAmount;
+    return this.#minorUnits >= min.minorUnits() && this.#minorUnits <= max.minorUnits();
   }
 
   /** @inheritdoc */
-  hasSameCurrency(input: MoneyContract): boolean {
-    if (!isMoney(input)) return false;
+  hasSameCurrency(other: MoneyContract): boolean {
+    if (!isMoney(other)) return false;
 
-    return this.#currency.code === input.currencyCode();
+    return this.#currency.code === other.currencyCode();
   }
 
   // #endregion
