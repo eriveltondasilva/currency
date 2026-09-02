@@ -6,7 +6,7 @@ export type {
   MoneyJSON,
   MoneyParts,
   PricedItem,
-  RoundingMode
+  RoundingMode,
 } from './types';
 
 // ─── Errors ──────────────────────────────────────────────────────────────────
@@ -20,17 +20,19 @@ export {
   InvalidRangeError,
   MoneyError,
   UnsafeIntegerError,
-  UnsupportedCurrencyError
+  UnsupportedCurrencyError,
 } from './lib/errors';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export {
-  from, fromMinorUnits as fromCents,
-  fromMinorUnits as fromInt, fromMinorUnits, parse as fromString, from as money, parse,
-  zero
+  from,
+  fromMinorUnits as fromCents,
+  fromMinorUnits as fromInt,
+  fromMinorUnits,
+  parse as fromString,
+  from as money,
+  parse,
+  zero,
 } from './api/creation';
-export {
-  isMoney
-} from './lib/utils';
-
+export { isMoney } from './lib/utils';

@@ -1,15 +1,15 @@
-import type { MoneyContract } from "@/types";
+import type { MoneyContract } from '@/types';
+import { InvalidInputError } from './errors';
 
-export const TAG = Symbol('@eriveltondasilva/currency');
+/** @internal */
+export const TAG = Symbol.for('@eriveltondasilva/currency');
 
 /**
  * Returns `true` if `value` is a non-null, non-array plain object.
  *
- * Used internally to validate structured inputs such as {@link PricedItem}
- * before destructuring their properties.
+ * @internal
  *
- * @param value — Any value to test.
- * @returns `true` when `value` is a plain object record.
+ * @param value {unknown} - Any value to test.
  *
  * @example
  * isRecord({ price: 10 }) // => true
@@ -23,11 +23,9 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 /**
  * Returns `true` if `value` is a `MoneyContract` instance.
  *
- * Use this as a type guard to distinguish `MoneyContract` from plain `number`
- * when handling {@link MoneyInput}.
+ * @internal
  *
- * @param value — Any value to test.
- * @returns `true` when `value` is an instance of `Money`.
+ * @param value {unknown} - Any value to test.
  *
  * @example
  * isMoney(from(10, 'BR')) // => true
@@ -36,4 +34,43 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
  */
 export function isMoney(value: unknown): value is MoneyContract {
   return isRecord(value) && TAG in value;
+}
+
+/**
+ *
+ * @internal
+ *
+ * @param value {unknown} - Any value to test.
+ */
+export function hasNoItems(value: unknown): value is [] {
+  return !Array.isArray(value) || value.length === 0;
+}
+
+export function resolveMinorUnits(value: MoneyInput, currency: Currency, context: string): number {
+  if (value == null) {
+    throw new InvalidInputError(`${context} — value cannot be null or undefined.`, {
+      input: value,
+    });
+  }
+
+  if (isMoney(value)) {
+    if (value.currencyCode() !== currency.code)
+      throw new CurrencyMismatchError(currency.code, value.currencyCode());
+
+    return value.minorUnits();
+  }
+
+  if (typeof value !== 'number') {
+    throw new InvalidInputError(`${context} — expected a number or MoneyContract.`, {
+      input: value,
+    });
+  }
+
+  try {
+    return numberToMinorUnit(value, currency.fractionDigits);
+  } catch (cause) {
+    if (cause instanceof MoneyError) throw cause;
+    /* v8 ignore next -- @preserve */
+    throw new InvalidInputError(`${context} — invalid value.`, { input: value, cause });
+  }
 }

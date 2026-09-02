@@ -1,0 +1,5 @@
+{
+  "out": "./docs/typedoc-api",
+  "docsRoot": "./docs",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"]
+}

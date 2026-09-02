@@ -1,27 +1,9 @@
 import { UnsupportedCurrencyError } from './errors';
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 interface CurrencyDef {
   name: string;
   fractionDigits: number;
 }
-
-interface CountryDef {
-  name: string;
-  currency: CurrencyCode;
-  locale: string;
-  decimal: string;
-}
-
-export interface Currency {
-  code: CurrencyCode;
-  fractionDigits: number;
-  locale: string;
-  decimal: string;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 const CURRENCY_DEFS = {
   AED: { name: 'UAE Dirham', fractionDigits: 2 },
@@ -47,51 +29,66 @@ const CURRENCY_DEFS = {
   SGD: { name: 'Singapore Dollar', fractionDigits: 2 },
   USD: { name: 'US Dollar', fractionDigits: 2 },
   ZAR: { name: 'South African Rand', fractionDigits: 2 },
-} as const satisfies Record<string, CurrencyDef>;
+} as const satisfies Record<Uppercase<string>, CurrencyDef>;
 
 export type CurrencyCode = keyof typeof CURRENCY_DEFS;
 
+interface CountryDef {
+  name: string;
+  currencyCode: CurrencyCode;
+  locale: string;
+  decimal: string;
+}
+
 const COUNTRY_DEFS = {
-  AE: { name: 'United Arab Emirates', locale: 'ar-AE', currency: 'AED', decimal: '.' },
-  AR: { name: 'Argentina', locale: 'es-AR', currency: 'ARS', decimal: ',' },
-  AU: { name: 'Australia', locale: 'en-AU', currency: 'AUD', decimal: '.' },
-  BR: { name: 'Brazil', locale: 'pt-BR', currency: 'BRL', decimal: ',' },
-  CA: { name: 'Canada', locale: 'en-CA', currency: 'CAD', decimal: '.' },
-  CH: { name: 'Switzerland', locale: 'de-CH', currency: 'CHF', decimal: '.' },
-  CL: { name: 'Chile', locale: 'es-CL', currency: 'CLP', decimal: ',' },
-  CN: { name: 'China', locale: 'zh-CN', currency: 'CNY', decimal: '.' },
-  CO: { name: 'Colombia', locale: 'es-CO', currency: 'COP', decimal: ',' },
-  DE: { name: 'Germany', locale: 'de-DE', currency: 'EUR', decimal: ',' },
-  FR: { name: 'France', locale: 'fr-FR', currency: 'EUR', decimal: ',' },
-  GB: { name: 'United Kingdom', locale: 'en-GB', currency: 'GBP', decimal: '.' },
-  IN: { name: 'India', locale: 'en-IN', currency: 'INR', decimal: '.' },
-  JP: { name: 'Japan', locale: 'ja-JP', currency: 'JPY', decimal: '.' },
-  KR: { name: 'South Korea', locale: 'ko-KR', currency: 'KRW', decimal: '.' },
-  MX: { name: 'Mexico', locale: 'es-MX', currency: 'MXN', decimal: '.' },
-  NO: { name: 'Norway', locale: 'nb-NO', currency: 'NOK', decimal: ',' },
-  NZ: { name: 'New Zealand', locale: 'en-NZ', currency: 'NZD', decimal: '.' },
-  PT: { name: 'Portugal', locale: 'pt-PT', currency: 'EUR', decimal: ',' },
-  RU: { name: 'Russia', locale: 'ru-RU', currency: 'RUB', decimal: ',' },
-  SA: { name: 'Saudi Arabia', locale: 'ar-SA', currency: 'SAR', decimal: '.' },
-  SE: { name: 'Sweden', locale: 'sv-SE', currency: 'SEK', decimal: ',' },
-  SG: { name: 'Singapore', locale: 'en-SG', currency: 'SGD', decimal: '.' },
-  US: { name: 'United States', locale: 'en-US', currency: 'USD', decimal: '.' },
-  ZA: { name: 'South Africa', locale: 'en-ZA', currency: 'ZAR', decimal: '.' },
-} as const satisfies Record<string, CountryDef>;
+  AE: { name: 'United Arab Emirates', locale: 'ar-AE', currencyCode: 'AED', decimal: '.' },
+  AR: { name: 'Argentina', locale: 'es-AR', currencyCode: 'ARS', decimal: ',' },
+  AU: { name: 'Australia', locale: 'en-AU', currencyCode: 'AUD', decimal: '.' },
+  BR: { name: 'Brazil', locale: 'pt-BR', currencyCode: 'BRL', decimal: ',' },
+  CA: { name: 'Canada', locale: 'en-CA', currencyCode: 'CAD', decimal: '.' },
+  CH: { name: 'Switzerland', locale: 'de-CH', currencyCode: 'CHF', decimal: '.' },
+  CL: { name: 'Chile', locale: 'es-CL', currencyCode: 'CLP', decimal: ',' },
+  CN: { name: 'China', locale: 'zh-CN', currencyCode: 'CNY', decimal: '.' },
+  CO: { name: 'Colombia', locale: 'es-CO', currencyCode: 'COP', decimal: ',' },
+  DE: { name: 'Germany', locale: 'de-DE', currencyCode: 'EUR', decimal: ',' },
+  FR: { name: 'France', locale: 'fr-FR', currencyCode: 'EUR', decimal: ',' },
+  GB: { name: 'United Kingdom', locale: 'en-GB', currencyCode: 'GBP', decimal: '.' },
+  IN: { name: 'India', locale: 'en-IN', currencyCode: 'INR', decimal: '.' },
+  JP: { name: 'Japan', locale: 'ja-JP', currencyCode: 'JPY', decimal: '.' },
+  KR: { name: 'South Korea', locale: 'ko-KR', currencyCode: 'KRW', decimal: '.' },
+  MX: { name: 'Mexico', locale: 'es-MX', currencyCode: 'MXN', decimal: '.' },
+  NO: { name: 'Norway', locale: 'nb-NO', currencyCode: 'NOK', decimal: ',' },
+  NZ: { name: 'New Zealand', locale: 'en-NZ', currencyCode: 'NZD', decimal: '.' },
+  PT: { name: 'Portugal', locale: 'pt-PT', currencyCode: 'EUR', decimal: ',' },
+  RU: { name: 'Russia', locale: 'ru-RU', currencyCode: 'RUB', decimal: ',' },
+  SA: { name: 'Saudi Arabia', locale: 'ar-SA', currencyCode: 'SAR', decimal: '.' },
+  SE: { name: 'Sweden', locale: 'sv-SE', currencyCode: 'SEK', decimal: ',' },
+  SG: { name: 'Singapore', locale: 'en-SG', currencyCode: 'SGD', decimal: '.' },
+  US: { name: 'United States', locale: 'en-US', currencyCode: 'USD', decimal: '.' },
+  ZA: { name: 'South Africa', locale: 'en-ZA', currencyCode: 'ZAR', decimal: '.' },
+} as const satisfies Record<Uppercase<string>, CountryDef>;
 
 export type CountryCode = keyof typeof COUNTRY_DEFS;
 
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const SUPPORTED_CODES = Object.keys(COUNTRY_DEFS).join(', ');
 
+export interface Currency {
+  currencyCode: CurrencyCode;
+  locale: string;
+  decimal: string;
+  fractionDigits: number;
+  scaleFactor: number;
+}
+
 export function resolveCurrency(country: CountryCode): Currency {
-  const countryDef = COUNTRY_DEFS[country];
+  const countryDef = COUNTRY_DEFS[country.toUpperCase() as CountryCode];
 
-  if (!countryDef) throw new UnsupportedCurrencyError(country, SUPPORTED_CODES);
+  if (!countryDef) {
+    throw new UnsupportedCurrencyError(country, SUPPORTED_CODES);
+  }
 
-  const { locale, currency, decimal } = countryDef;
-  const { fractionDigits } = CURRENCY_DEFS[currency];
+  const { currencyCode, locale, decimal } = countryDef;
+  const { fractionDigits } = CURRENCY_DEFS[currencyCode];
 
-  return { locale, code: currency, decimal, fractionDigits };
+  return { currencyCode, locale, decimal, fractionDigits, scaleFactor: 10 ** fractionDigits };
 }

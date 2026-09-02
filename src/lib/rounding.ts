@@ -1,6 +1,6 @@
 import type { RoundingMode } from '@/types';
 
-type RoundFunction = (value: number) => number;
+export type RoundFunction = (value: number) => number;
 
 // ─────────────────────────────────────────────────────────────────────────────
 

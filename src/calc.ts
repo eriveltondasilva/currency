@@ -1,12 +1,11 @@
 export {
   clamp,
-  percent
+  percent,
 } from './api/arithmetic';
 export { total } from './api/business';
 export {
   average,
   max,
   min,
-  sum
+  sum,
 } from './api/collection';
-

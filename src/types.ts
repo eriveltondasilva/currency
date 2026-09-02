@@ -307,7 +307,7 @@ export interface MoneyContract {
    * from(10.01, 'BR').isInteger()
    * // => false
    */
-  isInteger(): boolean
+  isInteger(): boolean;
 
   // #endregion
 
@@ -425,7 +425,7 @@ export interface MoneyContract {
    * denominations (e.g. rounding to the nearest $0.05 or $1.00).
    *
    * @param step {number} - Positive number in major units specifying the rounding step.
-   * @param mode {RoundingMode} - Rounding strategy. Defaults to `'halfExpand'`.
+   * @param roundingMode {RoundingMode} - Rounding strategy. Defaults to `'halfExpand'`.
    *
    * @example
    * from(1.03, 'BR').round(0.05).amount()
@@ -440,7 +440,7 @@ export interface MoneyContract {
    * from(1499, 'BR').round(500).amount()
    * // => 1500  (nearest R$ 500)
    */
-  round(step: number, mode?: RoundingMode): MoneyContract;
+  round(step: number, roundingMode?: RoundingMode): MoneyContract;
 
   /**
    * Returns a new instance with the amount clamped between `min` and `max`.
