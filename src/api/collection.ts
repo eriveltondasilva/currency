@@ -1,150 +1,125 @@
-import type { CountryCode } from '@/lib/currencies';
-import type { MoneyContract, MoneyInput, RoundingMode } from '@/types';
+import type { MoneyContract, RoundingMode } from '@/types';
 
-import { hasNoItems, resolveMinorUnits } from './_shared';
-import { zero } from './creation';
-
-import { resolveCurrency } from '@/lib/currencies';
 import { InvalidInputError } from '@/lib/errors';
-import { Money } from '@/lib/money';
-import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from '@/lib/rounding';
-
-// ─────────────────────────────────────────────────────────────────────────────
+import { DEFAULT_ROUNDING_MODE } from '@/lib/rounding';
+import { hasNoItems, isMoney } from '@/lib/utils';
 
 /**
- * Sums an array of monetary values.
+ * Sums an array of `MoneyContract` values.
  *
- * Returns `zero(country)` when `values` is empty.
- * All values must share the same currency as `country` — passing a
- * `MoneyContract` with a different currency throws `CurrencyMismatchError`.
+ * All items must share the same `currencyCode` — passing a mismatched
+ * currency throws `CurrencyMismatchError`.
  *
- * @param values - Array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country - Supported country code that defines the output currency.
+ * @param values - Non-empty array of `MoneyContract` instances, all in the same currency.
  *
  * @returns A new `MoneyContract` with the total sum.
  *
- * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
- * @throws `UnsafeIntegerError` - when the accumulated sum exceeds `Number.MAX_SAFE_INTEGER`.
+ * @throws `InvalidInputError` - when `values` is empty or contains a non-`MoneyContract` item.
+ * @throws `CurrencyMismatchError` - when any item has a different `currencyCode`.
  *
  * @example
- * sum([10, 20.50, 5], 'BR').format() // => 'R$ 35,50'
- * sum([], 'US').isZero()             // => true
+ * sum([from(10, 'BR'), from(20.50, 'BR'), from(5, 'BR')]).format() // => 'R$ 35,50'
  */
-export function sum(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (hasNoItems(values)) return zero(country);
+export function sum(values: MoneyContract[]): MoneyContract {
+  if (hasNoItems(values) || !values.every(isMoney)) {
+    throw new InvalidInputError('sum(): expected a non-empty array of Money.', {
+      input: values,
+    });
+  }
 
-  const currency = resolveCurrency(country);
+  const [firstValue, ...rest] = values;
 
-  const amount = values.reduce<number>((acc, value) => {
-    return acc + resolveMinorUnits(value, currency, 'sum()');
-  }, 0);
-
-  return Money.fromMinorUnits(amount, currency);
+  return rest.reduce<MoneyContract>((acc, value) => acc.plus(value), firstValue as MoneyContract);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Computes the arithmetic mean of an array of monetary values.
+ * Computes the arithmetic mean of an array of `MoneyContract` values.
  *
- * The result is rounded to the nearest minor unit using `'halfExpand'`.
- * Returns `zero(country)` when `values` is empty.
+ * The result is rounded to the nearest minor unit using `roundingMode`.
+ * All items must share the same `currencyCode`.
  *
- * @param values - Array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country - Supported country code that defines the output currency.
+ * @param values - Non-empty array of `MoneyContract` instances, all in the same currency.
+ * @param roundingMode - Rounding strategy applied to the result. Defaults to `'halfExpand'`.
  *
  * @returns A new `MoneyContract` with the average amount.
  *
- * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `values` is empty or contains a non-`MoneyContract` item.
+ * @throws `CurrencyMismatchError` - when any item has a different `currencyCode`.
  *
  * @example
- * average([10, 20, 30], 'US').amount() // => 20
- * average([1, 2], 'BR').amount()       // => 1.5
+ * average([from(10, 'US'), from(20, 'US'), from(30, 'US')]).amount() // => 20
  */
 export function average(
-  values: MoneyInput[],
-  country: CountryCode,
+  values: MoneyContract[],
   roundingMode: RoundingMode = DEFAULT_ROUNDING_MODE,
 ): MoneyContract {
-  if (hasNoItems(values)) return zero(country);
+  if (hasNoItems(values) || !values.every(isMoney)) {
+    throw new InvalidInputError('average(): expected a non-empty array of MoneyContract.', {
+      input: values,
+    });
+  }
 
-  const currency = resolveCurrency(country);
+  const [firstValue, ...rest] = values;
+  const total = rest.reduce<MoneyContract>(
+    (acc, value) => acc.plus(value),
+    firstValue as MoneyContract,
+  );
 
-  const amount = values.reduce<number>((acc, value) => {
-    return acc + resolveMinorUnits(value, currency, 'sum()');
-  }, 0);
-
-  return Money.fromMinorUnits(ROUND_FUNCTIONS[roundingMode](amount / values.length), currency);
+  return total.divide(values.length, roundingMode);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Returns the largest value in an array of monetary values.
+ * Returns the largest value in an array of `MoneyContract` values.
  *
- * Unlike {@link sum} and {@link average}, `max` requires at least one element.
+ * @param values - Non-empty array of `MoneyContract` instances, all in the same currency.
  *
- * @param values - Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country - Supported country code that defines the output currency.
+ * @returns The `MoneyContract` instance with the highest amount.
  *
- * @returns A new `MoneyContract` representing the maximum amount.
- *
- * @throws `InvalidInputError` - when `values` is empty.
- * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `values` is empty or contains a non-`MoneyContract` item.
+ * @throws `CurrencyMismatchError` - when any item has a different `currencyCode`.
  *
  * @example
- * max([5, 30, 10], 'US').amount() // => 30
+ * max([from(5, 'US'), from(30, 'US'), from(10, 'US')]).amount() // => 30
  */
-export function max(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (hasNoItems(values)) {
-    throw new InvalidInputError('max(): array must have at least one element.', { input: values });
+export function max(values: MoneyContract[]): MoneyContract {
+  if (hasNoItems(values) || !values.every(isMoney)) {
+    throw new InvalidInputError('max(): expected a non-empty array of MoneyContract.', {
+      input: values,
+    });
   }
 
-  const currency = resolveCurrency(country);
-  let amount = resolveMinorUnits(values[0] as MoneyInput, currency, 'max(): index 0');
+  const [firstValue, ...rest] = values;
 
-  for (let i = 1; i < values.length; i++) {
-    const current = resolveMinorUnits(values[i] as MoneyInput, currency, `max(): index ${i}`);
-    if (current > amount) amount = current;
-  }
-
-  return Money.fromMinorUnits(amount, currency);
+  return rest.reduce<MoneyContract>((acc, value) => acc.max(value), firstValue as MoneyContract);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Returns the smallest value in an array of monetary values.
+ * Returns the smallest value in an array of `MoneyContract` values.
  *
- * Unlike {@link sum} and {@link average}, `min` requires at least one element.
+ * @param values - Non-empty array of `MoneyContract` instances, all in the same currency.
  *
- * @param values - Non-empty array of amounts as numbers (major units) or `MoneyContract` instances.
- * @param country - Supported country code that defines the output currency.
+ * @returns The `MoneyContract` instance with the lowest amount.
  *
- * @returns A new `MoneyContract` representing the minimum amount.
- *
- * @throws `InvalidInputError` - when `values` is empty.
- * @throws `CurrencyMismatchError` - when any `MoneyContract` in `values` has a different currency.
- * @throws `UnsupportedCurrencyError` - when `country` is not a supported code.
+ * @throws `InvalidInputError` - when `values` is empty or contains a non-`MoneyContract` item.
+ * @throws `CurrencyMismatchError` - when any item has a different `currencyCode`.
  *
  * @example
- * min([5, 30, 10], 'US').amount() // => 5
+ * min([from(5, 'US'), from(30, 'US'), from(10, 'US')]).amount() // => 5
  */
-export function min(values: MoneyInput[], country: CountryCode): MoneyContract {
-  if (hasNoItems(values)) {
-    throw new InvalidInputError('min(): array must have at least one element.', { input: values });
+export function min(values: MoneyContract[]): MoneyContract {
+  if (hasNoItems(values) || !values.every(isMoney)) {
+    throw new InvalidInputError('min(): expected a non-empty array of MoneyContract.', {
+      input: values,
+    });
   }
 
-  const currency = resolveCurrency(country);
-  let amount = resolveMinorUnits(values[0] as MoneyInput, currency, 'min(): index 0');
+  const [firstValue, ...rest] = values;
 
-  for (let i = 1; i < values.length; i++) {
-    const current = resolveMinorUnits(values[i] as MoneyInput, currency, `min(): index ${i}`);
-    if (current < amount) amount = current;
-  }
-
-  return Money.fromMinorUnits(amount, currency);
+  return rest.reduce<MoneyContract>((acc, value) => acc.min(value), firstValue as MoneyContract);
 }
