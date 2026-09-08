@@ -108,7 +108,7 @@ export function numberToMinorUnit(input: number, fractionDigits: number): number
  * @internal
  *
  * @example
- * "19.99" with fractionDigits = 2 → 1999
+ * "$19.99" with fractionDigits = 2 → 1999
  */
 export function stringToMinorUnit(input: string, decimal: string, fractionDigits: number): number {
   const parsed = Number.parseFloat(parseNumericString(input, decimal));
