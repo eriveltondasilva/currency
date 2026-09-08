@@ -7,6 +7,7 @@ import type {
   RoundingMode,
 } from '@/types';
 import type { Currency, CurrencyCode } from './currencies';
+import type { RoundFunction } from './rounding';
 
 import {
   CurrencyMismatchError,
@@ -19,9 +20,7 @@ import {
 } from './errors';
 import { formatMoney } from './format';
 import { DEFAULT_ROUNDING_MODE, ROUND_FUNCTIONS } from './rounding';
-import { TAG, isMoney } from './utils';
-
-import type { RoundFunction } from './rounding';
+import { isMoney, TAG } from './utils';
 
 // ─────────────────────────────────────────────────────────────────────────────
 
