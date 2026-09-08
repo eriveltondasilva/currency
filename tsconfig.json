@@ -14,5 +14,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts", "benchmarks/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*", "benchmarks/**/*", "tests/**/*"]
 }
