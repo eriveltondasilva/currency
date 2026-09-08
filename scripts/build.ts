@@ -1,7 +1,8 @@
+// biome-ignore-all: build ignore
+
 import { $ } from 'bun';
-import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
-import pkg from '../package.json' with { type: 'json' };
+
+import pkg from '../package.json';
 
 const { name, description, version, author, license, homepage } = pkg;
 const year = new Date().getFullYear();
@@ -19,39 +20,36 @@ const banner = `/**
  * Inspired by currency.js — {@link https://github.com/scurker/currency.js}
  */`;
 
-console.log('🧹 Cleaning dist folder...');
-await $`rm -rf dist`;
+async function main() {
+  console.info('\n🧹 Cleaning dist folder...');
+  await $`rm -rf dist`;
 
-console.log('📦 Building JavaScript with Bun...');
-const buildResult = await Bun.build({
-  entrypoints: ['./src/index.ts', './src/presets.ts', './src/calc.ts'],
-  outdir: './dist',
-  format: 'esm',
-  target: 'node',
-  minify: isProduction,
-  splitting: true,
-  banner,
-});
+  console.info('\n📦 Building JavaScript with Bun...');
+  const buildResult = await Bun.build({
+    entrypoints: ['./src/index.ts', './src/presets.ts', './src/collection.ts'],
+    outdir: './dist',
+    format: 'esm',
+    target: 'node',
+    minify: isProduction,
+    splitting: true,
+    banner,
+  });
 
-if (!buildResult.success) {
+  if (!buildResult.success) {
+    throw new Error(
+      `JavaScript bundling failed:\n${buildResult.logs.map(String).join('\n')}`,
+    );
+  }
+
+  console.info('🏷️  Generating TypeScript definitions...');
+  await $`tsc -p tsconfig.build.json`;
+
+  console.info('\n✅ Build complete!');
+}
+
+main().catch((error) => {
   console.error('❌ Build failed:');
-  for (const message of buildResult.logs) {
-    console.error(message);
-  }
+  console.error(Error.isError(error) ? error.message : error);
+
   process.exit(1);
-}
-
-console.log('🏷️  Generating TypeScript definitions...');
-await $`tsc -p tsconfig.build.json`;
-
-console.log('📝 Adding banners to D.TS files...');
-const files = await readdir('./dist');
-for (const file of files) {
-  if (file.endsWith('.d.ts')) {
-    const filePath = join('./dist', file);
-    const content = await Bun.file(filePath).text();
-    await Bun.write(filePath, `${banner}\n${content}`);
-  }
-}
-
-console.log('✅ Build complete!');
+});
