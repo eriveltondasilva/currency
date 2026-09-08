@@ -27,11 +27,11 @@ export {
 
 export {
   from,
+  from as money,
   fromMinorUnits as fromCents,
   fromMinorUnits as fromInt,
   fromMinorUnits,
   parse as fromString,
-  from as money,
   parse,
   zero,
 } from './api/creation';
